@@ -161,7 +161,7 @@ export default function AdminUsersPage() {
               fetchList();
             }}
           >
-            Reset
+            Reset Filter
           </Button>
         </div>
       </div>
@@ -171,10 +171,10 @@ export default function AdminUsersPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[30%]">
-                <SortHeader  field="nama"><p className="font-bold">Nama</p></SortHeader>
+                <SortHeader  field="nama"><p className="font-bold cursor-pointer">Nama</p></SortHeader>
               </TableHead>
               <TableHead className="w-[30%]">
-                <SortHeader field="email"><p className="font-bold">Email</p></SortHeader>
+                <SortHeader field="email"><p className="font-bold cursor-pointer">Email</p></SortHeader>
               </TableHead>
               <TableHead className="w-[20%]"><p className="font-bold">Role</p></TableHead>
               <TableHead className="w-[20%]"><p className="font-bold">Action</p></TableHead>
