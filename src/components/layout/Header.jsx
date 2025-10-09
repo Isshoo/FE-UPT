@@ -56,7 +56,7 @@ export default function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           {menuItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive = pathname.includes(item.href);
             return (
               <Link
                 key={item.href}
