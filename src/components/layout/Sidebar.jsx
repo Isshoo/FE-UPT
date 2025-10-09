@@ -110,7 +110,7 @@ export default function Sidebar() {
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-[#174c4e] text-white">
-                        {getInitials(user?.name || 'User')}
+                        {getInitials(user?.nama || 'User')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="hidden flex-col items-start text-sm lg:flex">
@@ -182,7 +182,7 @@ export default function Sidebar() {
             <Button variant="ghost" size="icon">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-[#174c4e] text-white">
-                  {getInitials(user?.name || 'User')}
+                  {getInitials(user?.nama || 'User')}
                 </AvatarFallback>
               </Avatar>
             </Button>
