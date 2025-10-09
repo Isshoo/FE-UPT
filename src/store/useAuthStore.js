@@ -16,11 +16,14 @@ export const useAuthStore = create(
       login: async (credentials) => {
         set({ isLoading: true, error: null });
         try {
-          const { data } = await authAPI.login(credentials);
-          localStorage.setItem('token', data.token);
+          const response = await authAPI.login(credentials);
+          const { user, token } = response.data;
+
+          localStorage.setItem('token', token);
+
           set({
-            user: data.user,
-            token: data.token,
+            user,
+            token,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -36,11 +39,14 @@ export const useAuthStore = create(
       register: async (userData) => {
         set({ isLoading: true, error: null });
         try {
-          const { data } = await authAPI.register(userData);
-          localStorage.setItem('token', data.token);
+          const response = await authAPI.register(userData);
+          const { user, token } = response.data;
+
+          localStorage.setItem('token', token);
+
           set({
-            user: data.user,
-            token: data.token,
+            user,
+            token,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -61,7 +67,6 @@ export const useAuthStore = create(
           console.error('Logout error:', error);
         } finally {
           localStorage.removeItem('token');
-          localStorage.removeItem('user');
           set({
             user: null,
             token: null,
@@ -73,17 +78,33 @@ export const useAuthStore = create(
 
       // Get current user
       getCurrentUser: async () => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          return;
+        }
+
         set({ isLoading: true });
         try {
-          const { data } = await authAPI.getCurrentUser();
+          const response = await authAPI.getCurrentUser();
+          const { user } = response.data;
+
           set({
-            user: data.user,
+            user,
+            token,
             isAuthenticated: true,
             isLoading: false,
           });
         } catch (error) {
+          localStorage.removeItem('token');
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
             isLoading: false,
           });
@@ -96,9 +117,7 @@ export const useAuthStore = create(
     {
       name: 'auth-storage',
       partialize: (state) => ({
-        user: state.user,
         token: state.token,
-        isAuthenticated: state.isAuthenticated,
       }),
     }
   )
