@@ -1,16 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide-react';
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Facebook,
+  Instagram,
+  Twitter,
+} from 'lucide-react';
 import { APP_NAME, ROUTES } from '@/lib/constants';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#174c4e] text-white mt-auto">
+    <footer className="mt-auto bg-[#174c4e] text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* About Section */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-[#fba635]">{APP_NAME}</h3>
@@ -27,7 +34,7 @@ export default function Footer() {
               <li>
                 <Link
                   href={ROUTES.HOME}
-                  className="text-sm text-gray-300 hover:text-[#fba635] transition-colors"
+                  className="text-sm text-gray-300 transition-colors hover:text-[#fba635]"
                 >
                   Beranda
                 </Link>
@@ -35,7 +42,7 @@ export default function Footer() {
               <li>
                 <Link
                   href={ROUTES.USER_MARKETPLACE}
-                  className="text-sm text-gray-300 hover:text-[#fba635] transition-colors"
+                  className="text-sm text-gray-300 transition-colors hover:text-[#fba635]"
                 >
                   Marketplace
                 </Link>
@@ -43,7 +50,7 @@ export default function Footer() {
               <li>
                 <Link
                   href={ROUTES.USER_UMKM}
-                  className="text-sm text-gray-300 hover:text-[#fba635] transition-colors"
+                  className="text-sm text-gray-300 transition-colors hover:text-[#fba635]"
                 >
                   UMKM Binaan
                 </Link>
@@ -51,7 +58,7 @@ export default function Footer() {
               <li>
                 <Link
                   href={ROUTES.ABOUT}
-                  className="text-sm text-gray-300 hover:text-[#fba635] transition-colors"
+                  className="text-sm text-gray-300 transition-colors hover:text-[#fba635]"
                 >
                   About
                 </Link>
@@ -65,7 +72,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-gray-300">
                 <MapPin className="h-5 w-5 flex-shrink-0 text-[#fba635]" />
-                <span>Jl. Kampus UNSRAT, Bahu, Manado</span>
+                <span>Jl. Kampus De La Salle, Kombos, Manado</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-gray-300">
                 <Phone className="h-5 w-5 text-[#fba635]" />
@@ -84,21 +91,21 @@ export default function Footer() {
             <div className="flex gap-4">
               <a
                 href="#"
-                className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#fba635] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-[#fba635]"
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#fba635] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-[#fba635]"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#fba635] transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-[#fba635]"
                 aria-label="Twitter"
               >
                 <Twitter className="h-5 w-5" />

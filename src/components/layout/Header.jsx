@@ -25,6 +25,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isDosen = user?.role === ROLES.DOSEN;
+  const isAdmin = user?.role === ROLES.ADMIN;
 
   const menuItems = [
     { title: 'Beranda', href: ROUTES.HOME },
@@ -45,7 +46,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 dark:border-gray-800">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center">
@@ -53,7 +54,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden items-center gap-6 md:flex">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -90,14 +91,14 @@ export default function Header() {
           </Button>
 
           {/* Notifications (if authenticated) */}
-          {isAuthenticated && (
+          {isAuthenticated && !isAdmin && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   <Badge
                     variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                    className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
                   >
                     3
                   </Badge>
@@ -105,7 +106,7 @@ export default function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-80">
                 <div className="p-2 text-sm font-semibold">Notifikasi</div>
-                <DropdownMenuItem className="p-3 cursor-pointer">
+                <DropdownMenuItem className="cursor-pointer p-3">
                   <div className="flex flex-col gap-1">
                     <p className="text-sm font-medium">Event Baru Dibuka</p>
                     <p className="text-xs text-gray-500">
@@ -119,7 +120,7 @@ export default function Header() {
 
           {/* Auth Buttons */}
           {!isAuthenticated ? (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden items-center gap-2 md:flex">
               <Button variant="ghost" asChild>
                 <Link href={ROUTES.LOGIN}>Login</Link>
               </Button>
@@ -128,36 +129,44 @@ export default function Header() {
               </Button>
             </div>
           ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hidden md:flex gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-[#174c4e] text-white text-sm">
-                      {getInitials(user?.name || 'User')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium">{user?.name}</span>
+            <>
+              {!isAdmin ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="hidden gap-2 md:flex">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-[#174c4e] text-sm text-white">
+                          {getInitials(user?.name || 'User')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">{user?.name}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={ROUTES.USER_PROFILE}
+                        className="flex cursor-pointer items-center"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Profil
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer !text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
+                  <Link href={ROUTES.ADMIN_DASHBOARD}>Admin Panel</Link>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={ROUTES.USER_PROFILE}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Profil
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-red-600 cursor-pointer"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              )}
+            </>
           )}
 
           {/* Mobile Menu Button */}
@@ -174,20 +183,20 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t dark:border-gray-800">
+        <div className="border-t md:hidden dark:border-gray-800">
           <nav className="container mx-auto flex flex-col gap-2 p-4">
             {menuItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.title}
               </Link>
             ))}
             {!isAuthenticated && (
-              <div className="flex flex-col gap-2 mt-2 pt-2 border-t dark:border-gray-800">
+              <div className="mt-2 flex flex-col gap-2 border-t pt-2 dark:border-gray-800">
                 <Button variant="ghost" asChild>
                   <Link href={ROUTES.LOGIN}>Login</Link>
                 </Button>

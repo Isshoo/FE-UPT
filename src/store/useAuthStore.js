@@ -16,7 +16,7 @@ export const useAuthStore = create(
       login: async (credentials) => {
         set({ isLoading: true, error: null });
         try {
-          const data = await authAPI.login(credentials);
+          const { data } = await authAPI.login(credentials);
           localStorage.setItem('token', data.token);
           set({
             user: data.user,
@@ -26,8 +26,7 @@ export const useAuthStore = create(
           });
           return { success: true };
         } catch (error) {
-          const errorMessage =
-            error.response?.data?.message || 'Login gagal';
+          const errorMessage = error.response?.data?.message || 'Login gagal';
           set({ error: errorMessage, isLoading: false });
           return { success: false, error: errorMessage };
         }
@@ -37,7 +36,7 @@ export const useAuthStore = create(
       register: async (userData) => {
         set({ isLoading: true, error: null });
         try {
-          const data = await authAPI.register(userData);
+          const { data } = await authAPI.register(userData);
           localStorage.setItem('token', data.token);
           set({
             user: data.user,
@@ -76,7 +75,7 @@ export const useAuthStore = create(
       getCurrentUser: async () => {
         set({ isLoading: true });
         try {
-          const data = await authAPI.getCurrentUser();
+          const { data } = await authAPI.getCurrentUser();
           set({
             user: data.user,
             isAuthenticated: true,

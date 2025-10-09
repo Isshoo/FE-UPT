@@ -2,22 +2,22 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME;
 
 export const ROLES = {
-  ADMIN: 'admin',
-  DOSEN: 'dosen',
-  USER: 'user',
+  ADMIN: 'ADMIN',
+  DOSEN: 'DOSEN',
+  USER: 'USER',
 };
 
 export const EVENT_STATUS = {
-  DRAFT: 'draft',
-  OPEN: 'open',
-  PREPARATION: 'preparation',
-  ONGOING: 'ongoing',
-  COMPLETED: 'completed',
+  DRAFT: 'DRAFT',
+  OPEN: 'TERBUKA',
+  PREPARATION: 'PERSIAPAN',
+  ONGOING: 'BERLANGSUNG',
+  COMPLETED: 'SELESAI',
 };
 
 export const BUSINESS_TYPES = {
-  MAHASISWA: 'mahasiswa',
-  UMKM_LUAR: 'umkm_luar',
+  MAHASISWA: 'MAHASISWA',
+  UMKM_LUAR: 'UMKM_LUAR',
 };
 
 export const UMKM_STAGES = {
@@ -28,10 +28,10 @@ export const UMKM_STAGES = {
 };
 
 export const UMKM_STAGE_STATUS = {
-  NOT_STARTED: 'not_started',
-  IN_PROGRESS: 'in_progress',
-  WAITING_VALIDATION: 'waiting_validation',
-  COMPLETED: 'completed',
+  NOT_STARTED: 'BELUM_DIMULAI',
+  IN_PROGRESS: 'SEDANG_PROSES',
+  WAITING_VALIDATION: 'MENUNGGU_VALIDASI',
+  COMPLETED: 'SELESAI',
 };
 
 export const ROUTES = {

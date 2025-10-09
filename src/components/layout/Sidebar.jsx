@@ -9,9 +9,11 @@ import {
   Users,
   LogOut,
   User,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/store';
+import { useAuthStore, useThemeStore } from '@/store';
 import { ROUTES, APP_NAME } from '@/lib/constants';
 import {
   DropdownMenu,
@@ -49,6 +51,7 @@ const menuItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   const handleLogout = () => {
     logout();
@@ -56,14 +59,12 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-white dark:bg-gray-900 dark:border-gray-800">
+    <aside className="fixed top-0 left-0 z-40 h-screen w-64 border-r bg-white dark:border-gray-800 dark:bg-gray-900">
       <div className="flex h-full flex-col">
         {/* Logo/Brand */}
         <div className="flex h-16 items-center border-b px-6 dark:border-gray-800">
           <Link href={ROUTES.ADMIN_DASHBOARD} className="flex items-center">
-            <span className="text-xl font-bold text-[#fba635]">
-              {APP_NAME}
-            </span>
+            <span className="text-xl font-bold text-[#fba635]">{APP_NAME}</span>
           </Link>
         </div>
 
@@ -98,7 +99,7 @@ export default function Sidebar() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-3 w-full justify-start"
+                  className="flex w-full items-center justify-start gap-3"
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-[#174c4e] text-white">
@@ -106,9 +107,7 @@ export default function Sidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">
-                      {user?.name || 'User'}
-                    </span>
+                    <span className="font-medium">{user?.nama || 'User'}</span>
                     <span className="text-xs text-gray-500 capitalize">
                       {user?.role || 'Admin'}
                     </span>
@@ -119,23 +118,42 @@ export default function Sidebar() {
                 <DropdownMenuItem asChild>
                   <Link
                     href={ROUTES.USER_PROFILE}
-                    className="flex items-center cursor-pointer"
+                    className="flex cursor-pointer items-center"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild className="">
+                  {/* Theme Toggle */}
+                  <button
+                    onClick={toggleTheme}
+                    className="flex w-full cursor-pointer items-center"
+                  >
+                    {theme === 'light' ? (
+                      <>
+                        <Moon className="mr-2 h-5 w-5" />{' '}
+                        <p className="capitalize">{theme}</p>
+                      </>
+                    ) : (
+                      <>
+                        <Sun className="mr-2 h-5 w-5" />{' '}
+                        <p className="capitalize">{theme}</p>
+                      </>
+                    )}
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full cursor-pointer items-center !text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <LogOut className="mr-2 h-4 w-4 pl-0.5 text-red-600" />
+                    Logout
+                  </button>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
           </div>
         </div>
       </div>
