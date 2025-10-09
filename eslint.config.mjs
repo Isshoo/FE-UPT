@@ -10,7 +10,14 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals"),
+  ...compat.extends("next/core-web-vitals", "prettier"),
+  {
+    rules: {
+      "react/prop-types": "off",
+      "react/react-in-jsx-scope": "off",
+      "no-unused-vars": "warn",
+    },
+  },
   {
     ignores: [
       "node_modules/**",
