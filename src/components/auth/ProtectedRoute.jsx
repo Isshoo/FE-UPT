@@ -7,30 +7,29 @@ import { ROUTES, ROLES } from '@/lib/constants';
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading } = useAuthStore();
+  const { isAuthenticated, user, isLoading, isInitialized } = useAuthStore();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        router.push(ROUTES.LOGIN);
-        return;
-      }
+    if (!isInitialized || isLoading) return;
 
-      if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-        // Redirect based on role
-        if (user?.role === ROLES.ADMIN) {
-          router.push(ROUTES.ADMIN_DASHBOARD);
-        } else {
-          router.push(ROUTES.HOME);
-        }
+    if (!isAuthenticated) {
+      router.replace(ROUTES.LOGIN);
+      return;
+    }
+
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+      if (user?.role === ROLES.ADMIN) {
+        router.replace(ROUTES.ADMIN_DASHBOARD);
+      } else {
+        router.replace(ROUTES.HOME);
       }
     }
-  }, [isAuthenticated, user, isLoading, allowedRoles, router]);
+  }, [isAuthenticated, user, isInitialized, isLoading, allowedRoles, router]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#fba635]"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
       </div>
     );
   }

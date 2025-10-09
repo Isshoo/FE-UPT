@@ -7,23 +7,24 @@ import { ROUTES, ROLES } from '@/lib/constants';
 
 export default function GuestRoute({ children }) {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading } = useAuthStore();
+  const { isAuthenticated, user, isLoading, isInitialized } = useAuthStore();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      // Redirect based on role
+    if (!isInitialized || isLoading) return; // tunggu sampai siap
+
+    if (isAuthenticated) {
       if (user?.role === ROLES.ADMIN) {
-        router.push(ROUTES.ADMIN_DASHBOARD);
+        router.replace(ROUTES.ADMIN_DASHBOARD);
       } else {
-        router.push(ROUTES.HOME);
+        router.replace(ROUTES.HOME);
       }
     }
-  }, [isAuthenticated, user, isLoading, router]);
+  }, [isAuthenticated, user, isInitialized, isLoading, router]);
 
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#fba635]"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
       </div>
     );
   }

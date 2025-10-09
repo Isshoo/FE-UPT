@@ -10,7 +10,38 @@ export const useAuthStore = create(
       token: null,
       isAuthenticated: false,
       isLoading: false,
+      isInitialized: false,
       error: null,
+
+      initialize: async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          set({ isInitialized: true });
+          return;
+        }
+
+        set({ isLoading: true });
+        try {
+          const response = await authAPI.getCurrentUser();
+          const { user } = response.data;
+          set({
+            user,
+            token,
+            isAuthenticated: true,
+            isLoading: false,
+            isInitialized: true,
+          });
+        } catch (error) {
+          localStorage.removeItem('token');
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            isLoading: false,
+            isInitialized: true,
+          });
+        }
+      },
 
       // Login
       login: async (credentials) => {
