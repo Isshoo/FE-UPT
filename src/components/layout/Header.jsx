@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, Moon, Sun, User, LogOut, Bell } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuthStore, useThemeStore } from '@/store';
 import { ROUTES, APP_NAME, ROLES } from '@/lib/constants';
@@ -45,12 +45,35 @@ export default function Header() {
     window.location.href = ROUTES.LOGIN;
   };
 
+  const [scrolled, setScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
       <div className="container mx-auto flex h-18 items-center justify-between px-4">
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center">
-          <span className="text-2xl font-bold text-[#fba635]">{APP_NAME}</span>
+          <div className="flex items-center space-x-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#fba635] to-[#fdac58]">
+              <span className="text-xl font-bold text-white">U</span>
+            </div>
+            <span
+              className={`text-xl font-bold ${scrolled ? 'text-[#174c4e]' : 'text-[#174c4e]'}`}
+            >
+              {APP_NAME}
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
