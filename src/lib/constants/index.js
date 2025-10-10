@@ -50,13 +50,6 @@ export const UMKM_STAGES = {
   MARKETING: 4,
 };
 
-export const UMKM_STAGE_NAMES = {
-  1: 'Ide Bisnis',
-  2: 'Produk',
-  3: 'Legalitas',
-  4: 'Marketing',
-};
-
 export const UMKM_STAGE_STATUS = {
   BELUM_DIMULAI: 'BELUM_DIMULAI',
   SEDANG_PROSES: 'SEDANG_PROSES',
@@ -135,4 +128,37 @@ export const PRODI_BY_FAKULTAS = {
   Pertanian: ['Agronomi', 'Teknologi Hasil Pertanian', 'Ilmu Tanah'],
   MIPA: ['Matematika', 'Fisika', 'Kimia', 'Biologi'],
   // Add more as needed
+};
+
+// ... existing constants
+
+export const UMKM_STAGE_NAMES = {
+  1: 'Ide Bisnis',
+  2: 'Produk',
+  3: 'Legalitas',
+  4: 'Marketing',
+};
+
+export const UMKM_STAGE_DESCRIPTIONS = {
+  1: 'Upload Business Model Canvas dan rencana bisnis Anda',
+  2: 'Upload logo, kemasan, dan dokumentasi produk',
+  3: 'Upload surat izin usaha dan dokumen legalitas',
+  4: 'Upload link media sosial dan strategi marketing',
+};
+
+export const UMKM_STAGE_STATUS_LABELS = {
+  BELUM_DIMULAI: 'Belum Dimulai',
+  SEDANG_PROSES: 'Sedang Proses',
+  MENUNGGU_VALIDASI: 'Menunggu Validasi',
+  SELESAI: 'Selesai',
+};
+
+export const UMKM_STAGE_STATUS_COLORS = {
+  BELUM_DIMULAI:
+    'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+  SEDANG_PROSES:
+    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  MENUNGGU_VALIDASI:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  SELESAI: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
 };
