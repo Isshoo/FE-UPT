@@ -40,8 +40,6 @@ export default function SponsorForm({ data, onUpdate }) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Tambah Sponsor</h3>
-
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="namaSponsors">Nama Sponsor</Label>
@@ -56,7 +54,9 @@ export default function SponsorForm({ data, onUpdate }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="logoSponsor">URL Logo Sponsor</Label>
+            <Label htmlFor="logoSponsor">
+              URL Logo Sponsor <span>(Opsional)</span>
+            </Label>
             <Input
               id="logoSponsor"
               placeholder="https://example.com/logo.png"

@@ -46,7 +46,7 @@ export default function ManageUmkmPage() {
   const router = useRouter();
   const params = useParams();
   const umkmId = params.id;
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   const [umkm, setUmkm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,8 @@ export default function ManageUmkmPage() {
       const data = response.data;
 
       // Check if user is owner
-      if (!data.canEdit) {
+      const isOwner = isAuthenticated && user?.id === data.userId;
+      if (!isOwner) {
         toast.error('Anda tidak memiliki akses');
         router.push(`/umkm/${umkmId}`);
         return;

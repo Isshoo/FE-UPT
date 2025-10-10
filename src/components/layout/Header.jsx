@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Moon, Sun, User, LogOut, Bell } from 'lucide-react';
+import { Menu, Moon, Sun, User, LogOut, Bell, LogIn } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuthStore, useThemeStore } from '@/store';
@@ -190,7 +190,9 @@ export default function Header() {
                   asChild
                   className="hidden bg-[#fba635] hover:bg-[#fdac58] md:flex"
                 >
-                  <Link href={ROUTES.ADMIN_DASHBOARD}>Admin Panel</Link>
+                  <Link href={ROUTES.ADMIN_DASHBOARD}>
+                    Admin Panel <LogIn />
+                  </Link>
                 </Button>
               )}
             </>

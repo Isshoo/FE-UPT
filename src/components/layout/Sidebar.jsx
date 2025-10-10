@@ -11,6 +11,7 @@ import {
   User,
   Sun,
   Moon,
+  SquareArrowOutUpLeft,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore, useThemeStore } from '@/store';
@@ -65,13 +66,17 @@ export default function Sidebar() {
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
           <div className="flex h-16 items-center border-b px-6 dark:border-gray-800">
-            <Link href={ROUTES.ADMIN_DASHBOARD} className="flex items-center">
+            <Link
+              href={ROUTES.HOME}
+              className="flex !cursor-pointer items-center"
+            >
               <span className="hidden pl-1 text-xl font-bold text-[#fba635] lg:block">
                 {APP_NAME}
               </span>
               <span className="block pl-1 text-xl font-bold text-[#fba635] lg:hidden">
                 UP
               </span>
+              <SquareArrowOutUpLeft className="mt-0.5 ml-2 h-4 w-4 text-[#174c4e] dark:text-white" />
             </Link>
           </div>
 
