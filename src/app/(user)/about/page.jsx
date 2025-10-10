@@ -9,7 +9,6 @@ import {
   Users,
   Award,
   BookOpen,
-  Handshake,
   Leaf,
   MessageSquare,
   Search,
@@ -98,7 +97,7 @@ export default function AboutPage() {
       <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-br from-[#174c4e] via-[#0a3738] to-[#072526]">
         <div className="absolute inset-0">
           <Image
-            src="/hero.jpeg"
+            src="/images/hero.jpeg"
             alt="About Hero"
             fill
             className="object-cover opacity-20"

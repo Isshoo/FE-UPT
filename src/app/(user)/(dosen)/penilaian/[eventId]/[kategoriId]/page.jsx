@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import { assessmentAPI, marketplaceAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -28,16 +27,15 @@ export default function PenilaianFormPage() {
   const [category, setCategory] = useState(null);
   const [businesses, setBusinesses] = useState([]);
   const [scores, setScores] = useState({});
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, kategoriId]);
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const [eventResponse, categoryResponse, businessesResponse] =
         await Promise.all([
           marketplaceAPI.getEventById(eventId),
@@ -64,8 +62,6 @@ export default function PenilaianFormPage() {
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -145,19 +141,12 @@ export default function PenilaianFormPage() {
         );
       }
     } catch (error) {
+      console.error('Error submitting all scores:', error);
       toast.error('Terjadi kesalahan saat menyimpan nilai');
     } finally {
       setSubmitting(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
-      </div>
-    );
-  }
 
   if (!event || !category) {
     return (

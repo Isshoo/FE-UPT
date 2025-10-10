@@ -3,17 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { marketplaceAPI, assessmentAPI } from '@/lib/api';
+import { marketplaceAPI } from '@/lib/api';
 import {
   EVENT_STATUS_LABELS,
   EVENT_STATUS_COLORS,
-  BUSINESS_TYPE_LABELS,
   ROUTES,
 } from '@/lib/constants';
-import { formatDate, formatDateTime } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ChevronLeft,
@@ -22,7 +21,6 @@ import {
   Users,
   Lock,
   Unlock,
-  Upload,
   Edit2,
   Award,
 } from 'lucide-react';
@@ -42,6 +40,7 @@ export default function EventDetailPage() {
 
   useEffect(() => {
     fetchEventDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchEventDetail = async () => {
@@ -112,13 +111,16 @@ export default function EventDetailPage() {
   }
 
   const approvedBusinesses = event.usaha?.filter((b) => b.disetujui) || [];
-  const pendingBusinesses = event.usaha?.filter((b) => !b.disetujui) || [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+        <Button
+          variant="ghost"
+          onClick={() => router.push(`/admin/marketplace/`)}
+          className="mb-4"
+        >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Kembali
         </Button>

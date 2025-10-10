@@ -31,7 +31,6 @@ import toast from 'react-hot-toast';
 
 export default function UserMarketplacePage() {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     search: '',
     semester: '',
@@ -41,11 +40,11 @@ export default function UserMarketplacePage() {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchEvents = async () => {
     try {
-      setLoading(true);
       const response = await marketplaceAPI.getEvents(filters);
       // Filter out DRAFT events for non-admin users
       const publicEvents = (response.data.events || response.data).filter(
@@ -55,8 +54,6 @@ export default function UserMarketplacePage() {
     } catch (error) {
       toast.error('Gagal memuat data event');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -77,14 +74,6 @@ export default function UserMarketplacePage() {
     });
     setTimeout(() => fetchEvents(), 100);
   };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-8">

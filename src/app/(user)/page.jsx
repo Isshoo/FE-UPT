@@ -62,7 +62,7 @@ export default function HomePage() {
         {/* Hero Image Overlay */}
         <div className="absolute inset-0">
           <Image
-            src="/hero.jpeg"
+            src="/images/hero.jpeg"
             alt="Hero Background"
             fill
             className="object-cover opacity-30"

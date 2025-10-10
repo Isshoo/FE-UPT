@@ -38,7 +38,6 @@ import {
   FileText,
   CheckCircle,
   Send,
-  Trash2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -67,6 +66,7 @@ export default function ManageUmkmPage() {
 
   useEffect(() => {
     fetchUmkmDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [umkmId]);
 
   const fetchUmkmDetail = async () => {
@@ -370,12 +370,13 @@ export default function ManageUmkmPage() {
                                     className="flex items-center gap-2 rounded border p-2"
                                   >
                                     <FileText className="h-4 w-4 text-gray-600" />
-                                    <a>
+                                    <a
                                       href={fileUrl}
-                                      target="_blank" rel="noopener noreferrer"
-                                      className="text-sm text-blue-600
-                                      hover:underline flex-1 truncate" File{' '}
-                                      {index + 1}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex-1 truncate text-sm text-blue-600 hover:underline"
+                                    >
+                                      File {index + 1}
                                     </a>
                                     <CheckCircle className="h-4 w-4 text-green-600" />
                                   </div>

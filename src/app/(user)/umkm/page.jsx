@@ -6,7 +6,6 @@ import { umkmAPI } from '@/lib/api';
 import {
   KATEGORI_USAHA,
   UMKM_STAGE_NAMES,
-  UMKM_STAGE_STATUS_COLORS,
   UMKM_STAGE_STATUS_LABELS,
 } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,19 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Briefcase,
-  Search,
-  TrendingUp,
-  Building2,
-  MapPin,
-  ChevronRight,
-} from 'lucide-react';
+import { Briefcase, Search, TrendingUp, Building2, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function UmkmPage() {
   const [umkms, setUmkms] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     search: '',
     kategori: '',
@@ -41,18 +32,16 @@ export default function UmkmPage() {
 
   useEffect(() => {
     fetchUmkms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUmkms = async () => {
     try {
-      setLoading(true);
       const response = await umkmAPI.getUmkms(filters);
       setUmkms(response.data.umkms || response.data);
     } catch (error) {
       toast.error('Gagal memuat data UMKM');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -72,14 +61,6 @@ export default function UmkmPage() {
     });
     setTimeout(() => fetchUmkms(), 100);
   };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-8">

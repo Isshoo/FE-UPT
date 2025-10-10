@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { assessmentAPI } from '@/lib/api';
-import { useAuthStore } from '@/store';
 import { formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,26 +11,19 @@ import { Award, Calendar, ClipboardList, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function PenilaianPage() {
-  const { user } = useAuthStore();
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.role === 'DOSEN') {
-      fetchAssignedCategories();
-    }
-  }, [user]);
+    fetchAssignedCategories();
+  }, []);
 
   const fetchAssignedCategories = async () => {
     try {
-      setLoading(true);
       const response = await assessmentAPI.getCategoriesByDosen();
       setCategories(response.data);
     } catch (error) {
       toast.error('Gagal memuat data penilaian');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -49,14 +41,6 @@ export default function PenilaianPage() {
   }, {});
 
   const events = Object.values(groupedByEvent);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-8">

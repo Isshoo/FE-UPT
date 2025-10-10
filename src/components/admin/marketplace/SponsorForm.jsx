@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function SponsorForm({ data, onUpdate }) {
   const [sponsors, setSponsors] = useState(data.sponsor || []);
@@ -91,7 +92,7 @@ export default function SponsorForm({ data, onUpdate }) {
                   <div className="flex items-center justify-between">
                     <div className="flex flex-1 items-center gap-3">
                       {sponsor.logo ? (
-                        <img
+                        <Image
                           src={sponsor.logo}
                           alt={sponsor.nama}
                           className="h-16 w-16 rounded border object-contain"

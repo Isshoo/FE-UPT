@@ -41,6 +41,7 @@ import {
   LogIn,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function UserEventDetailPage() {
   const router = useRouter();
@@ -53,6 +54,7 @@ export default function UserEventDetailPage() {
 
   useEffect(() => {
     fetchEventDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchEventDetail = async () => {
@@ -131,23 +133,30 @@ export default function UserEventDetailPage() {
           </div>
 
           {isRegistrationOpen && (
-            <Button
-              onClick={handleRegister}
-              size="lg"
-              className="bg-[#fba635] hover:bg-[#fdac58]"
-            >
+            <>
               {isAuthenticated ? (
                 <>
-                  <FileText className="mr-2 h-5 w-5" />
-                  Daftar Sekarang
+                  <Button
+                    onClick={handleRegister}
+                    size="lg"
+                    className="bg-[#fba635] hover:bg-[#fdac58]"
+                  >
+                    <FileText className="mr-2 h-5 w-5" />
+                    Daftar Sekarang
+                  </Button>
                 </>
               ) : (
                 <>
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Login untuk Daftar
+                  <Link
+                    href={`${ROUTES.LOGIN}?redirect=/marketplace/${eventId}/register`}
+                    className="inline-flex items-center rounded-lg bg-[#fba635] px-4 py-2 text-white hover:bg-[#fdac58]"
+                  >
+                    <LogIn className="mr-2 h-5 w-5" />
+                    Login untuk Daftar
+                  </Link>
                 </>
               )}
-            </Button>
+            </>
           )}
         </div>
       </div>
@@ -295,7 +304,9 @@ export default function UserEventDetailPage() {
                       className="flex flex-col items-center gap-2 rounded-lg border p-4"
                     >
                       {sponsor.logo && (
-                        <img
+                        <Image
+                          width={100}
+                          height={100}
                           src={sponsor.logo}
                           alt={sponsor.nama}
                           className="h-20 w-full object-contain"
@@ -318,7 +329,7 @@ export default function UserEventDetailPage() {
                 <CardTitle>Layout Denah Booth</CardTitle>
               </CardHeader>
               <CardContent>
-                <img
+                <Image
                   src={event.gambarLayout}
                   alt="Layout Denah"
                   className="mx-auto w-full max-w-3xl rounded-lg border"

@@ -69,7 +69,7 @@ export default function AssessmentTab({ event }) {
                     <span className="font-semibold">Kriteria:</span>
                   </div>
                   <div className="space-y-1">
-                    {kategori.kriteria?.map((kriteria, index) => (
+                    {kategori.kriteria?.map((kriteria) => (
                       <div
                         key={kriteria.id}
                         className="flex items-center justify-between text-sm"

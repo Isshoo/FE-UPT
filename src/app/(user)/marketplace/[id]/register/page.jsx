@@ -32,6 +32,7 @@ export default function RegisterBusinessPage() {
     }
 
     fetchEventDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, isAuthenticated]);
 
   const fetchEventDetail = async () => {

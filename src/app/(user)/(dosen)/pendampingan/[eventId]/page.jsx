@@ -39,6 +39,7 @@ export default function PendampinganDetailPage() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchData = async () => {

@@ -10,25 +10,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Award, ClipboardList, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '@/store';
 
 export default function PenilaianEventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.eventId;
-  const { user } = useAuthStore();
 
   const [event, setEvent] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const [eventResponse, categoriesResponse, getCategoriesByDosenResponse] =
         await Promise.all([
           marketplaceAPI.getEventById(eventId),
@@ -38,11 +35,7 @@ export default function PenilaianEventDetailPage() {
 
       setEvent(eventResponse.data);
 
-      // Filter only categories where current user is assessor
-      // This is already filtered by backend getCategoriesByDosen, but we fetch all here
-
-      // TODO: fix this
-      // So we need to filter client-side
+      // we need to filter client-side
       const filteredCategories = categoriesResponse.data.filter((category) => {
         return getCategoriesByDosenResponse.data.some(
           (dosenCategory) => dosenCategory.id === category.id
@@ -52,32 +45,10 @@ export default function PenilaianEventDetailPage() {
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
-      </div>
-    );
-  }
-
-  if (!event) {
-    return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center">
-        <p className="mb-4 text-gray-500">Event tidak ditemukan</p>
-        <Button onClick={() => router.back()}>
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Kembali
-        </Button>
-      </div>
-    );
-  }
-
-  const canAssess = event.status === 'BERLANGSUNG';
+  const canAssess = event?.status === 'BERLANGSUNG';
 
   return (
     <div className="container mx-auto space-y-6 px-4 py-8">
@@ -94,11 +65,13 @@ export default function PenilaianEventDetailPage() {
 
         <div>
           <div className="mb-2 flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{event.nama}</h1>
+            <h1 className="text-3xl font-bold">{event?.nama}</h1>
             <Badge
-              variant={event.status === 'BERLANGSUNG' ? 'default' : 'secondary'}
+              variant={
+                event?.status === 'BERLANGSUNG' ? 'default' : 'secondary'
+              }
             >
-              {event.status}
+              {event?.status}
             </Badge>
           </div>
           <p className="text-gray-600 dark:text-gray-400">
@@ -138,12 +111,12 @@ export default function PenilaianEventDetailPage() {
                 Tanggal Pelaksanaan
               </p>
               <p className="font-semibold">
-                {formatDate(event.tanggalPelaksanaan)}
+                {formatDate(event?.tanggalPelaksanaan)}
               </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Lokasi</p>
-              <p className="font-semibold">{event.lokasi}</p>
+              <p className="font-semibold">{event?.lokasi}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">

@@ -36,6 +36,7 @@ export default function UmkmDetailPage() {
 
   useEffect(() => {
     fetchUmkmDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [umkmId]);
 
   const fetchUmkmDetail = async () => {
@@ -188,7 +189,7 @@ export default function UmkmDetailPage() {
           <div className="space-y-4">
             {umkm.tahap
               ?.sort((a, b) => a.tahap - b.tahap)
-              .map((stage, index) => (
+              .map((stage) => (
                 <div
                   key={stage.id}
                   className={`rounded-lg border p-4 ${

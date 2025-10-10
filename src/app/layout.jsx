@@ -15,6 +15,19 @@ const oxygen = Oxygen({
 export const metadata = {
   title: 'UPT-PIK - Manajemen Event & UMKM',
   description: 'Aplikasi manajemen event bazaar/marketplace dan manajemen UMKM',
+  keywords: [
+    'wirausaha',
+    'UMKM',
+    'marketplace',
+    'bazaar',
+    'kewirausahaan',
+    'Manado',
+    'De La Salle',
+    'UPT PIK',
+  ],
+  authors: [{ name: 'UPT Pusat Inovasi dan Kewirausahaan' }],
+  creator: 'Algy Fitzgerald Christian Ngenget',
+  publisher: 'Universitas Katolik De La Salle Manado',
 };
 
 export default function RootLayout({ children }) {

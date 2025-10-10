@@ -31,7 +31,6 @@ import toast from 'react-hot-toast';
 
 export default function AdminMarketplacePage() {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     search: '',
     semester: '',
@@ -41,18 +40,16 @@ export default function AdminMarketplacePage() {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchEvents = async () => {
     try {
-      setLoading(true);
       const response = await marketplaceAPI.getEvents(filters);
       setEvents(response.data.events || response.data);
     } catch (error) {
       toast.error('Gagal memuat data event');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 

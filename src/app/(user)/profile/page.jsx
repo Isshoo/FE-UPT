@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
 import { authAPI } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,16 +11,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { User, History, Briefcase, Lock } from 'lucide-react';
+import { ROUTES } from '@/lib/constants';
 import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
-  const searchParams = useSearchParams();
-  const defaultTab = searchParams.get('tab') || 'profil';
-
-  const { user, getCurrentUser } = useAuthStore();
-  const [activeTab, setActiveTab] = useState(defaultTab);
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
+  const [activeTab, setActiveTab] = useState('profil');
   const [changingPassword, setChangingPassword] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error('Silakan login terlebih dahulu');
+      router.push(`${ROUTES.LOGIN}?redirect=/`);
+      return;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',

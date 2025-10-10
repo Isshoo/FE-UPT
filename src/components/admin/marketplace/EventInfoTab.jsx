@@ -1,20 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { formatDate, formatDateTime } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Calendar,
-  MapPin,
-  Users,
-  Upload,
-  Image as ImageIcon,
-} from 'lucide-react';
+import { Upload, Image as ImageIcon } from 'lucide-react';
 import { marketplaceAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function EventInfoTab({ event, onRefresh }) {
   const [uploadingLayout, setUploadingLayout] = useState(false);
@@ -115,7 +110,9 @@ export default function EventInfoTab({ event, onRefresh }) {
                   className="flex flex-col items-center gap-2 rounded-lg border p-4"
                 >
                   {sponsor.logo ? (
-                    <img
+                    <Image
+                      width={100}
+                      height={100}
                       src={sponsor.logo}
                       alt={sponsor.nama}
                       className="h-20 w-full object-contain"
@@ -143,7 +140,9 @@ export default function EventInfoTab({ event, onRefresh }) {
         <CardContent className="space-y-4">
           {event.gambarLayout ? (
             <div className="space-y-4">
-              <img
+              <Image
+                width={800}
+                height={800}
                 src={event.gambarLayout}
                 alt="Layout Denah"
                 className="w-full max-w-2xl rounded-lg border"

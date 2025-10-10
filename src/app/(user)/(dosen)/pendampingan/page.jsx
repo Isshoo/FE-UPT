@@ -3,36 +3,27 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { assessmentAPI } from '@/lib/api';
-import { useAuthStore } from '@/store';
-import { ROUTES } from '@/lib/constants';
 import { formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Calendar, MapPin, ChevronRight } from 'lucide-react';
+import { Users, Calendar, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function PendampinganPage() {
-  const { user } = useAuthStore();
   const [businesses, setBusinesses] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.role === 'DOSEN') {
-      fetchMentoredBusinesses();
-    }
-  }, [user]);
+    fetchMentoredBusinesses();
+  }, []);
 
   const fetchMentoredBusinesses = async () => {
     try {
-      setLoading(true);
       const response = await assessmentAPI.getMentoredBusinesses();
       setBusinesses(response.data);
     } catch (error) {
       toast.error('Gagal memuat data pendampingan');
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -50,14 +41,6 @@ export default function PendampinganPage() {
   }, {});
 
   const events = Object.values(groupedByEvent);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-8">

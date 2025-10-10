@@ -15,13 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { ChevronLeft, Trophy, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -36,6 +30,7 @@ export default function AssessmentDetailPage() {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kategoriId]);
 
   const fetchData = async () => {
