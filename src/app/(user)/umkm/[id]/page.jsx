@@ -116,7 +116,7 @@ export default function UmkmDetailPage() {
 
           {isOwner && (
             <Button
-              onClick={() => router.push(`/umkm/${umkmId}/manage`)}
+              onClick={() => router.push(`/profile/umkm/${umkmId}`)}
               className="bg-[#fba635] hover:bg-[#fdac58]"
             >
               <Edit2 className="mr-2 h-4 w-4" />
@@ -278,7 +278,7 @@ export default function UmkmDetailPage() {
                   ajukan validasi
                 </p>
                 <Button
-                  onClick={() => router.push(`/umkm/${umkmId}/manage`)}
+                  onClick={() => router.push(`/profile/umkm/${umkmId}`)}
                   className="bg-[#fba635] hover:bg-[#fdac58]"
                 >
                   Kelola UMKM Saya

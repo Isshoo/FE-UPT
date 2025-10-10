@@ -181,11 +181,11 @@ export default function ManageUmkmPage() {
       <div>
         <Button
           variant="ghost"
-          onClick={() => router.push(`/umkm/${umkmId}`)}
+          onClick={() => router.push(`/profile?tab=umkm`)}
           className="mb-4"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
-          Kembali ke Detail
+          Kembali ke Daftar UMKM Anda
         </Button>
 
         <div>

@@ -330,6 +330,8 @@ export default function UserEventDetailPage() {
               </CardHeader>
               <CardContent>
                 <Image
+                  width={800}
+                  height={600}
                   src={event.gambarLayout}
                   alt="Layout Denah"
                   className="mx-auto w-full max-w-3xl rounded-lg border"
