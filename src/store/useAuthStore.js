@@ -93,7 +93,7 @@ export const useAuthStore = create(
       // Logout
       logout: async () => {
         try {
-          await authAPI.logout();
+          console.log('Logging Out..');
         } catch (error) {
           console.error('Logout error:', error);
         } finally {
