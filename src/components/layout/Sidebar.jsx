@@ -145,12 +145,12 @@ export default function Sidebar() {
                       {theme === 'light' ? (
                         <>
                           <Moon className="mr-2 h-5 w-5" />{' '}
-                          <p className="capitalize">{theme}</p>
+                          <p className="capitalize">Dark</p>
                         </>
                       ) : (
                         <>
                           <Sun className="mr-2 h-5 w-5" />{' '}
-                          <p className="capitalize">{theme}</p>
+                          <p className="capitalize">Light</p>
                         </>
                       )}
                     </button>
@@ -205,12 +205,12 @@ export default function Sidebar() {
                 {theme === 'light' ? (
                   <>
                     <Moon className="mr-2 h-5 w-5" />
-                    <p className="capitalize">{theme}</p>
+                    <p className="capitalize">Dark</p>
                   </>
                 ) : (
                   <>
                     <Sun className="mr-2 h-5 w-5" />
-                    <p className="capitalize">{theme}</p>
+                    <p className="capitalize">Light</p>
                   </>
                 )}
               </button>

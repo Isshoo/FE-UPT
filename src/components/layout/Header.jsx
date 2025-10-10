@@ -69,7 +69,7 @@ export default function Header() {
               <span className="text-xl font-bold text-white">U</span>
             </div>
             <span
-              className={`text-xl font-bold ${scrolled ? 'text-[#174c4e]' : 'text-[#174c4e]'}`}
+              className={`text-xl font-bold ${theme === 'light' ? 'text-[#174c4e]' : 'text-[#fba635]'}`}
             >
               {APP_NAME}
             </span>

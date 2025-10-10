@@ -316,7 +316,7 @@ export default function HomePage() {
       {/* Stats Section */}
       <section
         ref={statsRef}
-        className="relative bg-white pt-15 pb-5 dark:bg-gray-900"
+        className="relative bg-white pt-15 pb-15 dark:bg-gray-900"
       >
         <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900"></div>
         <div className="relative z-10 container mx-auto px-4">
