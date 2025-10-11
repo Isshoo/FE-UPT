@@ -375,7 +375,7 @@ export default function AdminUsersPage() {
                 value={filters.role}
                 onValueChange={(value) => handleFilterChange('role', value)}
               >
-                <SelectTrigger className="w-full sm:w-auto">
+                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent>

@@ -129,61 +129,68 @@ export default function AdminMarketplacePage() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="gap-2 pt-5 pb-6">
         <CardHeader>
           <CardTitle className="text-lg">Filter Event</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-3 md:flex-row">
-            <div className="relative w-full">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Cari event..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-9"
-              />
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <div className="relative w-full">
+                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Cari event..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              <Select
+                value={filters.semester}
+                onValueChange={(value) => handleFilterChange('semester', value)}
+              >
+                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
+                  <SelectValue placeholder="Semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SEMESTER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <div className="relative w-full">
+                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Tahun Ajaran (e.g., 2024/2025)"
+                  value={filters.tahunAjaran}
+                  onChange={(e) =>
+                    handleFilterChange('tahunAjaran', e.target.value)
+                  }
+                  className="pl-9"
+                />
+              </div>
 
-            <Select
-              value={filters.semester}
-              onValueChange={(value) => handleFilterChange('semester', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Semester" />
-              </SelectTrigger>
-              <SelectContent>
-                {SEMESTER_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Input
-              placeholder="Tahun Ajaran (e.g., 2024/2025)"
-              value={filters.tahunAjaran}
-              onChange={(e) =>
-                handleFilterChange('tahunAjaran', e.target.value)
-              }
-            />
-
-            <Select
-              value={filters.status}
-              onValueChange={(value) => handleFilterChange('status', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(EVENT_STATUS_LABELS).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select
+                value={filters.status}
+                onValueChange={(value) => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(EVENT_STATUS_LABELS).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="mt-4 flex w-full justify-end gap-2">

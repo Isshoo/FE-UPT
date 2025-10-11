@@ -205,7 +205,7 @@ export default function AdminUmkmPage() {
                     handleFilterChange('kategori', value)
                   }
                 >
-                  <SelectTrigger className="w-full sm:w-auto">
+                  <SelectTrigger className="w-full min-w-[104px] sm:w-auto">
                     <SelectValue placeholder="Kategori" />
                   </SelectTrigger>
                   <SelectContent>
@@ -221,7 +221,7 @@ export default function AdminUmkmPage() {
                   value={filters.tahap}
                   onValueChange={(value) => handleFilterChange('tahap', value)}
                 >
-                  <SelectTrigger className="w-full sm:w-auto">
+                  <SelectTrigger className="w-full min-w-[104px] sm:w-auto">
                     <SelectValue placeholder="Tahap" />
                   </SelectTrigger>
                   <SelectContent>
