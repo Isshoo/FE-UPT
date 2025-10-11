@@ -222,7 +222,7 @@ export default function AdminMarketplacePage() {
           </CardContent>
         </Card>
       ) : (
-        <>
+        <div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <Link key={event.id} href={`/admin/marketplace/${event.id}`}>
@@ -274,7 +274,7 @@ export default function AdminMarketplacePage() {
             onPageSizeChange={handlePageSizeChange}
             pageSizeOptions={[6, 12, 24, 48]}
           />
-        </>
+        </div>
       )}
     </div>
   );

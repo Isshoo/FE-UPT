@@ -71,7 +71,7 @@ export default function AdminUmkmPage() {
       setPagination((prev) => ({
         ...prev,
         total: umkmsResponse.pagination?.total || 0,
-        totalPages: umkmsResponse.pagination?.totalPages || 0,
+        totalPages: umkmsResponse.pagination?.totalPages || 1,
       }));
     } catch (error) {
       toast.error('Gagal memuat data');

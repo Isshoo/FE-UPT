@@ -76,7 +76,7 @@ export default function Sidebar() {
               <span className="block pl-1 text-xl font-bold text-[#fba635] lg:hidden">
                 UP
               </span>
-              <SquareArrowOutUpLeft className="mt-0.5 ml-2 h-4 w-4 text-[#174c4e] dark:text-white" />
+              <SquareArrowOutUpLeft className="mt-0.5 ml-2 hidden h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
             </Link>
           </div>
 
@@ -178,8 +178,9 @@ export default function Sidebar() {
 
       {/* Mobile Top Bar (hanya untuk layar sangat kecil) */}
       <div className="fixed top-0 right-0 left-0 z-40 flex h-16 items-center justify-between border-b bg-white px-4 sm:hidden dark:border-gray-800 dark:bg-gray-900">
-        <Link href={ROUTES.ADMIN_DASHBOARD} className="flex items-center">
+        <Link href={ROUTES.HOME} className="flex items-center">
           <span className="text-xl font-bold text-[#fba635]">{APP_NAME}</span>
+          <SquareArrowOutUpLeft className="mt-0.5 ml-2 h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
         </Link>
 
         <DropdownMenu>

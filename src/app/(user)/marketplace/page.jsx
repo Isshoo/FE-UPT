@@ -126,8 +126,8 @@ export default function UserMarketplacePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:grid-cols-3">
+        <Card className="gap-2 py-4">
           <CardContent className="">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
@@ -135,7 +135,7 @@ export default function UserMarketplacePage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Event Terbuka
+                  Terbuka
                 </p>
                 <p className="text-2xl font-bold">
                   {events.filter((e) => e.status === 'TERBUKA').length}
@@ -145,7 +145,7 @@ export default function UserMarketplacePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hidden gap-2 py-4 sm:block">
           <CardContent className="">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
@@ -153,7 +153,7 @@ export default function UserMarketplacePage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Event Berlangsung
+                  Berlangsung
                 </p>
                 <p className="text-2xl font-bold">
                   {events.filter((e) => e.status === 'BERLANGSUNG').length}
@@ -163,7 +163,7 @@ export default function UserMarketplacePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hidden gap-2 py-4 sm:block">
           <CardContent className="">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-900">
@@ -181,57 +181,65 @@ export default function UserMarketplacePage() {
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-1">
+      <Card className="gap-2 pt-6 pb-6">
+        <CardContent>
           <div className="flex flex-col gap-3 md:flex-row">
-            <div className="relative w-full">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Cari event..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-9"
-              />
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <div className="relative w-full">
+                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Cari event..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              <Select
+                value={filters.semester}
+                onValueChange={(value) => handleFilterChange('semester', value)}
+              >
+                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
+                  <SelectValue placeholder="Semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SEMESTER_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <div className="relative w-full">
+                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Tahun Ajaran (e.g., 2024/2025)"
+                  value={filters.tahunAjaran}
+                  onChange={(e) =>
+                    handleFilterChange('tahunAjaran', e.target.value)
+                  }
+                  className="pl-9"
+                />
+              </div>
 
-            <Select
-              value={filters.semester}
-              onValueChange={(value) => handleFilterChange('semester', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Semester" />
-              </SelectTrigger>
-              <SelectContent>
-                {SEMESTER_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Input
-              placeholder="Tahun Ajaran (e.g., 2024/2025)"
-              value={filters.tahunAjaran}
-              onChange={(e) =>
-                handleFilterChange('tahunAjaran', e.target.value)
-              }
-            />
-
-            <Select
-              value={filters.status}
-              onValueChange={(value) => handleFilterChange('status', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="TERBUKA">Terbuka</SelectItem>
-                <SelectItem value="PERSIAPAN">Persiapan</SelectItem>
-                <SelectItem value="BERLANGSUNG">Berlangsung</SelectItem>
-                <SelectItem value="SELESAI">Selesai</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select
+                value={filters.status}
+                onValueChange={(value) => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(EVENT_STATUS_LABELS).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="mt-4 flex w-full justify-end gap-2">
@@ -240,10 +248,10 @@ export default function UserMarketplacePage() {
             </Button>
             <Button
               onClick={handleSearch}
-              className="bg-[#fba635] hover:bg-[#fdac58]"
+              className="min-w-[120px] bg-[#fba635] font-bold hover:bg-[#fdac58]"
             >
-              <Search className="mr-2 h-4 w-4" />
               Cari
+              <Search className="mr-2 h-4 w-4" />
             </Button>
           </div>
         </CardContent>
@@ -263,7 +271,7 @@ export default function UserMarketplacePage() {
           </CardContent>
         </Card>
       ) : (
-        <>
+        <div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <Link key={event.id} href={`/marketplace/${event.id}`}>
@@ -320,7 +328,7 @@ export default function UserMarketplacePage() {
             onPageSizeChange={handlePageSizeChange}
             pageSizeOptions={[6, 12, 24, 48]}
           />
-        </>
+        </div>
       )}
     </div>
   );
