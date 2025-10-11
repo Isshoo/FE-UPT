@@ -1,4 +1,5 @@
 import { Header, Footer } from '@/components/layout';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 export default function UserLayout({ children }) {
   return (
@@ -6,6 +7,7 @@ export default function UserLayout({ children }) {
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 }

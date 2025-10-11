@@ -13,21 +13,25 @@ const oxygen = Oxygen({
 });
 
 export const metadata = {
-  title: 'UPT-PIK - Manajemen Event & UMKM',
-  description: 'Aplikasi manajemen event bazaar/marketplace dan manajemen UMKM',
+  title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
+  description:
+    'Platform terpadu untuk manajemen event marketplace, pembinaan UMKM, dan pengembangan usaha mahasiswa di Universitas Katolik De La Salle Manado.',
   keywords: [
-    'wirausaha',
+    'UPT-PIK',
     'UMKM',
-    'marketplace',
-    'bazaar',
-    'kewirausahaan',
-    'Manado',
-    'De La Salle',
-    'UPT PIK',
+    'Marketplace',
+    'Bazaar',
+    'Kewirausahaan',
+    'Universitas Katolik De La Salle Manado',
   ],
-  authors: [{ name: 'UPT Pusat Inovasi dan Kewirausahaan' }],
-  creator: 'Algy Fitzgerald Christian Ngenget',
-  publisher: 'Universitas Katolik De La Salle Manado',
+  authors: [{ name: 'UPT-PIK UKDLSM' }],
+  openGraph: {
+    title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
+    description:
+      'Platform terpadu untuk manajemen event marketplace dan pembinaan UMKM',
+    type: 'website',
+    locale: 'id_ID',
+  },
 };
 
 export default function RootLayout({ children }) {

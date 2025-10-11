@@ -1,7 +1,8 @@
 'use client';
 
+import AboutContent from '@/components/about/AboutContent';
+
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import {
   Target,
@@ -15,20 +16,19 @@ import {
   Heart,
   ChevronRight,
   Calendar,
-  Building2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants';
+import Image from 'next/image';
 
 export default function AboutPage() {
-  const [isVisible, setIsVisible] = useState(false);
   const profileRef = useRef(null);
   const visionRef = useRef(null);
   const missionRef = useRef(null);
   const leaderRef = useRef(null);
   const timelineRef = useRef(null);
 
-  const [profileVisible, setProfileVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [visionVisible, setVisionVisible] = useState(false);
   const [missionVisible, setMissionVisible] = useState(false);
   const [leaderVisible, setLeaderVisible] = useState(false);
@@ -36,7 +36,6 @@ export default function AboutPage() {
 
   useEffect(() => {
     setIsVisible(true);
-
     const observerOptions = {
       threshold: 0.2,
       rootMargin: '0px 0px -100px 0px',
@@ -92,9 +91,9 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-br from-[#174c4e] via-[#0a3738] to-[#072526]">
+      <section className="relative flex min-h-[86vh] items-center justify-center overflow-hidden bg-gradient-to-br from-[#174c4e] via-[#0a3738] to-[#072526]">
         <div className="absolute inset-0">
           <Image
             src="/images/hero.jpeg"
@@ -142,59 +141,12 @@ export default function AboutPage() {
       </section>
 
       {/* Profile Section */}
-      <section
-        ref={profileRef}
-        className="bg-white pt-17 pb-20 dark:bg-gray-900"
-      >
-        <div className="container mx-auto px-4">
-          <div
-            className={`mx-auto max-w-5xl transition-all duration-700 ${
-              profileVisible
-                ? 'translate-y-0 opacity-100'
-                : 'translate-y-10 opacity-0'
-            }`}
-          >
-            <div className="mb-12 text-center">
-              <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#fba635]/10">
-                <Building2 className="h-8 w-8 text-[#fba635]" />
-              </div>
-              <h2 className="mb-4 text-4xl font-bold text-[#174c4e] dark:text-white">
-                Profil UPT Pusat Inovasi dan Kewirausahaan
-              </h2>
-            </div>
-
-            <div className="space-y-6 text-lg leading-relaxed text-gray-700 dark:text-gray-300">
-              <p>
-                <span className="font-semibold text-[#174c4e] dark:text-[#fba635]">
-                  UPT Entrepreneurship Centre Universitas Katolik De La Salle
-                  Manado (EC-DLSU)
-                </span>{' '}
-                adalah metamorfosis dari Inkubator Bisnis yang didirikan sejak
-                tahun 2003. Inkubator bisnis mengalami kevakuman karena tidak
-                adanya tenaga kompeten yang mengelolanya.
-              </p>
-              <p>
-                Tahun 2014, Inkubator Bisnis yang vakum diubah menjadi
-                Entrepreneurship Centre yang lebih fokus pada pembentukan dan
-                peningkatan atmosfir kewirausahaan di kalangan mahasiswa dan
-                seluruh sivitas akademika Universitas Katolik De La Salle
-                Manado. Perubahan ini sebagai bentuk komitmen universitas dalam
-                pengembangan kewirausahaan.
-              </p>
-              <p>
-                Saat ini, EC-DLSU menyelenggarakan kegiatan-kegiatan
-                pendampingan, konsultasi dan seminar dalam rangka pengembangan
-                kemampuan kewirausahaan mahasiswa.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AboutContent />
 
       {/* Timeline Section */}
       <section
         ref={timelineRef}
-        className="bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900"
+        className="border-t bg-gradient-to-b from-slate-100 to-white py-20 dark:border-gray-800 dark:from-gray-800 dark:to-gray-900"
       >
         <div className="container mx-auto px-4">
           <div
@@ -351,7 +303,7 @@ export default function AboutPage() {
       {/* Leadership Section */}
       <section
         ref={leaderRef}
-        className="bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900"
+        className="bg-gradient-to-b from-slate-100 to-white pt-15 pb-20 dark:from-gray-800 dark:to-gray-900"
       >
         <div className="container mx-auto px-4">
           <div
