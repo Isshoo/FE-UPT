@@ -44,6 +44,7 @@ export default function NotificationBell() {
     // }, 120000); // 2 minutes
 
     // return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch notifications when dropdown opens
