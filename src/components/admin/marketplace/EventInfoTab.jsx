@@ -39,7 +39,7 @@ export default function EventInfoTab({ event, onRefresh }) {
   return (
     <div className="space-y-6">
       {/* Event Details */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Detail Event</CardTitle>
         </CardHeader>
@@ -98,7 +98,7 @@ export default function EventInfoTab({ event, onRefresh }) {
 
       {/* Sponsors */}
       {event.sponsor && event.sponsor.length > 0 && (
-        <Card>
+        <Card className="gap-3">
           <CardHeader>
             <CardTitle>Sponsor ({event.sponsor.length})</CardTitle>
           </CardHeader>
@@ -133,7 +133,7 @@ export default function EventInfoTab({ event, onRefresh }) {
       )}
 
       {/* Layout Denah */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Layout Denah Booth</CardTitle>
         </CardHeader>

@@ -80,8 +80,8 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
   return (
     <div className="space-y-6">
       {/* Filter */}
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="gap-3">
+        <CardContent className="pt-0">
           <div className="flex items-center gap-4">
             <Select value={filter} onValueChange={setFilter}>
               <SelectTrigger className="w-48">
@@ -109,7 +109,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
       </Card>
 
       {/* Participants Table */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Daftar Peserta ({filteredBusinesses.length})</CardTitle>
         </CardHeader>

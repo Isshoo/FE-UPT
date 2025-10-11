@@ -23,7 +23,7 @@ export default function AssessmentTab({ event }) {
           {categories.map((kategori) => (
             <Card
               key={kategori.id}
-              className="transition-shadow hover:shadow-lg"
+              className="gap-3 transition-shadow hover:shadow-lg"
             >
               <CardHeader>
                 <div className="flex items-start justify-between">

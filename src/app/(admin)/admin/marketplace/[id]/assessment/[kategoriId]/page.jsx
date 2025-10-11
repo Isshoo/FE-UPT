@@ -120,7 +120,7 @@ export default function AssessmentDetailPage() {
       </div>
 
       {/* Kriteria Info */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Kriteria Penilaian</CardTitle>
         </CardHeader>
@@ -139,7 +139,7 @@ export default function AssessmentDetailPage() {
       </Card>
 
       {/* Scores Table */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Hasil Penilaian ({businesses.length})</CardTitle>
         </CardHeader>
@@ -237,8 +237,8 @@ export default function AssessmentDetailPage() {
       </Card>
 
       {/* Legend */}
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="gap-3">
+        <CardContent className="pt-0">
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
             <p>
               <strong>Keterangan:</strong>

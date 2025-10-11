@@ -550,7 +550,7 @@ export default function AdminUsersPage() {
                     setFormData({ ...formData, role: value })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

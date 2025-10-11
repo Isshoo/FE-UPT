@@ -169,7 +169,7 @@ export default function CreateEventPage() {
       </Card>
 
       {/* Form Content */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>{STEPS[currentStep - 1].name}</CardTitle>
         </CardHeader>

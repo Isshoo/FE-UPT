@@ -169,7 +169,7 @@ export default function AssessmentForm({ data, onUpdate }) {
   return (
     <div className="space-y-6">
       {/* Form Kategori */}
-      <Card className="border-2 border-[#fba635]">
+      <Card className="gap-3 border-2 border-[#fba635]">
         <CardHeader>
           <CardTitle>
             {editingIndex !== null

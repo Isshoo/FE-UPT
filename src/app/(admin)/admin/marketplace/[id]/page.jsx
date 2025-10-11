@@ -182,7 +182,7 @@ export default function EventDetailPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <Calendar className="h-8 w-8 text-[#fba635]" />
               <div>
@@ -198,7 +198,7 @@ export default function EventDetailPage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <MapPin className="h-8 w-8 text-[#174c4e]" />
               <div>
@@ -212,7 +212,7 @@ export default function EventDetailPage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <Users className="h-8 w-8 text-green-600" />
               <div>
@@ -228,7 +228,7 @@ export default function EventDetailPage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <Award className="h-8 w-8 text-purple-600" />
               <div>

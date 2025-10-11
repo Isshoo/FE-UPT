@@ -56,6 +56,7 @@ export default function AdminUmkmDetailPage() {
 
   useEffect(() => {
     fetchUmkmDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [umkmId]);
 
   const fetchUmkmDetail = async () => {
@@ -158,8 +159,8 @@ export default function AdminUmkmDetailPage() {
 
       {/* Pending Validation Alert */}
       {pendingStages && pendingStages.length > 0 && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
-          <CardContent className="pt-6">
+        <Card className="border-yellow-200 bg-yellow-50 py-4 dark:border-yellow-800 dark:bg-yellow-950">
+          <CardContent className="pt-0">
             <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
               ⚠️ Ada {pendingStages.length} tahap yang menunggu validasi Anda
             </p>
@@ -168,7 +169,7 @@ export default function AdminUmkmDetailPage() {
       )}
 
       {/* UMKM Info */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Informasi UMKM</CardTitle>
         </CardHeader>
@@ -222,7 +223,7 @@ export default function AdminUmkmDetailPage() {
       </Card>
 
       {/* Stages Accordion */}
-      <Card>
+      <Card className="gap-1">
         <CardHeader>
           <CardTitle>Tahap Pembinaan</CardTitle>
         </CardHeader>
@@ -256,7 +257,7 @@ export default function AdminUmkmDetailPage() {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="space-y-4 pt-4">
+                      <div className="space-y-4 pt-0">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {UMKM_STAGE_DESCRIPTIONS[stage.tahap]}
                         </p>
