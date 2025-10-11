@@ -106,31 +106,28 @@ export const KATEGORI_USAHA = [
 
 export const FAKULTAS_OPTIONS = [
   { value: 'Teknik', label: 'Teknik' },
-  { value: 'Ekonomi', label: 'Ekonomi dan Bisnis' },
-  { value: 'Pertanian', label: 'Pertanian' },
-  { value: 'MIPA', label: 'MIPA' },
-  { value: 'Peternakan', label: 'Peternakan' },
-  { value: 'Kedokteran', label: 'Kedokteran' },
   { value: 'Hukum', label: 'Hukum' },
-  { value: 'Ilmu Sosial dan Politik', label: 'Ilmu Sosial dan Politik' },
-  { value: 'Perikanan', label: 'Perikanan dan Ilmu Kelautan' },
+  { value: 'FEB', label: 'Ekonomi dan Bisnis' },
+  { value: 'Pertanian', label: 'Pertanian' },
+  { value: 'Keperawatan', label: 'Keperawatan' },
+  { value: 'Pariwisata', label: 'Pariwisata' },
+  { value: 'PGSD', label: 'Ilmu Pendidikan' },
 ];
 
 export const PRODI_BY_FAKULTAS = {
   Teknik: [
-    'Teknik Sipil',
     'Teknik Elektro',
-    'Teknik Mesin',
-    'Arsitektur',
-    'Informatika',
+    'Teknik Industri',
+    'Teknik Informatika',
+    'Teknik Sipil',
   ],
-  Ekonomi: ['Manajemen', 'Akuntansi', 'Ekonomi Pembangunan'],
-  Pertanian: ['Agronomi', 'Teknologi Hasil Pertanian', 'Ilmu Tanah'],
-  MIPA: ['Matematika', 'Fisika', 'Kimia', 'Biologi'],
-  // Add more as needed
+  Hukum: ['Hukum'],
+  FEB: ['Manajemen', 'Akuntansi'],
+  Pertanian: ['Agribisnis'],
+  Keperawatan: ['Ilmu Keperawatan', 'Profesi Ners', 'Fisioterapi'],
+  Pariwisata: ['Hospitality dan Pariwisata'],
+  PGSD: ['Pendidikan Guru Sekolah Dasar'],
 };
-
-// ... existing constants
 
 export const UMKM_STAGE_NAMES = {
   1: 'Ide Bisnis',

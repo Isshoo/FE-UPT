@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   if (!dashboardData) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <p className="text-gray-600">Gagal memuat data dashboard</p>
       </div>
     );
@@ -63,99 +63,100 @@ export default function AdminDashboard() {
   } = dashboardData;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-4">
+      {/* Header - Compact */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600">
-          Overview statistik dan analytics UPT-PIK
-        </p>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-sm text-gray-600">Overview statistik UPT-PIK</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* Stats Cards - Smaller padding & text */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
         <StatsCard
-          title="Total Pengguna"
+          title="Pengguna"
           value={generalStats.totalUsers}
           icon={Users}
-          description="Pengguna terdaftar"
           color="blue"
+          compact
         />
         <StatsCard
-          title="Total Event"
+          title="Event"
           value={generalStats.totalEvents}
           icon={Calendar}
-          description={`${generalStats.activeEvents} event aktif`}
+          description={`${generalStats.activeEvents} aktif`}
           color="green"
+          compact
         />
         <StatsCard
-          title="Total UMKM"
+          title="UMKM"
           value={generalStats.totalUmkm}
           icon={Store}
-          description="UMKM binaan terdaftar"
           color="orange"
+          compact
         />
         <StatsCard
-          title="Total Peserta"
+          title="Peserta"
           value={generalStats.totalPeserta}
           icon={TrendingUp}
-          description="Peserta marketplace"
           color="purple"
+          compact
         />
         <StatsCard
           title="Event Aktif"
           value={generalStats.activeEvents}
           icon={Activity}
-          description="Sedang berlangsung/terbuka"
           color="teal"
+          compact
         />
         <StatsCard
-          title="Pending Validasi"
+          title="Pending"
           value={generalStats.pendingUmkmValidation}
           icon={Clock}
-          description="UMKM menunggu validasi"
+          description="Validasi UMKM"
           color="red"
+          compact
         />
       </div>
 
-      {/* Marketplace Analytics */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Charts Row 1 - 3 columns for better space usage */}
+      <div className="grid gap-4 lg:grid-cols-3">
         <BarChartCard
           title="Peserta per Semester"
-          data={marketplaceAnalytics.participantsPerSemester}
+          data={marketplaceAnalytics.participantsPerSemester.slice(0, 6)}
           dataKey="count"
           xAxisKey="semester"
           color="#fba635"
+          height={240}
         />
         <PieChartCard
-          title="Kategori Usaha Populer"
-          data={marketplaceAnalytics.categoryDistribution}
+          title="Kategori Usaha"
+          data={marketplaceAnalytics.categoryDistribution.slice(0, 6)}
           dataKey="count"
           nameKey="kategori"
+          height={240}
         />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
         <PieChartCard
-          title="Perbandingan Jenis Usaha"
+          title="Jenis Usaha"
           data={marketplaceAnalytics.businessTypeComparison.map((item) => ({
             name: item.type === 'MAHASISWA' ? 'Mahasiswa' : 'UMKM Luar',
             value: item.count,
           }))}
           dataKey="value"
           nameKey="name"
-        />
-        <BarChartCard
-          title="Perbandingan Fakultas"
-          data={marketplaceAnalytics.facultyComparison}
-          dataKey="count"
-          xAxisKey="fakultas"
-          color="#174c4e"
+          height={240}
         />
       </div>
 
-      {/* UMKM Analytics */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Charts Row 2 */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <BarChartCard
+          title="Fakultas"
+          data={marketplaceAnalytics.facultyComparison.slice(0, 6)}
+          dataKey="count"
+          xAxisKey="fakultas"
+          color="#174c4e"
+          height={240}
+        />
         <PieChartCard
           title="UMKM per Tahap"
           data={umkmAnalytics.umkmPerStage.map((item) => ({
@@ -164,17 +165,46 @@ export default function AdminDashboard() {
           }))}
           dataKey="value"
           nameKey="name"
+          height={240}
         />
-        <BarChartCard
-          title="Kategori UMKM"
-          data={umkmAnalytics.umkmByCategory}
-          dataKey="count"
-          xAxisKey="kategori"
-          color="#b81202"
-        />
+        <Card className="gap-6 p-4">
+          <h3 className="text-sm font-semibold">Info Tambahan</h3>
+          <div className="space-y-3">
+            <div className="rounded-lg bg-[#fba635]/10 p-3 text-center">
+              <p className="text-3xl font-bold text-[#fba635]">
+                {marketplaceAnalytics.approvalRate}%
+              </p>
+              <p className="mt-1 text-xs text-gray-600">Tingkat Persetujuan</p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-gray-600">
+                Penyelesaian Tahap UMKM
+              </p>
+              {umkmAnalytics.stageCompletionRate.map((stage) => (
+                <div
+                  key={stage.tahap}
+                  className="flex items-center justify-between text-xs"
+                >
+                  <span>Tahap {stage.tahap}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-20 overflow-hidden rounded-full bg-gray-200">
+                      <div
+                        className="h-full bg-[#fba635]"
+                        style={{ width: `${stage.completionRate}%` }}
+                      ></div>
+                    </div>
+                    <span className="w-8 font-medium">
+                      {stage.completionRate}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
       </div>
 
-      {/* Growth Analytics */}
+      {/* Growth Chart - Full width but shorter */}
       <LineChartCard
         title="Pertumbuhan Pengguna & UMKM"
         data={growthAnalytics.userGrowth.map((item, index) => ({
@@ -186,40 +216,35 @@ export default function AdminDashboard() {
           { dataKey: 'users', name: 'Pengguna' },
           { dataKey: 'umkm', name: 'UMKM' },
         ]}
+        height={240}
       />
 
-      {/* Recent Activities */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      {/* Recent Activities - More compact */}
+      <div className="grid gap-4 lg:grid-cols-3">
         {/* Recent Events */}
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">Event Terbaru</h3>
-          <div className="space-y-3">
+        <Card className="p-4">
+          <h3 className="mb-3 text-sm font-semibold">Event Terbaru</h3>
+          <div className="space-y-2">
             {recentActivities.recentEvents.length === 0 ? (
-              <p className="text-sm text-gray-500">Belum ada event</p>
+              <p className="text-xs text-gray-500">Belum ada event</p>
             ) : (
-              recentActivities.recentEvents.map((event) => (
+              recentActivities.recentEvents.slice(0, 4).map((event) => (
                 <Link
                   key={event.id}
                   href={`${ROUTES.ADMIN_MARKETPLACE}/${event.id}`}
-                  className="block rounded-lg border p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="block rounded border p-2 text-xs transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium">{event.nama}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 overflow-hidden">
+                      <p className="truncate font-medium">{event.nama}</p>
                       <p className="text-xs text-gray-500">
-                        {new Date(event.createdAt).toLocaleDateString('id-ID')}
+                        {new Date(event.createdAt).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
                       </p>
                     </div>
-                    <Badge
-                      variant={
-                        event.status === 'TERBUKA'
-                          ? 'default'
-                          : event.status === 'BERLANGSUNG'
-                            ? 'default'
-                            : 'secondary'
-                      }
-                      className="text-xs"
-                    >
+                    <Badge variant="outline" className="text-xs">
                       {event.status}
                     </Badge>
                   </div>
@@ -229,27 +254,33 @@ export default function AdminDashboard() {
           </div>
         </Card>
 
-        {/* Recent Business Registrations */}
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">Pendaftaran Terbaru</h3>
-          <div className="space-y-3">
+        {/* Recent Business */}
+        <Card className="p-4">
+          <h3 className="mb-3 text-sm font-semibold">Pendaftaran Terbaru</h3>
+          <div className="space-y-2">
             {recentActivities.recentBusinesses.length === 0 ? (
-              <p className="text-sm text-gray-500">Belum ada pendaftaran</p>
+              <p className="text-xs text-gray-500">Belum ada pendaftaran</p>
             ) : (
-              recentActivities.recentBusinesses.map((business) => (
-                <div key={business.id} className="rounded-lg border p-3">
-                  <p className="font-medium">{business.namaProduk}</p>
-                  <p className="text-xs text-gray-600">
+              recentActivities.recentBusinesses.slice(0, 4).map((business) => (
+                <div key={business.id} className="rounded border p-2 text-xs">
+                  <p className="truncate font-medium">{business.namaProduk}</p>
+                  <p className="truncate text-xs text-gray-600">
                     {business.pemilik.nama}
                   </p>
                   <div className="mt-1 flex items-center justify-between">
                     <Badge variant="outline" className="text-xs">
                       {business.tipeUsaha === 'MAHASISWA'
                         ? 'Mahasiswa'
-                        : 'UMKM Luar'}
+                        : 'UMKM'}
                     </Badge>
                     <p className="text-xs text-gray-500">
-                      {new Date(business.createdAt).toLocaleDateString('id-ID')}
+                      {new Date(business.createdAt).toLocaleDateString(
+                        'id-ID',
+                        {
+                          day: 'numeric',
+                          month: 'short',
+                        }
+                      )}
                     </p>
                   </div>
                 </div>
@@ -258,74 +289,37 @@ export default function AdminDashboard() {
           </div>
         </Card>
 
-        {/* Recent UMKM Registrations */}
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">UMKM Terdaftar Baru</h3>
-          <div className="space-y-3">
+        {/* Recent UMKM */}
+        <Card className="p-4">
+          <h3 className="mb-3 text-sm font-semibold">UMKM Baru</h3>
+          <div className="space-y-2">
             {recentActivities.recentUmkm.length === 0 ? (
-              <p className="text-sm text-gray-500">Belum ada UMKM terdaftar</p>
+              <p className="text-xs text-gray-500">Belum ada UMKM</p>
             ) : (
-              recentActivities.recentUmkm.map((umkm) => (
+              recentActivities.recentUmkm.slice(0, 4).map((umkm) => (
                 <Link
                   key={umkm.id}
                   href={`${ROUTES.ADMIN_UMKM}/${umkm.id}`}
-                  className="block rounded-lg border p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="block rounded border p-2 text-xs transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
-                  <p className="font-medium">{umkm.nama}</p>
-                  <p className="text-xs text-gray-600">{umkm.user.nama}</p>
+                  <p className="truncate font-medium">{umkm.nama}</p>
+                  <p className="truncate text-xs text-gray-600">
+                    {umkm.user.nama}
+                  </p>
                   <div className="mt-1 flex items-center justify-between">
                     <Badge variant="outline" className="text-xs">
                       Tahap {umkm.tahapSaatIni}
                     </Badge>
                     <p className="text-xs text-gray-500">
-                      {new Date(umkm.createdAt).toLocaleDateString('id-ID')}
+                      {new Date(umkm.createdAt).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
                     </p>
                   </div>
                 </Link>
               ))
             )}
-          </div>
-        </Card>
-      </div>
-
-      {/* Additional Info Cards */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">Tingkat Persetujuan</h3>
-          <div className="text-center">
-            <p className="text-5xl font-bold text-[#fba635]">
-              {marketplaceAnalytics.approvalRate}%
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              Persentase peserta yang disetujui
-            </p>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">
-            Tingkat Penyelesaian Tahap UMKM
-          </h3>
-          <div className="space-y-2">
-            {umkmAnalytics.stageCompletionRate.map((stage) => (
-              <div
-                key={stage.tahap}
-                className="flex items-center justify-between"
-              >
-                <span className="text-sm">Tahap {stage.tahap}</span>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-32 overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className="h-full bg-[#fba635]"
-                      style={{ width: `${stage.completionRate}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-medium">
-                    {stage.completionRate}%
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
         </Card>
       </div>

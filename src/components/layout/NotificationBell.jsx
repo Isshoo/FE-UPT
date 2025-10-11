@@ -35,13 +35,16 @@ export default function NotificationBell() {
   useEffect(() => {
     fetchUnreadCount();
 
-    // Poll every 30 seconds
-    const interval = setInterval(() => {
-      fetchUnreadCount();
-    }, 60000);
+    // // Poll every 2 minutes (120000ms) instead of 30 seconds
+    // const interval = setInterval(() => {
+    //   // Only fetch if document is visible (tab is active)
+    //   if (document.visibilityState === 'visible') {
+    //     fetchUnreadCount();
+    //   }
+    // }, 120000); // 2 minutes
 
-    return () => clearInterval(interval);
-  }, [fetchUnreadCount]);
+    // return () => clearInterval(interval);
+  }, []);
 
   // Fetch notifications when dropdown opens
   useEffect(() => {

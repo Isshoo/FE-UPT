@@ -10,19 +10,19 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-export default function LineChartCard({ title, data, lines }) {
+export default function LineChartCard({ title, data, lines, height = 300 }) {
   const colors = ['#fba635', '#174c4e', '#b81202', '#10b981'];
 
   return (
-    <Card className="p-6">
-      <h3 className="mb-4 text-lg font-semibold">{title}</h3>
-      <ResponsiveContainer width="100%" height={300}>
+    <Card className="gap-6 p-4">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
           <Tooltip />
-          <Legend />
+          <Legend wrapperStyle={{ fontSize: '12px' }} />
           {lines.map((line, index) => (
             <Line
               key={line.dataKey}
@@ -30,6 +30,7 @@ export default function LineChartCard({ title, data, lines }) {
               dataKey={line.dataKey}
               stroke={colors[index % colors.length]}
               name={line.name}
+              strokeWidth={2}
             />
           ))}
         </LineChart>

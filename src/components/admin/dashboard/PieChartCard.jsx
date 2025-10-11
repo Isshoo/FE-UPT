@@ -19,21 +19,25 @@ const COLORS = [
   '#8b5cf6',
 ];
 
-export default function PieChartCard({ title, data, dataKey, nameKey }) {
+export default function PieChartCard({
+  title,
+  data,
+  dataKey,
+  nameKey,
+  height = 300,
+}) {
   return (
-    <Card className="p-6">
-      <h3 className="mb-4 text-lg font-semibold">{title}</h3>
-      <ResponsiveContainer width="100%" height={300}>
+    <Card className="gap-0 p-4">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percent }) =>
-              `${name} ${(percent * 100).toFixed(0)}%`
-            }
-            outerRadius={80}
+            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+            outerRadius={height / 3}
             fill="#8884d8"
             dataKey={dataKey}
             nameKey={nameKey}
@@ -46,7 +50,7 @@ export default function PieChartCard({ title, data, dataKey, nameKey }) {
             ))}
           </Pie>
           <Tooltip />
-          <Legend />
+          <Legend wrapperStyle={{ fontSize: '12px' }} />
         </PieChart>
       </ResponsiveContainer>
     </Card>

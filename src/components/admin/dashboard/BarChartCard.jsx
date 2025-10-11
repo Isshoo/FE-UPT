@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 
@@ -16,17 +15,17 @@ export default function BarChartCard({
   dataKey,
   xAxisKey,
   color = '#fba635',
+  height = 300,
 }) {
   return (
-    <Card className="p-6">
-      <h3 className="mb-4 text-lg font-semibold">{title}</h3>
-      <ResponsiveContainer width="100%" height={300}>
+    <Card className="gap-6 p-4">
+      <h3 className="text-sm font-semibold">{title}</h3>
+      <ResponsiveContainer width="100%" height={height}>
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xAxisKey} />
-          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          <XAxis dataKey={xAxisKey} tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
           <Tooltip />
-          <Legend />
           <Bar dataKey={dataKey} fill={color} />
         </BarChart>
       </ResponsiveContainer>

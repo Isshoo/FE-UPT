@@ -12,25 +12,25 @@ export default function AuthProvider({ children }) {
   const { fetchUnreadCount, reset: resetNotifications } =
     useNotificationStore();
 
-  // Initialize auth only once
   useEffect(() => {
-    initialize();
-  }, [initialize]);
-
-  // Handle notification fetching based on auth state
-  useEffect(() => {
-    // Wait for auth to be initialized
-    if (!isInitialized) return;
-
-    if (isAuthenticated) {
-      // Fetch notifications only once when authenticated
-      // NotificationBell component will handle polling
-      fetchUnreadCount(false); // Don't skip, force initial fetch
-    } else {
-      // Reset notifications when logged out
-      resetNotifications();
+    if (isInitialized) {
+      return;
     }
-  }, [isAuthenticated, isInitialized, fetchUnreadCount, resetNotifications]);
+    const initAuth = async () => {
+      await initialize();
+
+      // Fetch notifications only once after successful auth
+      if (isInitialized && isAuthenticated) {
+        fetchUnreadCount();
+      } else if (isInitialized && !isAuthenticated) {
+        resetNotifications();
+      }
+    };
+
+    initAuth();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialize, isInitialized, isAuthenticated]);
 
   return <>{children}</>;
 }
