@@ -102,7 +102,7 @@ export default function UmkmDetailPage() {
           Kembali ke Daftar UMKM
         </Button>
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
           <div className="flex-1">
             <div className="mb-2 flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold md:text-4xl">{umkm.nama}</h1>
@@ -127,7 +127,7 @@ export default function UmkmDetailPage() {
       </div>
 
       {/* UMKM Info */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Informasi UMKM</CardTitle>
         </CardHeader>
@@ -181,7 +181,7 @@ export default function UmkmDetailPage() {
       </Card>
 
       {/* Stages Progress */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Tahap Pembinaan</CardTitle>
         </CardHeader>
@@ -264,7 +264,7 @@ export default function UmkmDetailPage() {
       {/* CTA for Owner */}
       {isOwner && umkm.tahapSaatIni < 4 && (
         <Card className="border-[#fba635] bg-orange-50 dark:bg-orange-950">
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-[#fba635] p-3">
                 <Building2 className="h-6 w-6 text-white" />

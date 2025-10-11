@@ -10,6 +10,7 @@ import {
   EVENT_STATUS_COLORS,
   BUSINESS_TYPE_LABELS,
   ROUTES,
+  ROLES,
 } from '@/lib/constants';
 import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,7 @@ export default function UserEventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id;
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -119,7 +120,7 @@ export default function UserEventDetailPage() {
           Kembali ke Marketplace
         </Button>
 
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
           <div className="flex-1">
             <div className="mb-2 flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold md:text-4xl">{event.nama}</h1>
@@ -136,14 +137,16 @@ export default function UserEventDetailPage() {
             <>
               {isAuthenticated ? (
                 <>
-                  <Button
-                    onClick={handleRegister}
-                    size="lg"
-                    className="bg-[#fba635] hover:bg-[#fdac58]"
-                  >
-                    <FileText className="mr-2 h-5 w-5" />
-                    Daftar Sekarang
-                  </Button>
+                  {user?.role === `${ROLES.USER}` && (
+                    <Button
+                      onClick={handleRegister}
+                      size="lg"
+                      className="bg-[#fba635] hover:bg-[#fdac58]"
+                    >
+                      <FileText className="mr-2 h-5 w-5" />
+                      Daftar Sekarang
+                    </Button>
+                  )}
                 </>
               ) : (
                 <>
@@ -164,7 +167,7 @@ export default function UserEventDetailPage() {
       {/* Event Info Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <Calendar className="h-8 w-8 text-[#fba635]" />
               <div>
@@ -180,7 +183,7 @@ export default function UserEventDetailPage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <MapPin className="h-8 w-8 text-[#174c4e]" />
               <div>
@@ -194,7 +197,7 @@ export default function UserEventDetailPage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <Users className="h-8 w-8 text-green-600" />
               <div>
@@ -210,7 +213,7 @@ export default function UserEventDetailPage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-3">
               <Award className="h-8 w-8 text-purple-600" />
               <div>
@@ -229,7 +232,7 @@ export default function UserEventDetailPage() {
       {/* Registration Info */}
       {isRegistrationOpen && (
         <Card className="border-2 border-[#fba635] bg-orange-50 dark:bg-orange-950">
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-[#fba635] p-3">
                 <Calendar className="h-6 w-6 text-white" />
@@ -266,7 +269,7 @@ export default function UserEventDetailPage() {
 
         {/* Info Tab */}
         <TabsContent value="info" className="space-y-6">
-          <Card>
+          <Card className="gap-3">
             <CardHeader>
               <CardTitle>Detail Event</CardTitle>
             </CardHeader>
@@ -292,7 +295,7 @@ export default function UserEventDetailPage() {
 
           {/* Sponsors */}
           {event.sponsor && event.sponsor.length > 0 && (
-            <Card>
+            <Card className="gap-3">
               <CardHeader>
                 <CardTitle>Sponsor</CardTitle>
               </CardHeader>
@@ -324,7 +327,7 @@ export default function UserEventDetailPage() {
 
           {/* Layout */}
           {event.gambarLayout && (
-            <Card>
+            <Card className="gap-3">
               <CardHeader>
                 <CardTitle>Layout Denah Booth</CardTitle>
               </CardHeader>
@@ -343,7 +346,7 @@ export default function UserEventDetailPage() {
 
         {/* Participants Tab */}
         <TabsContent value="participants">
-          <Card>
+          <Card className="gap-2">
             <CardHeader>
               <CardTitle>Daftar Peserta</CardTitle>
             </CardHeader>
@@ -400,7 +403,7 @@ export default function UserEventDetailPage() {
           <div className="space-y-6">
             {event.kategoriPenilaian && event.kategoriPenilaian.length > 0 ? (
               event.kategoriPenilaian.map((kategori) => (
-                <Card key={kategori.id}>
+                <Card key={kategori.id} className="gap-3">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>

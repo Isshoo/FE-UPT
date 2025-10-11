@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { marketplaceAPI } from '@/lib/api';
 import { useAuthStore } from '@/store';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES, ROLES } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,7 +17,7 @@ export default function RegisterBusinessPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id;
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +29,9 @@ export default function RegisterBusinessPage() {
       toast.error('Silakan login terlebih dahulu');
       router.push(`${ROUTES.LOGIN}?redirect=/marketplace/${eventId}/register`);
       return;
+    }
+    if (user?.role !== `${ROLES.USER}`) {
+      router.push(ROUTES.USER_MARKETPLACE);
     }
 
     fetchEventDetail();
@@ -149,7 +152,7 @@ export default function RegisterBusinessPage() {
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="MAHASISWA">
                 <Users className="mr-2 h-4 w-4" />
-                Usaha Mahasiswa
+                Mahasiswa
               </TabsTrigger>
               <TabsTrigger value="UMKM_LUAR">
                 <Building2 className="mr-2 h-4 w-4" />
