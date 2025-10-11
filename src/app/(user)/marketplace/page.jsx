@@ -26,11 +26,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import PaginationControls from '@/components/ui/pagination-controls';
 import { Search, Calendar, MapPin, Users, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function UserMarketplacePage() {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0,
+  });
   const [filters, setFilters] = useState({
     search: '',
     semester: '',
@@ -41,28 +49,49 @@ export default function UserMarketplacePage() {
   useEffect(() => {
     fetchEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pagination.page, pagination.limit]);
 
   const fetchEvents = async () => {
     try {
-      const response = await marketplaceAPI.getEvents(filters);
+      setLoading(true);
+      const response = await marketplaceAPI.getEvents({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      });
       // Filter out DRAFT events for non-admin users
       const publicEvents = (response.data.events || response.data).filter(
         (event) => event.status !== 'DRAFT'
       );
       setEvents(publicEvents);
+      setPagination((prev) => ({
+        ...prev,
+        total: response.pagination?.total || 0,
+        totalPages: response.pagination?.totalPages || 0,
+      }));
     } catch (error) {
       toast.error('Gagal memuat data event');
       console.error(error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleSearch = () => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    fetchEvents();
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handlePageSizeChange = (newLimit) => {
+    setPagination({ page: 1, limit: newLimit, total: 0, totalPages: 0 });
   };
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSearch = () => {
-    fetchEvents();
   };
 
   const handleReset = () => {
@@ -74,6 +103,14 @@ export default function UserMarketplacePage() {
     });
     setTimeout(() => fetchEvents(), 100);
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-8">
@@ -91,7 +128,7 @@ export default function UserMarketplacePage() {
       {/* Stats */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
                 <TrendingUp className="h-6 w-6 text-green-600 dark:text-green-300" />
@@ -109,7 +146,7 @@ export default function UserMarketplacePage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
                 <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -127,7 +164,7 @@ export default function UserMarketplacePage() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-900">
                 <Users className="h-6 w-6 text-purple-600 dark:text-purple-300" />
@@ -145,9 +182,9 @@ export default function UserMarketplacePage() {
 
       {/* Filters */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <div className="relative">
+        <CardContent className="pt-1">
+          <div className="flex flex-col gap-3 md:flex-row">
+            <div className="relative w-full">
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 placeholder="Cari event..."
@@ -197,16 +234,16 @@ export default function UserMarketplacePage() {
             </Select>
           </div>
 
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex w-full justify-end gap-2">
+            <Button onClick={handleReset} variant="outline">
+              Reset
+            </Button>
             <Button
               onClick={handleSearch}
               className="bg-[#fba635] hover:bg-[#fdac58]"
             >
               <Search className="mr-2 h-4 w-4" />
               Cari
-            </Button>
-            <Button onClick={handleReset} variant="outline">
-              Reset
             </Button>
           </div>
         </CardContent>
@@ -226,51 +263,64 @@ export default function UserMarketplacePage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
-            <Link key={event.id} href={`/marketplace/${event.id}`}>
-              <Card className="h-full cursor-pointer transition-all hover:scale-105 hover:shadow-xl">
-                <CardHeader>
-                  <div className="mb-2 flex items-start justify-between">
-                    <Badge className={EVENT_STATUS_COLORS[event.status]}>
-                      {EVENT_STATUS_LABELS[event.status]}
-                    </Badge>
-                    {event.status === 'TERBUKA' && (
-                      <Badge className="animate-pulse bg-green-500 text-white">
-                        Daftar Sekarang!
+        <>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {events.map((event) => (
+              <Link key={event.id} href={`/marketplace/${event.id}`}>
+                <Card className="h-full cursor-pointer transition-all hover:scale-105 hover:shadow-xl">
+                  <CardHeader>
+                    <div className="mb-2 flex items-start justify-between">
+                      <Badge className={EVENT_STATUS_COLORS[event.status]}>
+                        {EVENT_STATUS_LABELS[event.status]}
                       </Badge>
-                    )}
-                  </div>
-                  <CardTitle className="line-clamp-2">{event.nama}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {event.deskripsi}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Calendar className="h-4 w-4 flex-shrink-0" />
-                    <span>{formatDate(event.tanggalPelaksanaan)}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <MapPin className="h-4 w-4 flex-shrink-0" />
-                    <span className="line-clamp-1">{event.lokasi}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Users className="h-4 w-4 flex-shrink-0" />
-                    <span>
-                      {event._count?.usaha || 0} / {event.kuotaPeserta} Peserta
-                    </span>
-                  </div>
-                  <div className="border-t pt-3">
-                    <p className="text-xs text-gray-500">
-                      {event.semester} {event.tahunAjaran}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                      {event.status === 'TERBUKA' && (
+                        <Badge className="animate-pulse bg-green-500 text-white">
+                          Daftar Sekarang!
+                        </Badge>
+                      )}
+                    </div>
+                    <CardTitle className="line-clamp-2">{event.nama}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {event.deskripsi}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
+                      <span>{formatDate(event.tanggalPelaksanaan)}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <MapPin className="h-4 w-4 flex-shrink-0" />
+                      <span className="line-clamp-1">{event.lokasi}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Users className="h-4 w-4 flex-shrink-0" />
+                      <span>
+                        {event._count?.usaha || 0} / {event.kuotaPeserta}{' '}
+                        Peserta
+                      </span>
+                    </div>
+                    <div className="border-t pt-3">
+                      <p className="text-xs text-gray-500">
+                        {event.semester} {event.tahunAjaran}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+          {/* Add Pagination */}
+          <PaginationControls
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.limit}
+            totalItems={pagination.total}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            pageSizeOptions={[6, 12, 24, 48]}
+          />
+        </>
       )}
     </div>
   );

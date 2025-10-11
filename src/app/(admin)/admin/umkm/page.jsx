@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import PaginationControls from '@/components/ui/pagination-controls';
 import {
   Search,
   Briefcase,
@@ -36,6 +37,12 @@ export default function AdminUmkmPage() {
   const [umkms, setUmkms] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
   const [filters, setFilters] = useState({
     search: '',
     kategori: '',
@@ -45,18 +52,27 @@ export default function AdminUmkmPage() {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pagination.page, pagination.limit]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const [umkmsResponse, statsResponse] = await Promise.all([
-        umkmAPI.getUmkms(filters),
+        umkmAPI.getUmkms({
+          ...filters,
+          page: pagination.page,
+          limit: pagination.limit,
+        }),
         umkmAPI.getStatistics(),
       ]);
 
       setUmkms(umkmsResponse.data.umkms || umkmsResponse.data);
       setStats(statsResponse.data);
+      setPagination((prev) => ({
+        ...prev,
+        total: umkmsResponse.pagination?.total || 0,
+        totalPages: umkmsResponse.pagination?.totalPages || 0,
+      }));
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
@@ -65,12 +81,21 @@ export default function AdminUmkmPage() {
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleSearch = () => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    fetchData();
   };
 
-  const handleSearch = () => {
-    fetchData();
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handlePageSizeChange = (newLimit) => {
+    setPagination({ page: 1, limit: newLimit, total: 0, totalPages: 0 });
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleReset = () => {
@@ -107,9 +132,9 @@ export default function AdminUmkmPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5">
+        <Card className="gap-2 py-4">
+          <CardHeader className="flex flex-row items-center justify-between pb-0">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
               Total UMKM
             </CardTitle>
@@ -123,8 +148,8 @@ export default function AdminUmkmPage() {
         </Card>
 
         {[1, 2, 3, 4].map((tahap) => (
-          <Card key={tahap}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <Card key={tahap} className="gap-2 py-4">
+            <CardHeader className="flex flex-row items-center justify-between pb-0">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {UMKM_STAGE_NAMES[tahap]}
               </CardTitle>
@@ -143,8 +168,8 @@ export default function AdminUmkmPage() {
 
       {/* Pending Validation Alert */}
       {getPendingValidationCount() > 0 && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
-          <CardContent className="pt-6">
+        <Card className="gap-2 border-yellow-200 bg-yellow-50 py-4 dark:border-yellow-800 dark:bg-yellow-950">
+          <CardContent className="">
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-yellow-600" />
               <p className="text-sm text-yellow-800 dark:text-yellow-300">
@@ -157,72 +182,77 @@ export default function AdminUmkmPage() {
       )}
 
       {/* Filters */}
-      <Card>
+      <Card className="gap-2 pt-5 pb-6">
         <CardHeader>
           <CardTitle className="text-lg">Filter UMKM</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="relative">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Cari UMKM..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-9"
-              />
+          <div className="flex flex-col items-center gap-3 md:flex-row">
+            <div className="flex w-full flex-col gap-3 sm:flex-row">
+              <div className="relative w-full">
+                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Cari UMKM..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <div className="flex gap-3">
+                <Select
+                  value={filters.kategori}
+                  onValueChange={(value) =>
+                    handleFilterChange('kategori', value)
+                  }
+                >
+                  <SelectTrigger className="w-full sm:w-auto">
+                    <SelectValue placeholder="Kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {KATEGORI_USAHA.map((kategori) => (
+                      <SelectItem key={kategori} value={kategori}>
+                        {kategori}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={filters.tahap}
+                  onValueChange={(value) => handleFilterChange('tahap', value)}
+                >
+                  <SelectTrigger className="w-full sm:w-auto">
+                    <SelectValue placeholder="Tahap" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(UMKM_STAGE_NAMES).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        Tahap {key}: {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <Select
-              value={filters.kategori}
-              onValueChange={(value) => handleFilterChange('kategori', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                {KATEGORI_USAHA.map((kategori) => (
-                  <SelectItem key={kategori} value={kategori}>
-                    {kategori}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={filters.tahap}
-              onValueChange={(value) => handleFilterChange('tahap', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Tahap" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(UMKM_STAGE_NAMES).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    Tahap {key}: {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            <Button
-              onClick={handleSearch}
-              className="bg-[#fba635] hover:bg-[#fdac58]"
-            >
-              <Search className="mr-2 h-4 w-4" />
-              Cari
-            </Button>
-            <Button onClick={handleReset} variant="outline">
-              Reset
-            </Button>
+            <div className="flex w-full justify-end gap-3 md:w-auto">
+              <Button onClick={handleReset} variant="outline">
+                Reset
+              </Button>
+              <Button
+                onClick={handleSearch}
+                className="bg-[#fba635] hover:bg-[#fdac58]"
+              >
+                <Search className="mr-2 h-4 w-4" />
+                Cari
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* UMKM Table */}
-      <Card>
+      <Card className="gap-2">
         <CardHeader>
           <CardTitle>Daftar UMKM ({umkms.length})</CardTitle>
         </CardHeader>
@@ -233,73 +263,86 @@ export default function AdminUmkmPage() {
               <p className="text-gray-500">Belum ada UMKM terdaftar</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>No</TableHead>
-                    <TableHead>Nama UMKM</TableHead>
-                    <TableHead>Kategori</TableHead>
-                    <TableHead className="text-center">Tahap 1</TableHead>
-                    <TableHead className="text-center">Tahap 2</TableHead>
-                    <TableHead className="text-center">Tahap 3</TableHead>
-                    <TableHead className="text-center">Tahap 4</TableHead>
-                    <TableHead className="text-center">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {umkms.map((umkm, index) => {
-                    const hasPendingValidation = umkm.tahap?.some(
-                      (stage) => stage.status === 'MENUNGGU_VALIDASI'
-                    );
+            <>
+              <div className="w-[260] overflow-x-auto sm:w-[448] md:w-[655] lg:w-full">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>No</TableHead>
+                      <TableHead>Nama UMKM</TableHead>
+                      <TableHead>Kategori</TableHead>
+                      <TableHead className="text-center">Tahap 1</TableHead>
+                      <TableHead className="text-center">Tahap 2</TableHead>
+                      <TableHead className="text-center">Tahap 3</TableHead>
+                      <TableHead className="text-center">Tahap 4</TableHead>
+                      <TableHead className="text-center">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {umkms.map((umkm, index) => {
+                      const hasPendingValidation = umkm.tahap?.some(
+                        (stage) => stage.status === 'MENUNGGU_VALIDASI'
+                      );
 
-                    return (
-                      <TableRow
-                        key={umkm.id}
-                        className={
-                          hasPendingValidation
-                            ? 'bg-yellow-50 dark:bg-yellow-950'
-                            : ''
-                        }
-                      >
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell className="font-medium">
-                          {umkm.nama}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{umkm.kategori}</Badge>
-                        </TableCell>
-                        {[1, 2, 3, 4].map((tahap) => {
-                          const stage = umkm.tahap?.find(
-                            (t) => t.tahap === tahap
-                          );
-                          const status = stage?.status || 'BELUM_DIMULAI';
+                      return (
+                        <TableRow
+                          key={umkm.id}
+                          className={
+                            hasPendingValidation
+                              ? 'bg-yellow-50 dark:bg-yellow-950'
+                              : ''
+                          }
+                        >
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell className="font-medium">
+                            {umkm.nama}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">{umkm.kategori}</Badge>
+                          </TableCell>
+                          {[1, 2, 3, 4].map((tahap) => {
+                            const stage = umkm.tahap?.find(
+                              (t) => t.tahap === tahap
+                            );
+                            const status = stage?.status || 'BELUM_DIMULAI';
 
-                          return (
-                            <TableCell key={tahap} className="text-center">
-                              {status === 'SELESAI' ? (
-                                <CheckCircle className="mx-auto h-5 w-5 text-green-600" />
-                              ) : status === 'MENUNGGU_VALIDASI' ? (
-                                <Clock className="mx-auto h-5 w-5 text-yellow-600" />
-                              ) : status === 'SEDANG_PROSES' ? (
-                                <div className="mx-auto h-5 w-5 rounded-full border-2 border-blue-500" />
-                              ) : (
-                                <div className="mx-auto h-5 w-5 rounded-full border-2 border-gray-300" />
-                              )}
-                            </TableCell>
-                          );
-                        })}
-                        <TableCell className="text-center">
-                          <Button asChild size="sm">
-                            <Link href={`/admin/umkm/${umkm.id}`}>Detail</Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                            return (
+                              <TableCell key={tahap} className="text-center">
+                                {status === 'SELESAI' ? (
+                                  <CheckCircle className="mx-auto h-5 w-5 text-green-600" />
+                                ) : status === 'MENUNGGU_VALIDASI' ? (
+                                  <Clock className="mx-auto h-5 w-5 text-yellow-600" />
+                                ) : status === 'SEDANG_PROSES' ? (
+                                  <div className="mx-auto h-5 w-5 rounded-full border-2 border-blue-500" />
+                                ) : (
+                                  <div className="mx-auto h-5 w-5 rounded-full border-2 border-gray-300" />
+                                )}
+                              </TableCell>
+                            );
+                          })}
+                          <TableCell className="text-center">
+                            <Button asChild size="sm">
+                              <Link href={`/admin/umkm/${umkm.id}`}>
+                                Detail
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+              {/* Add Pagination */}
+              <PaginationControls
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                pageSize={pagination.limit}
+                totalItems={pagination.total}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+              />
+            </>
           )}
         </CardContent>
       </Card>

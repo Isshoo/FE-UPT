@@ -27,10 +27,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, Search, Calendar, MapPin, Users } from 'lucide-react';
+import PaginationControls from '@/components/ui/pagination-controls';
 import toast from 'react-hot-toast';
 
 export default function AdminMarketplacePage() {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0,
+  });
   const [filters, setFilters] = useState({
     search: '',
     semester: '',
@@ -41,28 +49,50 @@ export default function AdminMarketplacePage() {
   useEffect(() => {
     fetchEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pagination.page, pagination.limit]);
 
   const fetchEvents = async () => {
     try {
-      const response = await marketplaceAPI.getEvents(filters);
+      setLoading(true);
+      const response = await marketplaceAPI.getEvents({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      });
+
       setEvents(response.data.events || response.data);
+      setPagination((prev) => ({
+        ...prev,
+        total: response.pagination?.total || 0,
+        totalPages: response.pagination?.totalPages || 0,
+      }));
     } catch (error) {
       toast.error('Gagal memuat data event');
       console.error(error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleSearch = () => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    fetchEvents();
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handlePageSizeChange = (newLimit) => {
+    setPagination({ page: 1, limit: newLimit, total: 0, totalPages: 0 });
   };
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSearch = () => {
-    fetchEvents();
-  };
-
-  const handleReset = async () => {
-    await setFilters((prev) => ({
+  const handleReset = () => {
+    setFilters((prev) => ({
       ...prev,
       search: '',
       semester: '',
@@ -71,6 +101,14 @@ export default function AdminMarketplacePage() {
     }));
     fetchEvents();
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -177,47 +215,59 @@ export default function AdminMarketplacePage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
-            <Link key={event.id} href={`/admin/marketplace/${event.id}`}>
-              <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
-                <CardHeader>
-                  <div className="mb-2 flex items-start justify-between">
-                    <Badge className={EVENT_STATUS_COLORS[event.status]}>
-                      {EVENT_STATUS_LABELS[event.status]}
-                    </Badge>
-                    {event.terkunci && (
-                      <Badge variant="outline" className="ml-2">
-                        🔒 Terkunci
+        <>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {events.map((event) => (
+              <Link key={event.id} href={`/admin/marketplace/${event.id}`}>
+                <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
+                  <CardHeader>
+                    <div className="mb-2 flex items-start justify-between">
+                      <Badge className={EVENT_STATUS_COLORS[event.status]}>
+                        {EVENT_STATUS_LABELS[event.status]}
                       </Badge>
-                    )}
-                  </div>
-                  <CardTitle className="line-clamp-2">{event.nama}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {event.deskripsi}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(event.tanggalPelaksanaan)}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <MapPin className="h-4 w-4" />
-                    {event.lokasi}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Users className="h-4 w-4" />
-                    {event._count?.usaha || 0} / {event.kuotaPeserta} Peserta
-                  </div>
-                  <div className="mt-2 text-xs text-gray-500">
-                    {event.semester} {event.tahunAjaran}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                      {event.terkunci && (
+                        <Badge variant="outline" className="ml-2">
+                          🔒 Terkunci
+                        </Badge>
+                      )}
+                    </div>
+                    <CardTitle className="line-clamp-2">{event.nama}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {event.deskripsi}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Calendar className="h-4 w-4" />
+                      {formatDate(event.tanggalPelaksanaan)}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <MapPin className="h-4 w-4" />
+                      {event.lokasi}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Users className="h-4 w-4" />
+                      {event._count?.usaha || 0} / {event.kuotaPeserta} Peserta
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      {event.semester} {event.tahunAjaran}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+          {/* Add Pagination */}
+          <PaginationControls
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            pageSize={pagination.limit}
+            totalItems={pagination.total}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            pageSizeOptions={[6, 12, 24, 48]}
+          />
+        </>
       )}
     </div>
   );
