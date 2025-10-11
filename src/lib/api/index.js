@@ -6,3 +6,4 @@ export { umkmAPI } from './umkm';
 export { usersAPI } from './users';
 export { notificationAPI } from './notification';
 export { dashboardAPI } from './dashboard';
+export { exportAPI, downloadBlob } from './export';

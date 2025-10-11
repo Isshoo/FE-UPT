@@ -32,6 +32,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { exportAPI, downloadBlob } from '@/lib/api';
+import ExportButton from '@/components/ui/ExportButton';
 
 export default function AdminUmkmPage() {
   const [umkms, setUmkms] = useState([]);
@@ -113,6 +115,12 @@ export default function AdminUmkmPage() {
     ).length;
   };
 
+  const handleExportUmkm = async (format) => {
+    const response = await exportAPI.exportUmkm(format);
+    const filename = `data-umkm-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+    downloadBlob(response.data, filename);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -124,11 +132,20 @@ export default function AdminUmkmPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">UMKM Binaan</h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Kelola dan validasi UMKM yang mengikuti program pembinaan
-        </p>
+      <div className="flex flex-col justify-between gap-3 sm:flex-row">
+        <div>
+          <h1 className="text-3xl font-bold">UMKM Binaan</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Kelola dan validasi UMKM yang mengikuti program pembinaan
+          </p>
+        </div>
+        <div>
+          <ExportButton
+            onExport={handleExportUmkm}
+            formats={['excel']}
+            label="Export Data"
+          />
+        </div>
       </div>
 
       {/* Stats */}

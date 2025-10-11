@@ -28,6 +28,8 @@ import toast from 'react-hot-toast';
 import EventInfoTab from '@/components/admin/marketplace/EventInfoTab';
 import ParticipantsTab from '@/components/admin/marketplace/ParticipantsTab';
 import AssessmentTab from '@/components/admin/marketplace/AssessmentTab';
+import { exportAPI, downloadBlob } from '@/lib/api';
+import ExportButton from '@/components/ui/ExportButton';
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -88,6 +90,12 @@ export default function EventDetailPage() {
     }
   };
 
+  const handleExportEvent = async (format) => {
+    const response = await exportAPI.exportEvent(eventId, format);
+    const filename = `laporan-event-${event.nama}-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+    downloadBlob(response.data, filename);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -125,7 +133,7 @@ export default function EventDetailPage() {
           Kembali
         </Button>
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row">
           <div className="flex-1">
             <div className="mb-2 flex items-center gap-3">
               <h1 className="text-3xl font-bold">{event.nama}</h1>
@@ -147,6 +155,12 @@ export default function EventDetailPage() {
           <div className="flex gap-2">
             {!event.terkunci ? (
               <>
+                <ExportButton
+                  onExport={handleExportEvent}
+                  formats={['excel', 'pdf']}
+                  label="Export Laporan"
+                  variant="outline"
+                />
                 <Button
                   variant="outline"
                   onClick={() =>
@@ -166,14 +180,22 @@ export default function EventDetailPage() {
                 </Button>
               </>
             ) : (
-              <Button
-                variant="outline"
-                onClick={handleUnlockEvent}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <Unlock className="mr-2 h-4 w-4" />
-                Buka Kunci
-              </Button>
+              <>
+                <ExportButton
+                  onExport={handleExportEvent}
+                  formats={['excel', 'pdf']}
+                  label="Export Laporan"
+                  variant="outline"
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleUnlockEvent}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <Unlock className="mr-2 h-4 w-4" />
+                  Buka Kunci
+                </Button>
+              </>
             )}
           </div>
         </div>

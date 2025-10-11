@@ -26,9 +26,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Download, FileSpreadsheet } from 'lucide-react';
 import { Plus, Search, Calendar, MapPin, Users } from 'lucide-react';
 import PaginationControls from '@/components/ui/pagination-controls';
 import toast from 'react-hot-toast';
+
+import { exportAPI, downloadBlob } from '@/lib/api';
 
 export default function AdminMarketplacePage() {
   const [events, setEvents] = useState([]);
@@ -102,6 +111,30 @@ export default function AdminMarketplacePage() {
     fetchEvents();
   };
 
+  const handleExportMarketplace = async (format) => {
+    // Export dengan filter yang sedang aktif
+    const response = await exportAPI.exportMarketplace(
+      {
+        status: filters.status,
+        semester: filters.semester,
+        tahunAjaran: filters.tahunAjaran,
+      },
+      format
+    );
+    const filename = `data-marketplace-${new Date().getTime()}.xlsx`;
+    downloadBlob(response.data, filename);
+  };
+
+  const handleExportMarketplaceDetailed = async () => {
+    const response = await exportAPI.exportMarketplaceDetailed({
+      status: filters.status,
+      semester: filters.semester,
+      tahunAjaran: filters.tahunAjaran,
+    });
+    const filename = `data-marketplace-detail-${new Date().getTime()}.xlsx`;
+    downloadBlob(response.data, filename);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -113,19 +146,45 @@ export default function AdminMarketplacePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5">
+      <div className="flex flex-col justify-between gap-3 md:flex-row">
         <div>
           <h1 className="text-3xl font-bold">Marketplace</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Kelola event bazaar dan marketplace
           </p>
         </div>
-        <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
-          <Link href="/admin/marketplace/create">
-            <Plus className="mr-2 h-5 w-5" />
-            Buat Event Baru
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Export Data
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => handleExportMarketplace('excel')}
+                className="cursor-pointer"
+              >
+                <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
+                Export Ringkasan
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleExportMarketplaceDetailed()}
+                className="cursor-pointer"
+              >
+                <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
+                Export Detail Lengkap
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button asChild className="">
+            <Link href="/admin/marketplace/create">
+              <Plus className="mr-2 h-5 w-5" />
+              Buat Event Baru
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

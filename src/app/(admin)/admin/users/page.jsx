@@ -41,6 +41,8 @@ import {
   Key,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { exportAPI, downloadBlob } from '@/lib/api';
+import ExportButton from '@/components/ui/ExportButton';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -263,6 +265,12 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleExportUsers = async (format) => {
+    const response = await exportAPI.exportUsers(format);
+    const filename = `data-pengguna-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+    downloadBlob(response.data, filename);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -274,20 +282,24 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col justify-between gap-3 md:flex-row">
+        <div className="">
           <h1 className="text-3xl font-bold">Users</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Kelola pengguna aplikasi
           </p>
         </div>
-        <Button
-          onClick={handleCreate}
-          className="bg-[#fba635] hover:bg-[#fdac58]"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah User
-        </Button>
+        <div className="flex items-center gap-2">
+          <ExportButton
+            onExport={handleExportUsers}
+            formats={['excel']}
+            label="Export Data"
+          />
+          <Button onClick={handleCreate}>
+            <Plus className="mr-2 h-4 w-4" />
+            Tambah User
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}

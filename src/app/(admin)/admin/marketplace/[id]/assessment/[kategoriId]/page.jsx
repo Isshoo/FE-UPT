@@ -19,6 +19,9 @@ import {
 import { ChevronLeft, Trophy, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { exportAPI, downloadBlob } from '@/lib/api';
+import ExportButton from '@/components/ui/ExportButton';
+
 export default function AssessmentDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -65,6 +68,12 @@ export default function AssessmentDetailPage() {
     } finally {
       setSettingWinner(false);
     }
+  };
+
+  const handleExportAssessment = async (format) => {
+    const response = await exportAPI.exportAssessment(kategoriId, format);
+    const filename = `hasil-penilaian-${kategori?.nama}-${new Date().getTime()}.xlsx`;
+    downloadBlob(response.data, filename);
   };
 
   if (loading) {
@@ -115,6 +124,14 @@ export default function AssessmentDetailPage() {
                 {kategori.deskripsi}
               </p>
             )}
+          </div>
+          <div className="flex items-center justify-between">
+            <ExportButton
+              onExport={handleExportAssessment}
+              formats={['excel']}
+              label="Export Hasil"
+              size="sm"
+            />
           </div>
         </div>
       </div>
