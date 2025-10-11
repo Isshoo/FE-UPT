@@ -17,6 +17,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import NotificationBell from './NotificationBell';
 import { getInitials } from '@/lib/utils';
+import Image from 'next/image';
 
 export default function Header() {
   const pathname = usePathname();
@@ -51,8 +52,15 @@ export default function Header() {
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center">
           <div className="flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#fba635] to-[#fdac58]">
-              <span className="text-xl font-bold text-white">U</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
+              {/* <span className="text-xl font-bold text-white">U</span> */}
+              <Image
+                src="/images/icon.png"
+                alt="Logo"
+                width={30}
+                height={30}
+                className="rounded-lg"
+              />
             </div>
             <span
               className={`text-xl font-bold ${theme === 'light' ? 'text-[#174c4e]' : 'text-[#fba635]'}`}

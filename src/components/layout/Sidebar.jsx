@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import NotificationBell from './NotificationBell';
 import { getInitials } from '@/lib/utils';
+import Image from 'next/image';
 
 const menuItems = [
   {
@@ -66,20 +67,29 @@ export default function Sidebar() {
       <aside className="fixed top-0 left-0 z-40 hidden h-screen w-20 max-w-64 min-w-20 border-r bg-white sm:block lg:w-full dark:border-gray-800 dark:bg-gray-900">
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
-          <div className="flex h-16 items-center justify-between border-b px-6 dark:border-gray-800">
+          <div className="flex h-24 items-center justify-center border-b pt-2 lg:justify-between lg:px-5 dark:border-gray-800">
             <Link
               href={ROUTES.HOME}
               className="flex !cursor-pointer items-center"
             >
-              <span className="hidden pl-1 text-xl font-bold text-[#fba635] lg:block">
+              <div className="flex size-15 items-center justify-center rounded-lg border border-gray-300 bg-transparent shadow-md lg:size-10 lg:border-transparent lg:shadow-none">
+                {/* <span className="text-xl font-bold text-white">U</span> */}
+                <Image
+                  src="/images/icon.png"
+                  alt="Logo"
+                  width={30}
+                  height={30}
+                  className="rounded-lg"
+                />
+              </div>
+              <span className="hidden pl-0 text-xl font-bold text-[#fba635] lg:block">
                 {APP_NAME}
-              </span>
-              <span className="block pl-1 text-xl font-bold text-[#fba635] lg:hidden">
-                UP
               </span>
               <SquareArrowOutUpLeft className="mt-0.5 ml-2 hidden h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
             </Link>
-            <div className="hidden lg:block">{<NotificationBell />}</div>
+            <div className="hidden lg:mt-1 lg:block">
+              {<NotificationBell />}
+            </div>
           </div>
 
           {/* Navigation Menu */}
@@ -182,9 +192,21 @@ export default function Sidebar() {
       </aside>
 
       {/* Mobile Top Bar (hanya untuk layar sangat kecil) */}
-      <div className="fixed top-0 right-0 left-0 z-40 flex h-16 items-center justify-between border-b bg-white px-4 sm:hidden dark:border-gray-800 dark:bg-gray-900">
+      <div className="fixed top-0 right-0 left-0 z-40 flex h-18 items-center justify-between border-b bg-white px-4 sm:hidden dark:border-gray-800 dark:bg-gray-900">
         <Link href={ROUTES.HOME} className="flex items-center">
-          <span className="text-xl font-bold text-[#fba635]">{APP_NAME}</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
+            {/* <span className="text-xl font-bold text-white">U</span> */}
+            <Image
+              src="/images/icon.png"
+              alt="Logo"
+              width={30}
+              height={30}
+              className="rounded-lg"
+            />
+          </div>
+          <span className="pl-2 text-xl font-bold text-[#fba635]">
+            {APP_NAME}
+          </span>
           <SquareArrowOutUpLeft className="mt-0.5 ml-2 h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
         </Link>
         <div className="flex gap-3">

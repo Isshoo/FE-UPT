@@ -46,7 +46,7 @@ export default function AssessmentTab({ event }) {
                   )}
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="flex h-full flex-col gap-4">
                 {/* Penilai */}
                 <div>
                   <div className="mb-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -94,13 +94,15 @@ export default function AssessmentTab({ event }) {
                 )}
 
                 {/* Action Button */}
-                <Button asChild className="w-full" variant="outline">
-                  <Link
-                    href={`/admin/marketplace/${event.id}/assessment/${kategori.id}`}
-                  >
-                    Lihat Detail Penilaian
-                  </Link>
-                </Button>
+                <div className="flex w-full flex-1 items-end">
+                  <Button asChild className="w-full" variant="outline">
+                    <Link
+                      href={`/admin/marketplace/${event.id}/assessment/${kategori.id}`}
+                    >
+                      Lihat Detail Penilaian
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

@@ -139,7 +139,7 @@ export default function AssessmentDetailPage() {
       </Card>
 
       {/* Scores Table */}
-      <Card className="gap-3">
+      <Card className="gap-1">
         <CardHeader>
           <CardTitle>Hasil Penilaian ({businesses.length})</CardTitle>
         </CardHeader>
@@ -161,10 +161,6 @@ export default function AssessmentDetailPage() {
                     {kriteria.map((k) => (
                       <TableHead key={k.id} className="text-center">
                         {k.nama}
-                        <br />
-                        <span className="text-xs text-gray-500">
-                          ({k.bobot}%)
-                        </span>
                       </TableHead>
                     ))}
                     <TableHead className="text-center font-bold">

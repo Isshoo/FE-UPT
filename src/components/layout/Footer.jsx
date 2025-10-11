@@ -10,6 +10,7 @@ import {
   Twitter,
 } from 'lucide-react';
 import { APP_NAME, ROUTES } from '@/lib/constants';
+import Image from 'next/image';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -21,7 +22,19 @@ export default function Footer() {
           <div className="flex flex-1 flex-col gap-10 lg:flex-row lg:justify-between lg:gap-20">
             {/* About Section */}
             <div className="w-[80%] space-y-4 lg:w-[50%]">
-              <h3 className="text-xl font-bold text-[#fba635]">{APP_NAME}</h3>
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
+                  {/* <span className="text-xl font-bold text-white">U</span> */}
+                  <Image
+                    src="/images/icon.png"
+                    alt="Logo"
+                    width={30}
+                    height={30}
+                    className="rounded-lg"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-[#fba635]">{APP_NAME}</h3>
+              </div>
               <p className="justify text-sm leading-6 text-gray-300">
                 Platform manajemen event bazaar/marketplace dan pembinaan UMKM
                 untuk mendukung perkembangan wirausaha mahasiswa dan UMKM lokal.
