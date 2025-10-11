@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import NotificationBell from './NotificationBell';
 import { getInitials } from '@/lib/utils';
 
 const menuItems = [
@@ -65,7 +66,7 @@ export default function Sidebar() {
       <aside className="fixed top-0 left-0 z-40 hidden h-screen w-20 max-w-64 min-w-20 border-r bg-white sm:block lg:w-full dark:border-gray-800 dark:bg-gray-900">
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
-          <div className="flex h-16 items-center border-b px-6 dark:border-gray-800">
+          <div className="flex h-16 items-center justify-between border-b px-6 dark:border-gray-800">
             <Link
               href={ROUTES.HOME}
               className="flex !cursor-pointer items-center"
@@ -78,10 +79,14 @@ export default function Sidebar() {
               </span>
               <SquareArrowOutUpLeft className="mt-0.5 ml-2 hidden h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
             </Link>
+            <div className="hidden lg:block">{<NotificationBell />}</div>
           </div>
 
           {/* Navigation Menu */}
           <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+            <div className="mb-3.5 flex w-full items-center justify-center gap-3 rounded-lg border-y border-[#fba635] px-3 py-2.5 pl-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 lg:hidden lg:justify-start lg:pl-4 dark:text-gray-300 dark:hover:bg-gray-800">
+              {<NotificationBell />}
+            </div>
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname.includes(item.href);
@@ -182,56 +187,59 @@ export default function Sidebar() {
           <span className="text-xl font-bold text-[#fba635]">{APP_NAME}</span>
           <SquareArrowOutUpLeft className="mt-0.5 ml-2 h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
         </Link>
+        <div className="flex gap-3">
+          <div className="lg:block">{<NotificationBell />}</div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-[#174c4e] text-white">
-                  {getInitials(user?.nama || 'User')}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem asChild>
-              <Link
-                href={ROUTES.USER_PROFILE}
-                className="flex cursor-pointer items-center"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Profil
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <button
-                onClick={toggleTheme}
-                className="flex w-full cursor-pointer items-center"
-              >
-                {theme === 'light' ? (
-                  <>
-                    <Moon className="mr-2 h-5 w-5" />
-                    <p className="capitalize">Dark</p>
-                  </>
-                ) : (
-                  <>
-                    <Sun className="mr-2 h-5 w-5" />
-                    <p className="capitalize">Light</p>
-                  </>
-                )}
-              </button>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <button
-                onClick={handleLogout}
-                className="flex w-full cursor-pointer items-center !text-red-600 hover:bg-red-50 hover:text-red-700"
-              >
-                <LogOut className="mr-2 h-4 w-4 pl-0.5 text-red-600" />
-                Logout
-              </button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-[#174c4e] text-white">
+                    {getInitials(user?.nama || 'User')}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link
+                  href={ROUTES.USER_PROFILE}
+                  className="flex cursor-pointer items-center"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Profil
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <button
+                  onClick={toggleTheme}
+                  className="flex w-full cursor-pointer items-center"
+                >
+                  {theme === 'light' ? (
+                    <>
+                      <Moon className="mr-2 h-5 w-5" />
+                      <p className="capitalize">Dark</p>
+                    </>
+                  ) : (
+                    <>
+                      <Sun className="mr-2 h-5 w-5" />
+                      <p className="capitalize">Light</p>
+                    </>
+                  )}
+                </button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full cursor-pointer items-center !text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  <LogOut className="mr-2 h-4 w-4 pl-0.5 text-red-600" />
+                  Logout
+                </button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation (hanya untuk layar sangat kecil) */}

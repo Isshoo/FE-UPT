@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Moon, Sun, User, LogOut, Bell, LogIn } from 'lucide-react';
+import { Menu, Moon, Sun, User, LogOut, LogIn } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuthStore, useThemeStore } from '@/store';
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import NotificationBell from './NotificationBell';
 import { getInitials } from '@/lib/utils';
 
 export default function Header() {
@@ -99,32 +100,7 @@ export default function Header() {
           </Button>
 
           {/* Notifications (if authenticated) */}
-          {isAuthenticated && !isAdmin && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="!size-6" />
-                  {/* <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
-                  >
-                    3
-                  </Badge> */}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <div className="p-2 text-sm font-semibold">Notifikasi</div>
-                <DropdownMenuItem className="cursor-pointer p-3">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm font-medium">Event Baru Dibuka</p>
-                    <p className="text-xs text-gray-500">
-                      Bazaar Semester Ganjil 2025 telah dibuka
-                    </p>
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {isAuthenticated && !isAdmin && <NotificationBell />}
 
           {/* Auth Buttons */}
           {!isAuthenticated ? (

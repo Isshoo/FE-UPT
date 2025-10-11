@@ -93,6 +93,8 @@ export default function SponsorForm({ data, onUpdate }) {
                     <div className="flex flex-1 items-center gap-3">
                       {sponsor.logo ? (
                         <Image
+                          width={64}
+                          height={64}
                           src={sponsor.logo}
                           alt={sponsor.nama}
                           className="h-16 w-16 rounded border object-contain"

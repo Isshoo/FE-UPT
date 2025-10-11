@@ -19,7 +19,7 @@ import {
   FAKULTAS_OPTIONS,
   PRODI_BY_FAKULTAS,
 } from '@/lib/constants';
-import { apiClient } from '@/lib/api';
+import { usersAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function MahasiswaForm({ onSubmit, isSubmitting }) {
@@ -58,12 +58,10 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
   const fetchDosenByProdi = async (prodi) => {
     try {
       setLoadingDosen(true);
-      const response = await apiClient.get('/users', {
-        params: { role: 'DOSEN' },
-      });
+      const response = await usersAPI.getUsersGuest({ role: 'DOSEN' });
 
       // Filter dosen by prodi
-      const filteredDosen = response.data.data.filter(
+      const filteredDosen = response.data.filter(
         (dosen) => dosen.prodi === prodi
       );
 
@@ -215,10 +213,10 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
         </div>
 
         {formData.anggota.map((anggota, index) => (
-          <Card key={index}>
-            <CardContent className="pt-6">
+          <Card key={index} className="gap-1 pt-4">
+            <CardContent className="pt-0">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="mb-2 flex items-center justify-between">
                   <h4 className="font-semibold">Anggota {index + 1}</h4>
                   {formData.anggota.length > 1 && (
                     <Button

@@ -117,7 +117,7 @@ export default function RegisterBusinessPage() {
 
       {/* Info Card */}
       <Card className="border-l-4 border-l-[#fba635]">
-        <CardContent className="pt-6">
+        <CardContent className="pt-0">
           <div className="space-y-2 text-sm">
             <p>
               <strong>📅 Tanggal Pelaksanaan:</strong>{' '}
@@ -140,7 +140,7 @@ export default function RegisterBusinessPage() {
       </Card>
 
       {/* Registration Form */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Pilih Tipe Usaha</CardTitle>
         </CardHeader>

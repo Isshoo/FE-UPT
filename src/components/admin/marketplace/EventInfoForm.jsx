@@ -92,7 +92,7 @@ export default function EventInfoForm({ data, onUpdate }) {
           </Label>
           <Input
             id="lokasi"
-            placeholder="e.g., Lapangan Parkir UNSRAT"
+            placeholder="e.g., Sporthall Unika De La Salle"
             value={data.lokasi}
             onChange={(e) => handleChange('lokasi', e.target.value)}
             required

@@ -1,41 +1,145 @@
 import { create } from 'zustand';
+import { notificationAPI } from '@/lib/api';
 
-export const useNotificationStore = create((set) => ({
+export const useNotificationStore = create((set, get) => ({
   notifications: [],
   unreadCount: 0,
+  isLoading: false,
+  error: null,
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  },
 
-  addNotification: (notification) =>
-    set((state) => ({
-      notifications: [notification, ...state.notifications],
-      unreadCount: state.unreadCount + 1,
-    })),
+  // Fetch notifications
+  fetchNotifications: async (params = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await notificationAPI.getUserNotifications(params);
+      const { notifications, pagination } = response.data;
 
-  markAsRead: (notificationId) =>
-    set((state) => ({
-      notifications: state.notifications.map((notif) =>
-        notif.id === notificationId ? { ...notif, read: true } : notif
-      ),
-      unreadCount: Math.max(0, state.unreadCount - 1),
-    })),
+      set({
+        notifications,
+        pagination,
+        isLoading: false,
+      });
 
-  markAllAsRead: () =>
-    set((state) => ({
-      notifications: state.notifications.map((notif) => ({
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || 'Gagal memuat notifikasi';
+      set({ error: errorMessage, isLoading: false });
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // Fetch unread count
+  fetchUnreadCount: async () => {
+    try {
+      const response = await notificationAPI.getUnreadCount();
+      const { count } = response.data;
+
+      set({ unreadCount: count });
+      return { success: true, count };
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+      return { success: false };
+    }
+  },
+
+  // Mark notification as read
+  markAsRead: async (notificationId) => {
+    try {
+      await notificationAPI.markAsRead(notificationId);
+
+      // Update local state
+      const { notifications, unreadCount } = get();
+      const updatedNotifications = notifications.map((notif) =>
+        notif.id === notificationId ? { ...notif, sudahBaca: true } : notif
+      );
+
+      set({
+        notifications: updatedNotifications,
+        unreadCount: Math.max(0, unreadCount - 1),
+      });
+
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || 'Gagal menandai notifikasi';
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // Mark all as read
+  markAllAsRead: async () => {
+    try {
+      await notificationAPI.markAllAsRead();
+
+      // Update local state
+      const { notifications } = get();
+      const updatedNotifications = notifications.map((notif) => ({
         ...notif,
-        read: true,
-      })),
-      unreadCount: 0,
-    })),
+        sudahBaca: true,
+      }));
 
-  clearNotifications: () =>
+      set({
+        notifications: updatedNotifications,
+        unreadCount: 0,
+      });
+
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || 'Gagal menandai semua notifikasi';
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // Delete notification
+  deleteNotification: async (notificationId) => {
+    try {
+      await notificationAPI.deleteNotification(notificationId);
+
+      // Update local state
+      const { notifications, unreadCount } = get();
+      const deletedNotif = notifications.find((n) => n.id === notificationId);
+      const updatedNotifications = notifications.filter(
+        (notif) => notif.id !== notificationId
+      );
+
+      set({
+        notifications: updatedNotifications,
+        unreadCount: deletedNotif?.sudahBaca
+          ? unreadCount
+          : Math.max(0, unreadCount - 1),
+      });
+
+      return { success: true };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || 'Gagal menghapus notifikasi';
+      return { success: false, error: errorMessage };
+    }
+  },
+
+  // Clear error
+  clearError: () => set({ error: null }),
+
+  // Reset store
+  reset: () =>
     set({
       notifications: [],
       unreadCount: 0,
-    }),
-
-  setNotifications: (notifications) =>
-    set({
-      notifications,
-      unreadCount: notifications.filter((n) => !n.read).length,
+      isLoading: false,
+      error: null,
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+      },
     }),
 }));
