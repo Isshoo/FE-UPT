@@ -87,7 +87,7 @@ export default function Sidebar() {
               </span>
               <SquareArrowOutUpLeft className="mt-0.5 ml-2 hidden h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
             </Link>
-            <div className="hidden lg:mt-1 lg:block">
+            <div className="hidden lg:mt-0.5 lg:block">
               {<NotificationBell />}
             </div>
           </div>

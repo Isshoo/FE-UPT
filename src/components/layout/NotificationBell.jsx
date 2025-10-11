@@ -38,7 +38,7 @@ export default function NotificationBell() {
     // Poll every 30 seconds
     const interval = setInterval(() => {
       fetchUnreadCount();
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [fetchUnreadCount]);

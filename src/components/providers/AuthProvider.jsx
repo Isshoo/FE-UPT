@@ -5,32 +5,32 @@ import { useAuthStore } from '@/store';
 import { useNotificationStore } from '@/store';
 
 export default function AuthProvider({ children }) {
-  const getCurrentUser = useAuthStore((state) => state.getCurrentUser);
   const initialize = useAuthStore((state) => state.initialize);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
 
   const { fetchUnreadCount, reset: resetNotifications } =
     useNotificationStore();
 
+  // Initialize auth only once
   useEffect(() => {
-    const initAuth = async () => {
-      await initialize();
+    initialize();
+  }, [initialize]);
 
-      // Fetch notifications if authenticated
-      if (isAuthenticated) {
-        fetchUnreadCount();
-      } else {
-        resetNotifications();
-      }
-    };
-
-    initAuth();
-  }, [initialize, isAuthenticated, fetchUnreadCount, resetNotifications]);
-
+  // Handle notification fetching based on auth state
   useEffect(() => {
-    // Check authentication on mount
-    getCurrentUser();
-  }, [getCurrentUser]);
+    // Wait for auth to be initialized
+    if (!isInitialized) return;
+
+    if (isAuthenticated) {
+      // Fetch notifications only once when authenticated
+      // NotificationBell component will handle polling
+      fetchUnreadCount(false); // Don't skip, force initial fetch
+    } else {
+      // Reset notifications when logged out
+      resetNotifications();
+    }
+  }, [isAuthenticated, isInitialized, fetchUnreadCount, resetNotifications]);
 
   return <>{children}</>;
 }
