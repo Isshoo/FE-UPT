@@ -97,7 +97,7 @@ export default function PendampinganDetailPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-8">
+    <div className="container mx-auto space-y-6 px-4 py-6">
       {/* Header */}
       <div>
         <Button
@@ -118,9 +118,9 @@ export default function PendampinganDetailPage() {
       </div>
 
       {/* Event Info */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <Card className="pt-5 pb-6">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Tanggal Pelaksanaan
@@ -148,7 +148,7 @@ export default function PendampinganDetailPage() {
       </Card>
 
       {/* Businesses Table */}
-      <Card>
+      <Card className="gap-3">
         <CardHeader>
           <CardTitle>Daftar Usaha Mahasiswa ({businesses.length})</CardTitle>
         </CardHeader>

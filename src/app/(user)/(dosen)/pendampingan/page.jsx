@@ -53,9 +53,9 @@ export default function PendampinganPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card>
-          <CardContent className="pt-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="py-4">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
                 <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -70,8 +70,8 @@ export default function PendampinganPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="hidden py-4 sm:block">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
                 <Users className="h-6 w-6 text-green-600 dark:text-green-300" />
@@ -86,8 +86,8 @@ export default function PendampinganPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="hidden py-4 sm:block">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-yellow-100 p-3 dark:bg-yellow-900">
                 <Users className="h-6 w-6 text-yellow-600 dark:text-yellow-300" />
@@ -107,7 +107,7 @@ export default function PendampinganPage() {
 
       {/* Events List */}
       {events.length === 0 ? (
-        <Card>
+        <Card className="pt-6 pb-5">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="mb-4 h-16 w-16 text-gray-400" />
             <p className="mb-2 text-lg text-gray-500">
@@ -122,7 +122,7 @@ export default function PendampinganPage() {
       ) : (
         <div className="space-y-6">
           {events.map(({ event, businesses }) => (
-            <Card key={event.id}>
+            <Card key={event.id} className="pt-6 pb-5">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">

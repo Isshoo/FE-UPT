@@ -28,6 +28,7 @@ export default function PenilaianFormPage() {
   const [businesses, setBusinesses] = useState([]);
   const [scores, setScores] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -36,6 +37,7 @@ export default function PenilaianFormPage() {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const [eventResponse, categoryResponse, businessesResponse] =
         await Promise.all([
           marketplaceAPI.getEventById(eventId),
@@ -62,6 +64,8 @@ export default function PenilaianFormPage() {
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,6 +152,14 @@ export default function PenilaianFormPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
+  }
+
   if (!event || !category) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center">
@@ -163,7 +175,7 @@ export default function PenilaianFormPage() {
   const canAssess = event.status === 'BERLANGSUNG';
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-8">
+    <div className="container mx-auto space-y-6 px-4 py-6">
       {/* Header */}
       <div>
         <Button
@@ -188,8 +200,8 @@ export default function PenilaianFormPage() {
 
       {/* Alert */}
       {!canAssess && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
-          <CardContent className="pt-6">
+        <Card className="border-yellow-200 bg-yellow-50 pt-5 pb-6 dark:border-yellow-800 dark:bg-yellow-950">
+          <CardContent className="pt-0">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
               ⚠️ Penilaian hanya dapat dilakukan saat event sedang berlangsung
             </p>
@@ -198,7 +210,7 @@ export default function PenilaianFormPage() {
       )}
 
       {/* Kriteria Info */}
-      <Card>
+      <Card className="gap-3 pt-5 pb-6">
         <CardHeader>
           <CardTitle>Kriteria Penilaian</CardTitle>
         </CardHeader>
@@ -220,7 +232,7 @@ export default function PenilaianFormPage() {
       </Card>
 
       {/* Assessment Form */}
-      <Card>
+      <Card className="gap-3 pt-5 pb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Form Penilaian ({businesses.length} Peserta)</CardTitle>
@@ -327,8 +339,8 @@ export default function PenilaianFormPage() {
       </Card>
 
       {/* Legend */}
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="pt-5 pb-6">
+        <CardContent className="pt-0">
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
             <p>
               <strong>Petunjuk:</strong>

@@ -25,27 +25,10 @@ export default function NotificationBell() {
     notifications,
     unreadCount,
     fetchNotifications,
-    fetchUnreadCount,
     markAsRead,
     markAllAsRead,
     deleteNotification,
   } = useNotificationStore();
-
-  // Fetch unread count on mount and periodically
-  useEffect(() => {
-    fetchUnreadCount();
-
-    // // Poll every 2 minutes (120000ms) instead of 30 seconds
-    // const interval = setInterval(() => {
-    //   // Only fetch if document is visible (tab is active)
-    //   if (document.visibilityState === 'visible') {
-    //     fetchUnreadCount();
-    //   }
-    // }, 120000); // 2 minutes
-
-    // return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Fetch notifications when dropdown opens
   useEffect(() => {

@@ -51,7 +51,7 @@ export default function PenilaianEventDetailPage() {
   const canAssess = event?.status === 'BERLANGSUNG';
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-8">
+    <div className="container mx-auto space-y-6 px-4 py-6">
       {/* Header */}
       <div>
         <Button
@@ -82,8 +82,8 @@ export default function PenilaianEventDetailPage() {
 
       {/* Info Alert */}
       {!canAssess && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
-          <CardContent className="pt-6">
+        <Card className="border-yellow-200 bg-yellow-50 pt-5 pb-6 dark:border-yellow-800 dark:bg-yellow-950">
+          <CardContent className="pt-0">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
               ⚠️ Penilaian hanya dapat dilakukan saat event sedang berlangsung
             </p>
@@ -92,8 +92,8 @@ export default function PenilaianEventDetailPage() {
       )}
 
       {canAssess && (
-        <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-          <CardContent className="pt-6">
+        <Card className="border-green-200 bg-green-50 pt-5 pb-6 dark:border-green-800 dark:bg-green-950">
+          <CardContent className="pt-0">
             <p className="text-sm text-green-800 dark:text-green-300">
               ✅ Event sedang berlangsung. Anda dapat melakukan penilaian
               sekarang!
@@ -103,8 +103,8 @@ export default function PenilaianEventDetailPage() {
       )}
 
       {/* Event Info */}
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="pt-5 pb-6">
+        <CardContent className="pt-0">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -133,7 +133,7 @@ export default function PenilaianEventDetailPage() {
         <h2 className="text-2xl font-bold">Kategori Penilaian</h2>
 
         {categories.length === 0 ? (
-          <Card>
+          <Card className="pt-5 pb-6">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Award className="mb-4 h-16 w-16 text-gray-400" />
               <p className="text-gray-500">
@@ -146,7 +146,7 @@ export default function PenilaianEventDetailPage() {
             {categories.map((category) => (
               <Card
                 key={category.id}
-                className="transition-shadow hover:shadow-lg"
+                className="flex h-full flex-col justify-between gap-2 pt-5 pb-6 transition-shadow hover:shadow-lg"
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -163,7 +163,7 @@ export default function PenilaianEventDetailPage() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="flex h-full flex-col justify-between gap-4">
                   {/* Kriteria */}
                   <div>
                     <div className="mb-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

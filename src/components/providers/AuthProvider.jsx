@@ -12,25 +12,34 @@ export default function AuthProvider({ children }) {
   const { fetchUnreadCount, reset: resetNotifications } =
     useNotificationStore();
 
+  // Effect 1: Initialize auth (hanya sekali)
   useEffect(() => {
-    if (isInitialized) {
-      return;
+    if (!isInitialized) {
+      initialize();
     }
-    const initAuth = async () => {
-      await initialize();
+  }, [initialize, isInitialized]);
 
-      // Fetch notifications only once after successful auth
-      if (isInitialized && isAuthenticated) {
-        fetchUnreadCount();
-      } else if (isInitialized && !isAuthenticated) {
-        resetNotifications();
-      }
-    };
+  // Effect 2: Handle notifications berdasarkan auth status
+  useEffect(() => {
+    if (!isInitialized) return; // Tunggu sampai init selesai
 
-    initAuth();
+    if (isAuthenticated) {
+      // Fetch pertama kali
+      fetchUnreadCount();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialize, isInitialized, isAuthenticated]);
+      // Setup polling setiap 2 menit
+      const interval = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          fetchUnreadCount();
+        }
+      }, 120000);
+
+      return () => clearInterval(interval);
+    } else {
+      // Reset notifications jika tidak authenticated
+      resetNotifications();
+    }
+  }, [isInitialized, isAuthenticated, fetchUnreadCount, resetNotifications]);
 
   return <>{children}</>;
 }

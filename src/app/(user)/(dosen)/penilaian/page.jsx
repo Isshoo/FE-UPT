@@ -53,9 +53,9 @@ export default function PenilaianPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card>
-          <CardContent className="pt-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="py-4 sm:block">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
                 <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -70,8 +70,8 @@ export default function PenilaianPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="hidden py-4 sm:block">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-900">
                 <Award className="h-6 w-6 text-purple-600 dark:text-purple-300" />
@@ -86,8 +86,8 @@ export default function PenilaianPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="hidden py-4 sm:block">
+          <CardContent className="pt-0">
             <div className="flex items-center gap-4">
               <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
                 <ClipboardList className="h-6 w-6 text-green-600 dark:text-green-300" />
@@ -110,7 +110,7 @@ export default function PenilaianPage() {
 
       {/* Events List */}
       {events.length === 0 ? (
-        <Card>
+        <Card className="gap-3">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Award className="mb-4 h-16 w-16 text-gray-400" />
             <p className="mb-2 text-lg text-gray-500">
@@ -124,7 +124,7 @@ export default function PenilaianPage() {
       ) : (
         <div className="space-y-6">
           {events.map(({ event, categories }) => (
-            <Card key={event.id}>
+            <Card key={event.id} className="gap-3">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
