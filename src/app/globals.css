@@ -159,3 +159,48 @@ html {
 .dark .animate-shimmer {
   background: linear-gradient(to right, #1f2937 4%, #374151 25%, #1f2937 36%);
 }
+
+/* Focus visible untuk keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #fba635;
+  outline-offset: 2px;
+}
+
+/* Skip to content link untuk screen readers */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #fba635;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Reduce motion untuk users yang memilih prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Improve text readability */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Better line height for readability */
+p {
+  line-height: 1.7;
+}

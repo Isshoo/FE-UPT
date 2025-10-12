@@ -53,7 +53,7 @@ export default function HeroSection() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-white text-lg text-black hover:bg-white/10 dark:text-white"
+                className="border-white text-lg text-black hover:bg-white/10 hover:text-white dark:text-white"
               >
                 <Link href={ROUTES.ABOUT}>Pelajari Lebih Lanjut</Link>
               </Button>

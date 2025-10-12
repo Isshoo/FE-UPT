@@ -30,9 +30,14 @@ import PaginationControls from '@/components/ui/pagination-controls';
 import { Search, Calendar, MapPin, Users, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { EventCardSkeleton } from '@/components/skeletons';
+import EmptyState from '@/components/ui/EmptyState';
+import ErrorMessage from '@/components/ui/ErrorMessage';
+
 export default function UserMarketplacePage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
@@ -54,6 +59,7 @@ export default function UserMarketplacePage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await marketplaceAPI.getEvents({
         ...filters,
         page: pagination.page,
@@ -71,6 +77,7 @@ export default function UserMarketplacePage() {
       }));
     } catch (error) {
       toast.error('Gagal memuat data event');
+      setError(error.message);
       console.error(error);
     } finally {
       setLoading(false);
@@ -104,10 +111,49 @@ export default function UserMarketplacePage() {
     setTimeout(() => fetchEvents(), 100);
   };
 
+  // Ganti bagian loading
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mt-2 h-4 w-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <div className="mb-6 flex gap-4">
+          <div className="h-10 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-10 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <EventCardSkeleton count={6} />
+        </div>
+      </div>
+    );
+  }
+
+  // Ganti bagian error
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage
+          title="Gagal Memuat Event"
+          message={error}
+          onRetry={fetchEvents}
+        />
+      </div>
+    );
+  }
+
+  // Ganti bagian empty state
+  if (events.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="mb-2 text-3xl font-bold">Marketplace</h1>
+        <p className="mb-6 text-gray-600">Daftar event marketplace/bazaar</p>
+        <EmptyState
+          icon={Calendar}
+          title="Belum Ada Event"
+          description="Belum ada event marketplace yang tersedia saat ini. Silakan cek kembali nanti."
+        />
       </div>
     );
   }

@@ -13,7 +13,10 @@ const oxygen = Oxygen({
 });
 
 export const metadata = {
-  title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
+  title: {
+    default: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
+    template: '%s | UPT-PIK',
+  },
   description:
     'Platform terpadu untuk manajemen event marketplace, pembinaan UMKM, dan pengembangan usaha mahasiswa di Universitas Katolik De La Salle Manado.',
   keywords: [
@@ -23,14 +26,63 @@ export const metadata = {
     'Bazaar',
     'Kewirausahaan',
     'Universitas Katolik De La Salle Manado',
+    'Inkubator Bisnis',
   ],
   authors: [{ name: 'UPT-PIK UKDLSM' }],
+  creator: 'UPT-PIK UKDLSM',
+  publisher: 'UPT-PIK UKDLSM',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
     description:
       'Platform terpadu untuk manajemen event marketplace dan pembinaan UMKM',
     type: 'website',
     locale: 'id_ID',
+    siteName: 'UPT-PIK',
+    images: [
+      {
+        url: '/images/banner.png',
+        width: 800,
+        height: 600,
+        alt: 'UPT-PIK',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
+    description:
+      'Platform terpadu untuk manajemen event marketplace dan pembinaan UMKM',
+    images: [
+      {
+        url: '/images/banner.png',
+        width: 800,
+        height: 600,
+        alt: 'UPT-PIK',
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
   },
 };
 

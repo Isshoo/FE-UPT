@@ -43,6 +43,9 @@ import {
 import toast from 'react-hot-toast';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
+import { TableSkeleton } from '@/components/skeletons';
+import EmptyState from '@/components/ui/EmptyState';
+import { Users } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -271,10 +274,18 @@ export default function AdminUsersPage() {
     downloadBlob(response.data, filename);
   };
 
+  // Loading state
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="mt-2 h-4 w-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+          <div className="h-10 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <TableSkeleton rows={10} columns={5} />
       </div>
     );
   }
@@ -420,10 +431,11 @@ export default function AdminUsersPage() {
         </CardHeader>
         <CardContent>
           {users.length === 0 ? (
-            <div className="py-12 text-center">
-              <UsersIcon className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-              <p className="text-gray-500">Belum ada user</p>
-            </div>
+            <EmptyState
+              icon={Users}
+              title="Tidak Ada Pengguna"
+              description="Tidak ada pengguna yang sesuai dengan kriteria pencarian."
+            />
           ) : (
             <>
               <div className="w-[260] overflow-x-auto sm:w-[448] md:w-[655] lg:w-full">

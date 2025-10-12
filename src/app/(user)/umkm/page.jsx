@@ -22,10 +22,15 @@ import {
 import PaginationControls from '@/components/ui/pagination-controls';
 import { Briefcase, Search, TrendingUp, Building2, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { CardSkeleton } from '@/components/skeletons';
+import EmptyState from '@/components/ui/EmptyState';
+import ErrorMessage from '@/components/ui/ErrorMessage';
+import { Store } from 'lucide-react';
 
 export default function UmkmPage() {
   const [umkms, setUmkms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -46,6 +51,7 @@ export default function UmkmPage() {
   const fetchUmkms = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await umkmAPI.getUmkms({
         ...filters,
         page: pagination.page,
@@ -59,6 +65,7 @@ export default function UmkmPage() {
       }));
     } catch (error) {
       toast.error('Gagal memuat data UMKM');
+      setError(error.message);
       console.error(error);
     } finally {
       setLoading(false);
@@ -91,10 +98,49 @@ export default function UmkmPage() {
     setTimeout(() => fetchUmkms(), 100);
   };
 
+  // Loading state
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mt-2 h-4 w-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <div className="mb-6 flex gap-4">
+          <div className="h-10 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-10 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <CardSkeleton count={6} />
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <ErrorMessage
+          title="Gagal Memuat UMKM"
+          message={error}
+          onRetry={fetchUmkms}
+        />
+      </div>
+    );
+  }
+
+  // Empty state
+  if (umkms.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="mb-2 text-3xl font-bold">UMKM Binaan</h1>
+        <p className="mb-6 text-gray-600">Daftar UMKM yang terdaftar</p>
+        <EmptyState
+          icon={Store}
+          title="Belum Ada UMKM"
+          description="Belum ada UMKM binaan yang terdaftar saat ini."
+        />
       </div>
     );
   }
