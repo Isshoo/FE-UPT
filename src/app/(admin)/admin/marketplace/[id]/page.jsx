@@ -163,6 +163,7 @@ export default function EventDetailPage() {
                 />
                 <Button
                   variant="outline"
+                  disabled
                   onClick={() =>
                     router.push(`${ROUTES.ADMIN_MARKETPLACE}/${eventId}/edit`)
                   }
