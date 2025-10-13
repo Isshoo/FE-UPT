@@ -215,7 +215,7 @@ body {
     max-width: 80rem /* 1280px */;
   }
   @media (width >= 1440px /* 1536px */) {
-    max-width: 1440px /* 1536px */;
+    max-width: 80rem /* 1536px */;
   }
 }
 
