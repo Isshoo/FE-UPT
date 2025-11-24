@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -85,8 +85,8 @@ export default function CreateUmkmPage() {
       </div>
 
       {/* Info Card */}
-      <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-        <CardContent className="pt-6">
+      {/* <Card className="border-blue-200 bg-blue-50 py-4 dark:border-blue-800 dark:bg-blue-950">
+        <CardContent className="pt-0">
           <div className="space-y-2 text-sm text-blue-800 dark:text-blue-300">
             <p className="font-semibold">ℹ️ Informasi Program Pembinaan:</p>
             <ul className="list-inside list-disc space-y-1">
@@ -97,13 +97,10 @@ export default function CreateUmkmPage() {
             </ul>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Form */}
       <Card>
-        <CardHeader>
-          <CardTitle>Informasi UMKM</CardTitle>
-        </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Business Info */}
