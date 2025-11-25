@@ -1,6 +1,6 @@
 'use client';
 
-import { ProtectedRoute } from '@/components/auth';
+import { ProtectedRoute } from '@/components/features/auth';
 import { ROLES } from '@/lib/constants';
 
 export default function UserLayout({ children }) {

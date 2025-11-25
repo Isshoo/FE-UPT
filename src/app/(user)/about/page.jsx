@@ -1,6 +1,6 @@
 'use client';
 
-import AboutContent from '@/components/about/AboutContent';
+import AboutContent from '@/components/features/user/about/AboutContent';
 
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';

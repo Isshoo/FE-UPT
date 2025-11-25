@@ -30,7 +30,7 @@ import PaginationControls from '@/components/ui/pagination-controls';
 import { Search, Calendar, MapPin, Users, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-import { EventCardSkeleton } from '@/components/skeletons';
+import { EventCardSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 

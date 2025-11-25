@@ -10,8 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronLeft, Users, Building2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import MahasiswaForm from '@/components/user/marketplace/MahasiswaForm';
-import UmkmLuarForm from '@/components/user/marketplace/UmkmLuarForm';
+import MahasiswaForm from '@/components/features/user/marketplace/MahasiswaForm';
+import UmkmLuarForm from '@/components/features/user/marketplace/UmkmLuarForm';
 
 export default function RegisterBusinessPage() {
   const router = useRouter();

@@ -1,4 +1,4 @@
-import { Header, Footer } from '@/components/layout';
+import { Header, Footer } from '@/components/common/layout';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 
 export default function UserLayout({ children }) {

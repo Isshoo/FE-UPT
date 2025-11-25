@@ -22,7 +22,7 @@ import {
 import PaginationControls from '@/components/ui/pagination-controls';
 import { Briefcase, Search, TrendingUp, Building2, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { CardSkeleton } from '@/components/skeletons';
+import { CardSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { Store } from 'lucide-react';

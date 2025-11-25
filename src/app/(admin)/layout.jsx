@@ -1,7 +1,7 @@
 'use client';
 
-import { Sidebar } from '@/components/layout';
-import { ProtectedRoute } from '@/components/auth';
+import { Sidebar } from '@/components/common/layout';
+import { ProtectedRoute } from '@/components/features/auth';
 import { ROLES } from '@/lib/constants';
 
 export default function AdminLayout({ children }) {

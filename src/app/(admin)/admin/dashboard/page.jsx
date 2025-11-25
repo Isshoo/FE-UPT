@@ -11,15 +11,15 @@ import {
 } from 'lucide-react';
 import { dashboardAPI } from '@/lib/api';
 import { toast } from 'react-hot-toast';
-import StatsCard from '@/components/admin/dashboard/StatsCard';
-import BarChartCard from '@/components/admin/dashboard/BarChartCard';
-import PieChartCard from '@/components/admin/dashboard/PieChartCard';
-import LineChartCard from '@/components/admin/dashboard/LineChartCard';
+import StatsCard from '@/components/features/admin/dashboard/StatsCard';
+import BarChartCard from '@/components/features/admin/dashboard/BarChartCard';
+import PieChartCard from '@/components/features/admin/dashboard/PieChartCard';
+import LineChartCard from '@/components/features/admin/dashboard/LineChartCard';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants';
-import DashboardSkeleton from '@/components/admin/dashboard/DashboardSkeleton';
+import DashboardSkeleton from '@/components/features/admin/dashboard/DashboardSkeleton';
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);

@@ -25,9 +25,9 @@ import {
   Award,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import EventInfoTab from '@/components/admin/marketplace/EventInfoTab';
-import ParticipantsTab from '@/components/admin/marketplace/ParticipantsTab';
-import AssessmentTab from '@/components/admin/marketplace/AssessmentTab';
+import EventInfoTab from '@/components/features/admin/marketplace/EventInfoTab';
+import ParticipantsTab from '@/components/features/admin/marketplace/ParticipantsTab';
+import AssessmentTab from '@/components/features/admin/marketplace/AssessmentTab';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
 

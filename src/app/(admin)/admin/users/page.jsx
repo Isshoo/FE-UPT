@@ -43,7 +43,7 @@ import {
 import toast from 'react-hot-toast';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
-import { TableSkeleton } from '@/components/skeletons';
+import { TableSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import { Users } from 'lucide-react';
 
