@@ -100,7 +100,6 @@ export const KATEGORI_USAHA = [
   'Kerajinan',
   'Teknologi',
   'Jasa',
-  'Pertanian',
   'Lainnya',
 ];
 

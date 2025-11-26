@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Store,
-  Briefcase,
+  // Briefcase,
   Users,
   LogOut,
   User,
@@ -39,13 +39,13 @@ const menuItems = [
     href: ROUTES.ADMIN_MARKETPLACE,
     icon: Store,
   },
+  // {
+  //   title: 'UMKM Binaan',
+  //   href: ROUTES.ADMIN_UMKM,
+  //   icon: Briefcase,
+  // },
   {
-    title: 'UMKM Binaan',
-    href: ROUTES.ADMIN_UMKM,
-    icon: Briefcase,
-  },
-  {
-    title: 'Users',
+    title: 'Pengguna',
     href: ROUTES.ADMIN_USERS,
     icon: Users,
   },
@@ -64,7 +64,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Sidebar untuk Tablet & Desktop */}
-      <aside className="fixed top-0 left-0 z-40 hidden h-screen w-20 max-w-64 min-w-20 border-r bg-white sm:block lg:w-full dark:border-gray-800 dark:bg-gray-900">
+      <aside className="fixed top-0 left-0 z-40 hidden h-screen w-20 max-w-64 min-w-20 border-r bg-white md:block lg:w-full dark:border-gray-800 dark:bg-gray-900">
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
           <div className="flex h-24 items-center justify-center border-b pt-2 lg:justify-between lg:px-5 dark:border-gray-800">
@@ -265,7 +265,7 @@ export default function Sidebar() {
       </div>
 
       {/* Mobile Bottom Navigation (hanya untuk layar sangat kecil) */}
-      <nav className="fixed right-0 bottom-0 left-0 z-40 border-t bg-white sm:hidden dark:border-gray-800 dark:bg-gray-900">
+      <nav className="fixed right-0 bottom-0 left-0 z-40 border-t bg-white md:hidden dark:border-gray-800 dark:bg-gray-900">
         <div className="flex items-center justify-around">
           {menuItems.map((item) => {
             const Icon = item.icon;

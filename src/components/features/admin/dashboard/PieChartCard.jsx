@@ -10,13 +10,13 @@ import {
 
 const COLORS = [
   '#fba635',
-  '#fdac58',
   '#174c4e',
   '#b81202',
   '#072526',
   '#10b981',
   '#3b82f6',
   '#8b5cf6',
+  '#ec4899',
 ];
 
 export default function PieChartCard({
@@ -24,7 +24,7 @@ export default function PieChartCard({
   data,
   dataKey,
   nameKey,
-  height = 300,
+  height = 400,
 }) {
   return (
     <Card className="gap-0 p-4">
@@ -37,7 +37,7 @@ export default function PieChartCard({
             cy="50%"
             labelLine={false}
             label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-            outerRadius={height / 3}
+            outerRadius={height / 3.5}
             fill="#8884d8"
             dataKey={dataKey}
             nameKey={nameKey}

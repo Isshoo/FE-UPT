@@ -27,7 +27,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import PaginationControls from '@/components/ui/pagination-controls';
-import { Search, Calendar, MapPin, Users, TrendingUp } from 'lucide-react';
+import {
+  Search,
+  Calendar,
+  MapPin,
+  Users,
+  // TrendingUp
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { EventCardSkeleton } from '@/components/common/skeletons';
@@ -172,7 +178,7 @@ export default function UserMarketplacePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:grid-cols-3">
+      {/* <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 md:grid-cols-3">
         <Card className="gap-2 py-4">
           <CardContent className="">
             <div className="flex items-center gap-4">
@@ -224,7 +230,7 @@ export default function UserMarketplacePage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Filters */}
       <Card className="gap-2 pt-6 pb-6">

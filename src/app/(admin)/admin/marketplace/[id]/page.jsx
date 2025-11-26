@@ -203,7 +203,7 @@ export default function EventDetailPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-0">
             <div className="flex items-center gap-3">
@@ -283,7 +283,7 @@ export default function EventDetailPage() {
           <EventInfoTab event={event} onRefresh={fetchEventDetail} />
         </TabsContent>
 
-        <TabsContent value="participants" className="space-y-6">
+        <TabsContent value="participants" className="w-full space-y-6">
           <ParticipantsTab
             event={event}
             onRefresh={fetchEventDetail}

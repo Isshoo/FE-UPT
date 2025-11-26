@@ -113,7 +113,7 @@ export default function AssessmentDetailPage() {
           Kembali ke Detail Event
         </Button>
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col items-start justify-between">
           <div>
             <h1 className="flex items-center gap-3 text-3xl font-bold">
               <Award className="h-8 w-8 text-[#fba635]" />

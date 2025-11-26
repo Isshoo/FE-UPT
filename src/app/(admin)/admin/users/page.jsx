@@ -37,7 +37,7 @@ import {
   Plus,
   Edit2,
   Trash2,
-  Users as UsersIcon,
+  // Users as UsersIcon,
   Key,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -49,7 +49,7 @@ import { Users } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
-  const [stats, setStats] = useState(null);
+  // const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -97,7 +97,7 @@ export default function AdminUsersPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [usersResponse, statsResponse] = await Promise.all([
+      const [usersResponse] = await Promise.all([
         usersAPI.getUsers({
           ...filters,
           page: pagination.page,
@@ -112,7 +112,7 @@ export default function AdminUsersPage() {
         total: usersResponse.pagination?.total || 0,
         totalPages: usersResponse.pagination?.totalPages || 0,
       }));
-      setStats(statsResponse.data);
+      // setStats(statsResponse.data);
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
@@ -314,7 +314,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+      {/* <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
         <Card className="gap-2 py-4">
           <CardHeader className="flex flex-row items-center justify-between pb-0">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -374,13 +374,10 @@ export default function AdminUsersPage() {
             <div className="text-3xl font-bold">{stats?.byRole?.user || 0}</div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Filters */}
-      <Card className="gap-2 pt-5 pb-6">
-        <CardHeader>
-          <CardTitle className="text-lg">Filter Users</CardTitle>
-        </CardHeader>
+      <Card className="gap-2 py-6">
         <CardContent>
           <div className="flex flex-col items-center gap-3 md:flex-row">
             <div className="flex w-full flex-col gap-3 sm:flex-row">
@@ -438,7 +435,7 @@ export default function AdminUsersPage() {
             />
           ) : (
             <>
-              <div className="w-[260] overflow-x-auto sm:w-[448] md:w-[655] lg:w-full">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>

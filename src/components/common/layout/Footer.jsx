@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {
   MapPin,
   Mail,
-  Phone,
+  // Phone,
   Facebook,
   Instagram,
   Twitter,
@@ -14,7 +14,7 @@ import { APP_NAME, ROUTES } from '@/lib/constants';
 export default function Footer() {
   return (
     <footer className="border-t bg-slate-50 dark:border-gray-800 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 pt-12 pb-8">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand & Description */}
           <div>
@@ -31,30 +31,30 @@ export default function Footer() {
               UMKM di lingkungan kampus.
             </p>
             <div className="flex gap-3">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors hover:bg-[#fba635] hover:text-white dark:bg-gray-800 dark:text-gray-400"
+              <p
+                // href="https://facebook.com"
+                // target="_blank"
+                // rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors dark:bg-gray-800 dark:text-gray-400"
               >
                 <Facebook className="h-4 w-4" />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors hover:bg-[#fba635] hover:text-white dark:bg-gray-800 dark:text-gray-400"
+              </p>
+              <p
+                // href="https://instagram.com"
+                // target="_blank"
+                // rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors dark:bg-gray-800 dark:text-gray-400"
               >
                 <Instagram className="h-4 w-4" />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors hover:bg-[#fba635] hover:text-white dark:bg-gray-800 dark:text-gray-400"
+              </p>
+              <p
+                // href="https://twitter.com"
+                // target="_blank"
+                // rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 transition-colors dark:bg-gray-800 dark:text-gray-400"
               >
                 <Twitter className="h-4 w-4" />
-              </a>
+              </p>
             </div>
           </div>
 
@@ -122,20 +122,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
-                >
+                <p className="text-gray-600 transition-colors dark:text-gray-400">
                   Panduan Pengguna
-                </a>
+                </p>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
-                >
+                <p className="text-gray-600 transition-colors dark:text-gray-400">
                   FAQ
-                </a>
+                </p>
               </li>
             </ul>
           </div>
@@ -157,29 +151,29 @@ export default function Footer() {
               <li className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Mail className="h-4 w-4 flex-shrink-0" />
                 <a
-                  href="mailto:info@upt-pik.ac.id"
+                  href="mailto: upt-pik@unikadelasalle.ac.id"
                   className="hover:text-[#fba635]"
                 >
-                  info@upt-pik.ac.id
+                  upt-pik@unikadelasalle.ac.id
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              {/* <li className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Phone className="h-4 w-4 flex-shrink-0" />
-                <a href="tel:+624318910031" className="hover:text-[#fba635]">
-                  +62 (431) 891-031
-                </a>
-              </li>
+                <p href="tel:+621" className="hover:text-[#fba635]">
+                  +62 
+                </p>
+              </li> */}
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 border-t pt-8 dark:border-gray-800">
-          <div className="flex flex-col items-center justify-between gap-4 text-sm text-gray-600 md:flex-row dark:text-gray-400">
+        <div className="mt-12 border-t pt-6 dark:border-gray-800">
+          <div className="flex flex-col items-center justify-center gap-4 text-sm text-gray-600 md:flex-row dark:text-gray-400">
             <p>
               © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
             </p>
-            <div className="flex gap-6">
+            {/* <div className="flex gap-6">
               <a href="#" className="hover:text-[#fba635]">
                 Privacy Policy
               </a>
@@ -189,7 +183,7 @@ export default function Footer() {
               <a href="#" className="hover:text-[#fba635]">
                 Cookie Policy
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

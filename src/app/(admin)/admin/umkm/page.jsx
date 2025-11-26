@@ -281,7 +281,7 @@ export default function AdminUmkmPage() {
             </div>
           ) : (
             <>
-              <div className="w-[260] overflow-x-auto sm:w-[448] md:w-[655] lg:w-full">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
