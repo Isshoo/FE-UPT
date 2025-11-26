@@ -12,7 +12,7 @@ import {
   ROUTES,
   ROLES,
 } from '@/lib/constants';
-import { formatDate } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -40,6 +40,9 @@ import {
   FileText,
   Trophy,
   LogIn,
+  CheckCircle,
+  Clock,
+  XCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -52,6 +55,7 @@ export default function UserEventDetailPage() {
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRegistration, setUserRegistration] = useState(null);
 
   useEffect(() => {
     fetchEventDetail();
@@ -63,11 +67,29 @@ export default function UserEventDetailPage() {
       setLoading(true);
       const response = await marketplaceAPI.getEventById(eventId);
       setEvent(response.data);
+
+      // Check user registration after getting event data
+      if (isAuthenticated && user?.role === ROLES.USER && response.data) {
+        checkUserRegistration(response.data);
+      }
     } catch (error) {
       toast.error('Gagal memuat detail event');
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkUserRegistration = (eventData) => {
+    // Cek apakah user sudah mendaftar di event ini
+    if (eventData && eventData.usaha && user) {
+      const userBusiness = eventData.usaha.find(
+        (usaha) => usaha.pemilik.id === user.id
+      );
+
+      setUserRegistration(userBusiness || null);
+    } else {
+      setUserRegistration(null);
     }
   };
 
@@ -78,7 +100,53 @@ export default function UserEventDetailPage() {
       return;
     }
 
+    if (userRegistration) {
+      toast.error('Anda sudah mendaftarkan usaha di event ini');
+      return;
+    }
+
     router.push(`/marketplace/${eventId}/register`);
+  };
+
+  const getRegistrationStatusBadge = () => {
+    if (!userRegistration) return null;
+
+    const statusConfig = {
+      PENDING: {
+        icon: Clock,
+        color:
+          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+        label: 'Menunggu Persetujuan',
+      },
+      APPROVED: {
+        icon: CheckCircle,
+        color:
+          'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+        label: 'Disetujui',
+      },
+      REJECTED: {
+        icon: XCircle,
+        color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+        label: 'Ditolak',
+      },
+    };
+
+    const status =
+      userRegistration.disetujui === null
+        ? 'PENDING'
+        : userRegistration.disetujui
+          ? 'APPROVED'
+          : 'REJECTED';
+
+    const config = statusConfig[status];
+    const Icon = config.icon;
+
+    return (
+      <Badge className={config.color}>
+        <Icon className="mr-1 h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
   };
 
   if (loading) {
@@ -103,9 +171,13 @@ export default function UserEventDetailPage() {
     );
   }
 
-  const isRegistrationOpen = event.status === 'TERBUKA';
+  const isRegistrationOpen =
+    event.status === 'TERBUKA' &&
+    new Date() >= new Date(event.mulaiPendaftaran) &&
+    new Date() <= new Date(event.akhirPendaftaran);
   const isEventCompleted = event.status === 'SELESAI';
   const approvedBusinesses = event.usaha?.filter((b) => b.disetujui) || [];
+  const canRegister = isRegistrationOpen && !userRegistration;
 
   return (
     <div className="container mx-auto space-y-8 px-4 py-8">
@@ -124,24 +196,100 @@ export default function UserEventDetailPage() {
           <div className="flex-1">
             <div className="mb-2 flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold md:text-4xl">{event.nama}</h1>
-              <Badge className={EVENT_STATUS_COLORS[event.status]}>
-                {EVENT_STATUS_LABELS[event.status]}
-              </Badge>
+              {isRegistrationOpen && (
+                <Badge className={EVENT_STATUS_COLORS['TERBUKA']}>
+                  {EVENT_STATUS_LABELS['TERBUKA']}
+                </Badge>
+              )}
+              {userRegistration && getRegistrationStatusBadge()}
             </div>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               {event.deskripsi}
             </p>
           </div>
+        </div>
+      </div>
 
-          {isRegistrationOpen && (
-            <>
+      {/* User Registration Status */}
+      {userRegistration && (
+        <Card className="border-2 border-blue-500 bg-blue-50 dark:bg-blue-950">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="rounded-lg bg-blue-500 p-3">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="mb-2 text-lg font-semibold">
+                  Status Pendaftaran Anda
+                </h3>
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
+                  Usaha: <strong>{userRegistration.namaProduk}</strong>
+                </p>
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
+                  Kategori: <strong>{userRegistration.kategori}</strong>
+                </p>
+                {userRegistration.disetujui === null && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Pendaftaran Anda sedang menunggu persetujuan dari admin.
+                  </p>
+                )}
+                {userRegistration.disetujui === true && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Selamat! Pendaftaran Anda telah disetujui.
+                    {userRegistration.nomorBooth && (
+                      <>
+                        {' '}
+                        Nomor booth:{' '}
+                        <strong>{userRegistration.nomorBooth}</strong>
+                      </>
+                    )}
+                  </p>
+                )}
+                {userRegistration.disetujui === false && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Maaf, pendaftaran Anda ditolak.
+                    {userRegistration.alasanPenolakan && (
+                      <> Alasan: {userRegistration.alasanPenolakan}</>
+                    )}
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Registration Info */}
+      {isRegistrationOpen && !userRegistration && (
+        <Card className="border-2 border-[#fba635] bg-orange-50 dark:bg-orange-950">
+          <CardContent className="flex flex-col gap-4 pt-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-lg bg-[#fba635] p-3">
+                <Calendar className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="mb-2 text-lg font-semibold">
+                  Pendaftaran Dibuka!
+                </h3>
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
+                  Periode pendaftaran:{' '}
+                  <strong>{formatDateTime(event.mulaiPendaftaran)}</strong> s/d{' '}
+                  <strong>{formatDateTime(event.akhirPendaftaran)}</strong>
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Jangan lewatkan kesempatan untuk ikut serta dalam event ini!
+                </p>
+              </div>
+            </div>
+            <div className="flex w-full items-end justify-end md:w-auto md:justify-end">
               {isAuthenticated ? (
                 <>
-                  {user?.role === `${ROLES.USER}` && (
+                  {user?.role === ROLES.USER && (
                     <Button
                       onClick={handleRegister}
                       size="lg"
-                      className="bg-[#fba635] hover:bg-[#fdac58]"
+                      disabled={!canRegister}
+                      className="bg-[#fba635] hover:bg-[#fdac58] disabled:opacity-50"
                     >
                       <FileText className="mr-2 h-5 w-5" />
                       Daftar Sekarang
@@ -149,20 +297,18 @@ export default function UserEventDetailPage() {
                   )}
                 </>
               ) : (
-                <>
-                  <Link
-                    href={`${ROUTES.LOGIN}?redirect=/marketplace/${eventId}/register`}
-                    className="inline-flex items-center rounded-lg bg-[#fba635] px-4 py-2 text-white hover:bg-[#fdac58]"
-                  >
-                    <LogIn className="mr-2 h-5 w-5" />
-                    Login untuk Daftar
-                  </Link>
-                </>
+                <Link
+                  href={`${ROUTES.LOGIN}?redirect=/marketplace/${eventId}/register`}
+                  className="inline-flex items-center rounded-lg bg-[#fba635] px-4 py-2 text-white hover:bg-[#fdac58]"
+                >
+                  <LogIn className="mr-2 h-5 w-5" />
+                  Login untuk Daftar
+                </Link>
               )}
-            </>
-          )}
-        </div>
-      </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Event Info Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -175,7 +321,7 @@ export default function UserEventDetailPage() {
                   Tanggal Pelaksanaan
                 </p>
                 <p className="font-semibold">
-                  {formatDate(event.tanggalPelaksanaan)}
+                  {formatDateTime(event.tanggalPelaksanaan)}
                 </p>
               </div>
             </div>
@@ -228,32 +374,6 @@ export default function UserEventDetailPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Registration Info */}
-      {isRegistrationOpen && (
-        <Card className="border-2 border-[#fba635] bg-orange-50 dark:bg-orange-950">
-          <CardContent className="pt-0">
-            <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-[#fba635] p-3">
-                <Calendar className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="mb-2 text-lg font-semibold">
-                  Pendaftaran Dibuka!
-                </h3>
-                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
-                  Periode pendaftaran:{' '}
-                  <strong>{formatDate(event.mulaiPendaftaran)}</strong> s/d{' '}
-                  <strong>{formatDate(event.akhirPendaftaran)}</strong>
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Jangan lewatkan kesempatan untuk ikut serta dalam event ini!
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Tabs */}
       <Tabs defaultValue="info" className="space-y-6">

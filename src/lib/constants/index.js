@@ -158,3 +158,19 @@ export const UMKM_STAGE_STATUS_COLORS = {
     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
   SELESAI: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
 };
+
+export const generateTahunAjaranOptions = () => {
+  const currentYear = new Date().getFullYear();
+  const options = [];
+
+  for (let i = 0; i <= 5; i++) {
+    const year = currentYear + i;
+    const nextYear = year + 1;
+    options.push({
+      value: `${year}/${nextYear}`,
+      label: `${year}/${nextYear}`,
+    });
+  }
+
+  return options;
+};

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store';
-import { authAPI, umkmAPI } from '@/lib/api';
+import { authAPI, umkmAPI, marketplaceAPI } from '@/lib/api';
 import { UMKM_STAGE_NAMES } from '@/lib/constants';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,8 +20,15 @@ import {
   Plus,
   Edit2,
   Trash2,
+  ShoppingBag,
+  Calendar,
+  MapPin,
+  Clock,
+  ExternalLink,
+  CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { formatDateTime } from '@/lib/utils';
 
 export default function ProfilePage() {
   const searchParams = useSearchParams();
@@ -31,7 +38,9 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [changingPassword, setChangingPassword] = useState(false);
   const [myUmkms, setMyUmkms] = useState([]);
+  const [marketplaceHistory, setMarketplaceHistory] = useState([]);
   const [loadingUmkms, setLoadingUmkms] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
@@ -45,6 +54,9 @@ export default function ProfilePage() {
     if (activeTab === 'umkm' && !isDosen && !isAdmin) {
       fetchMyUmkms();
     }
+    if (activeTab === 'riwayat' && !isDosen && !isAdmin) {
+      fetchMarketplaceHistory();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -57,6 +69,19 @@ export default function ProfilePage() {
       console.error('Failed to fetch UMKM:', error);
     } finally {
       setLoadingUmkms(false);
+    }
+  };
+
+  const fetchMarketplaceHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      const response = await marketplaceAPI.getMyHistory();
+      setMarketplaceHistory(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+      toast.error('Gagal memuat riwayat marketplace');
+    } finally {
+      setLoadingHistory(false);
     }
   };
 
@@ -91,6 +116,20 @@ export default function ProfilePage() {
     } finally {
       setChangingPassword(false);
     }
+  };
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      TERBUKA: { label: 'Terbuka', className: 'bg-green-500' },
+      BERLANGSUNG: { label: 'Berlangsung', className: 'bg-blue-500' },
+      SELESAI: { label: 'Selesai', className: 'bg-gray-500' },
+    };
+
+    const config = statusConfig[status] || statusConfig.TERBUKA;
+
+    return (
+      <Badge className={`${config.className} text-white`}>{config.label}</Badge>
+    );
   };
 
   const handleDeleteUmkm = async (umkmId, namaUmkm) => {
@@ -132,7 +171,7 @@ export default function ProfilePage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList
-          className={showOnlyProfile ? 'w-full' : 'grid w-full grid-cols-3'}
+          className={showOnlyProfile ? 'w-full' : 'grid w-full grid-cols-2'}
         >
           <TabsTrigger value="profil">
             <User className="mr-2 h-4 w-4" />
@@ -144,10 +183,10 @@ export default function ProfilePage() {
                 <History className="mr-2 h-4 w-4" />
                 Riwayat Marketplace
               </TabsTrigger>
-              <TabsTrigger value="umkm">
+              {/* <TabsTrigger value="umkm">
                 <Briefcase className="mr-2 h-4 w-4" />
                 UMKM Anda
-              </TabsTrigger>
+              </TabsTrigger> */}
             </>
           )}
         </TabsList>
@@ -276,16 +315,136 @@ export default function ProfilePage() {
 
         {/* Riwayat Marketplace Tab */}
         {!showOnlyProfile && (
-          <TabsContent value="riwayat">
+          <TabsContent value="riwayat" className="space-y-6">
             <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <History className="mb-4 h-16 w-16 text-gray-400" />
-                <p className="mb-2 text-gray-500">
-                  Belum ada riwayat marketplace
-                </p>
-                <p className="text-sm text-gray-400">
-                  Riwayat event yang Anda ikuti akan muncul di sini
-                </p>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>
+                    Riwayat Marketplace ({marketplaceHistory.length})
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {loadingHistory ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+                  </div>
+                ) : marketplaceHistory.length === 0 ? (
+                  <div className="py-12 text-center">
+                    <History className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                    <p className="mb-2 text-gray-500">
+                      Belum ada riwayat marketplace
+                    </p>
+                    <p className="mb-4 text-sm text-gray-400">
+                      Riwayat event yang Anda ikuti akan muncul di sini
+                    </p>
+                    <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
+                      <Link href="/marketplace">
+                        <ShoppingBag className="mr-2 h-4 w-4" />
+                        Lihat Event Tersedia
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {marketplaceHistory.map((history) => (
+                      <Card
+                        key={history.id}
+                        className="border-l-4 border-l-[#fba635]"
+                      >
+                        <CardContent className="pt-0">
+                          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                            {/* Event Info */}
+                            <div className="flex-1 space-y-3">
+                              <div className="flex items-start gap-3">
+                                <Calendar className="mt-1 h-5 w-5 text-[#fba635]" />
+                                <div>
+                                  <h3 className="text-lg font-semibold">
+                                    {history.event.nama}
+                                  </h3>
+                                  <p className="text-sm text-gray-500">
+                                    {history.event.semester} -{' '}
+                                    {history.event.tahunAjaran}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <MapPin className="h-4 w-4" />
+                                <span>{history.event.lokasi}</span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Clock className="h-4 w-4" />
+                                <span>
+                                  Pelaksanaan:{' '}
+                                  {formatDateTime(
+                                    history.event.tanggalPelaksanaan
+                                  )}
+                                </span>
+                              </div>
+
+                              {/* Business Info */}
+                              {history.usaha && (
+                                <div className="mt-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                                  <div className="flex items-start justify-between">
+                                    <div>
+                                      <p className="text-sm font-semibold">
+                                        {history.usaha.namaProduk}
+                                      </p>
+                                      <div className="mt-1 flex flex-wrap gap-2">
+                                        <Badge variant="outline">
+                                          {history.usaha.kategori}
+                                        </Badge>
+                                        <Badge variant="outline">
+                                          {history.usaha.tipeUsaha ===
+                                          'MAHASISWA'
+                                            ? 'Mahasiswa'
+                                            : 'UMKM Luar'}
+                                        </Badge>
+                                        {history.usaha.nomorBooth && (
+                                          <Badge className="bg-[#174c4e] text-white">
+                                            Booth {history.usaha.nomorBooth}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {history.usaha.disetujui ? (
+                                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                    ) : (
+                                      <Clock className="h-5 w-5 text-yellow-500" />
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Status & Actions */}
+                            <div className="flex flex-col items-end gap-3">
+                              {getStatusBadge(history.event.status)}
+
+                              <Button
+                                asChild
+                                size="sm"
+                                variant="outline"
+                                className="w-full md:w-auto"
+                              >
+                                <Link href={`/marketplace/${history.event.id}`}>
+                                  <ExternalLink className="mr-2 h-4 w-4" />
+                                  Lihat Detail
+                                </Link>
+                              </Button>
+
+                              <p className="text-xs text-gray-500">
+                                Terdaftar: {formatDateTime(history.createdAt)}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

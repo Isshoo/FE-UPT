@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Plus, Trash2, Edit2, Save, X } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -36,13 +43,10 @@ export default function AssessmentForm({ data, onUpdate }) {
   const fetchDosen = async () => {
     try {
       setLoadingDosen(true);
-      // Fetch list dosen - you'll need to create this endpoint
-      // For now, we'll use a placeholder
       const response = await apiClient.get('/users?role=DOSEN');
       setDosenList(response.data.data || []);
     } catch (error) {
       console.error('Failed to fetch dosen:', error);
-      // Use dummy data for now
       setDosenList([]);
     } finally {
       setLoadingDosen(false);
@@ -150,12 +154,9 @@ export default function AssessmentForm({ data, onUpdate }) {
     toast.success('Kategori dihapus');
   };
 
-  const handleTogglePenilai = (dosenId) => {
-    const penilaiIds = newKategori.penilaiIds.includes(dosenId)
-      ? newKategori.penilaiIds.filter((id) => id !== dosenId)
-      : [...newKategori.penilaiIds, dosenId];
-
-    setNewKategori({ ...newKategori, penilaiIds });
+  const getDosenName = (dosenId) => {
+    const dosen = dosenList.find((d) => d.id === dosenId);
+    return dosen ? dosen.nama : 'Dosen tidak ditemukan';
   };
 
   const totalBobot = getTotalBobot();
@@ -207,9 +208,9 @@ export default function AssessmentForm({ data, onUpdate }) {
             </div>
           </div>
 
-          {/* Penilai */}
+          {/* Penilai - Changed to Select Dropdown */}
           <div className="space-y-2">
-            <Label>
+            <Label htmlFor="penilai">
               Dosen Penilai <span className="text-red-500">*</span>
             </Label>
             {loadingDosen ? (
@@ -220,27 +221,28 @@ export default function AssessmentForm({ data, onUpdate }) {
                 dahulu.
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-                {dosenList.map((dosen) => (
-                  <label
-                    key={dosen.id}
-                    className="flex cursor-pointer items-center gap-2 rounded border p-2 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={newKategori.penilaiIds.includes(dosen.id)}
-                      onChange={() => handleTogglePenilai(dosen.id)}
-                      className="rounded"
-                    />
-                    <span className="text-sm">{dosen.nama}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-            {newKategori.penilaiIds.length > 0 && (
-              <p className="text-xs text-gray-500">
-                {newKategori.penilaiIds.length} penilai dipilih
-              </p>
+              <Select
+                value={newKategori.penilaiIds[0] || ''}
+                onValueChange={(value) =>
+                  setNewKategori({ ...newKategori, penilaiIds: [value] })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih dosen penilai" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80 overflow-y-auto">
+                  {dosenList.map((dosen) => (
+                    <SelectItem key={dosen.id} value={dosen.id}>
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium">{dosen.nama}</span>
+                        <span className="text-xs text-gray-500">
+                          {dosen.fakultas} - {dosen.prodi}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           </div>
 
@@ -256,14 +258,14 @@ export default function AssessmentForm({ data, onUpdate }) {
             </div>
 
             {/* Add Kriteria Form */}
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Input
                 placeholder="Nama kriteria"
                 value={newKriteria.nama}
                 onChange={(e) =>
                   setNewKriteria({ ...newKriteria, nama: e.target.value })
                 }
-                className="flex-1"
+                className="w-full min-w-48 flex-1"
               />
               <Input
                 type="number"
@@ -362,7 +364,7 @@ export default function AssessmentForm({ data, onUpdate }) {
           <div className="space-y-4">
             {kategoriList.map((kategori, index) => (
               <Card key={index}>
-                <CardContent className="pt-6">
+                <CardContent className="pt-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2">
@@ -378,8 +380,8 @@ export default function AssessmentForm({ data, onUpdate }) {
 
                       <div className="text-sm text-gray-600 dark:text-gray-400">
                         <p>
-                          <strong>Penilai:</strong> {kategori.penilaiIds.length}{' '}
-                          dosen
+                          <strong>Penilai:</strong>{' '}
+                          {getDosenName(kategori.penilaiIds[0])}
                         </p>
                         <p>
                           <strong>Kriteria:</strong> {kategori.kriteria.length}

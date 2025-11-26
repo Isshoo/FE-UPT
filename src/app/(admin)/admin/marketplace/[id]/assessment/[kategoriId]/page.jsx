@@ -113,7 +113,7 @@ export default function AssessmentDetailPage() {
           Kembali ke Detail Event
         </Button>
 
-        <div className="flex flex-col items-start justify-between">
+        <div className="flex flex-row items-start justify-between">
           <div>
             <h1 className="flex items-center gap-3 text-3xl font-bold">
               <Award className="h-8 w-8 text-[#fba635]" />
@@ -143,8 +143,11 @@ export default function AssessmentDetailPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {kriteria.map((k) => (
+            {kriteria.map((k, index) => (
               <div key={k.id} className="rounded-lg border p-4 text-center">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  (K{index + 1})
+                </p>
                 <p className="font-semibold">{k.nama}</p>
                 <p className="mt-2 text-2xl font-bold text-[#fba635]">
                   {k.bobot}%
@@ -175,9 +178,9 @@ export default function AssessmentDetailPage() {
                     <TableHead>Kategori</TableHead>
                     <TableHead>Pemilik</TableHead>
                     <TableHead>Booth</TableHead>
-                    {kriteria.map((k) => (
+                    {kriteria.map((k, index) => (
                       <TableHead key={k.id} className="text-center">
-                        {k.nama}
+                        K{index + 1}
                       </TableHead>
                     ))}
                     <TableHead className="text-center font-bold">

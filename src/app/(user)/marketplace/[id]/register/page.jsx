@@ -111,7 +111,7 @@ export default function RegisterBusinessPage() {
         </Button>
 
         <div>
-          <h1 className="mb-2 text-3xl font-bold">Daftar Peserta</h1>
+          <h1 className="mb-2 text-3xl font-bold">Mendaftar Peserta</h1>
           <p className="text-gray-600 dark:text-gray-400">
             {event.nama} - {event.semester} {event.tahunAjaran}
           </p>
@@ -119,7 +119,7 @@ export default function RegisterBusinessPage() {
       </div>
 
       {/* Info Card */}
-      <Card className="border-l-4 border-l-[#fba635]">
+      {/* <Card className="border-l-4 border-l-[#fba635]">
         <CardContent className="pt-0">
           <div className="space-y-2 text-sm">
             <p>
@@ -140,7 +140,7 @@ export default function RegisterBusinessPage() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Registration Form */}
       <Card className="gap-3">
@@ -156,7 +156,7 @@ export default function RegisterBusinessPage() {
               </TabsTrigger>
               <TabsTrigger value="UMKM_LUAR">
                 <Building2 className="mr-2 h-4 w-4" />
-                UMKM Luar
+                Usaha Luar
               </TabsTrigger>
             </TabsList>
 

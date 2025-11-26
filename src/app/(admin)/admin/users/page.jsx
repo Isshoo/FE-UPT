@@ -295,7 +295,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-3 md:flex-row">
         <div className="">
-          <h1 className="text-3xl font-bold">Users</h1>
+          <h1 className="text-3xl font-bold">Pengguna</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
             Kelola pengguna aplikasi
           </p>
@@ -304,77 +304,14 @@ export default function AdminUsersPage() {
           <ExportButton
             onExport={handleExportUsers}
             formats={['excel']}
-            label="Export Data"
+            label="Ekspor Data"
           />
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah User
+            Tambah Pengguna
           </Button>
         </div>
       </div>
-
-      {/* Stats */}
-      {/* <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-        <Card className="gap-2 py-4">
-          <CardHeader className="flex flex-row items-center justify-between pb-0">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Total Users
-            </CardTitle>
-            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-950">
-              <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.total || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="gap-2 py-4">
-          <CardHeader className="flex flex-row items-center justify-between pb-0">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Admin
-            </CardTitle>
-            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-950">
-              <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {stats?.byRole?.admin || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="gap-2 py-4">
-          <CardHeader className="flex flex-row items-center justify-between pb-0">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Dosen
-            </CardTitle>
-            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-950">
-              <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {stats?.byRole?.dosen || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="gap-2 py-4">
-          <CardHeader className="pb- flex flex-row items-center justify-between pb-0">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Pengguna Biasa
-            </CardTitle>
-            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-950">
-              <UsersIcon className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.byRole?.user || 0}</div>
-          </CardContent>
-        </Card>
-      </div> */}
 
       {/* Filters */}
       <Card className="gap-2 py-6">
@@ -401,7 +338,7 @@ export default function AdminUsersPage() {
                 <SelectContent>
                   <SelectItem value="ADMIN">Admin</SelectItem>
                   <SelectItem value="DOSEN">Dosen</SelectItem>
-                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="USER">Pengguna Biasa</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -424,7 +361,7 @@ export default function AdminUsersPage() {
       {/* Users Table */}
       <Card className="gap-2">
         <CardHeader>
-          <CardTitle>Daftar Users ({pagination.total})</CardTitle>
+          <CardTitle>Daftar Pengguna ({pagination.total})</CardTitle>
         </CardHeader>
         <CardContent>
           {users.length === 0 ? (
@@ -517,9 +454,9 @@ export default function AdminUsersPage() {
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Tambah User Baru</DialogTitle>
+            <DialogTitle>Tambah Pengguna Baru</DialogTitle>
             <DialogDescription>
-              Lengkapi form untuk membuat user baru
+              Lengkapi form untuk membuat pengguna baru
             </DialogDescription>
           </DialogHeader>
 
@@ -575,7 +512,7 @@ export default function AdminUsersPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="USER">User</SelectItem>
+                    <SelectItem value="USER">Pengguna Biasa</SelectItem>
                     <SelectItem value="DOSEN">Dosen</SelectItem>
                     <SelectItem value="ADMIN">Admin</SelectItem>
                   </SelectContent>
@@ -657,8 +594,8 @@ export default function AdminUsersPage() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Update informasi user</DialogDescription>
+            <DialogTitle>Edit Pengguna</DialogTitle>
+            <DialogDescription>Update informasi pengguna</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmitEdit} className="space-y-4">

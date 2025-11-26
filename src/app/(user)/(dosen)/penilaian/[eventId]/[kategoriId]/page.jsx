@@ -5,8 +5,17 @@ import { useRouter, useParams } from 'next/navigation';
 import { assessmentAPI, marketplaceAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -15,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ChevronLeft, Save, Award } from 'lucide-react';
+import { ChevronLeft, Award, Edit, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function PenilaianFormPage() {
@@ -26,9 +35,15 @@ export default function PenilaianFormPage() {
   const [event, setEvent] = useState(null);
   const [category, setCategory] = useState(null);
   const [businesses, setBusinesses] = useState([]);
-  const [scores, setScores] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  const [existingScores, setExistingScores] = useState({});
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [modalScores, setModalScores] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -38,29 +53,43 @@ export default function PenilaianFormPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [eventResponse, categoryResponse, businessesResponse] =
-        await Promise.all([
-          marketplaceAPI.getEventById(eventId),
-          assessmentAPI.getCategoryById(kategoriId),
-          marketplaceAPI.getBusinessesByEvent(eventId, {
-            tipeUsaha: 'MAHASISWA',
-            disetujui: 'true',
-          }),
-        ]);
+      const [eventResponse, scoresDataResponse] = await Promise.all([
+        marketplaceAPI.getEventById(eventId),
+        assessmentAPI.getScoresByCategory(kategoriId),
+      ]);
 
       setEvent(eventResponse.data);
-      setCategory(categoryResponse.data);
-      setBusinesses(businessesResponse.data);
 
-      // Initialize scores
-      const initialScores = {};
-      businessesResponse.data.forEach((business) => {
-        initialScores[business.id] = {};
-        categoryResponse.data.kriteria.forEach((kriteria) => {
-          initialScores[business.id][kriteria.id] = '';
+      const {
+        kategori,
+        kriteria,
+        businesses: businessesData,
+      } = scoresDataResponse.data;
+
+      setCategory({
+        ...kategori,
+        kriteria: kriteria,
+      });
+
+      // Extract businesses from scores data
+      const businessesList = businessesData.map((b) => ({
+        id: b.usahaId,
+        namaProduk: b.namaProduk,
+        kategori: b.kategoriUsaha,
+        nomorBooth: b.nomorBooth,
+        pemilik: b.pemilik,
+      }));
+      setBusinesses(businessesList);
+
+      // Organize existing scores by business and kriteria
+      const scoresMap = {};
+      businessesData.forEach((business) => {
+        scoresMap[business.usahaId] = {};
+        business.scoreDetails.forEach((score) => {
+          scoresMap[business.usahaId][score.kriteriaId] = score.nilai;
         });
       });
-      setScores(initialScores);
+      setExistingScores(scoresMap);
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
@@ -69,36 +98,72 @@ export default function PenilaianFormPage() {
     }
   };
 
-  const handleScoreChange = (businessId, kriteriaId, value) => {
+  const handleOpenModal = (business) => {
+    setSelectedBusiness(business);
+
+    // Initialize modal scores with existing scores or empty
+    const initialScores = {};
+    category.kriteria.forEach((kriteria) => {
+      initialScores[kriteria.id] =
+        existingScores[business.id]?.[kriteria.id]?.toString() || '';
+    });
+    setModalScores(initialScores);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedBusiness(null);
+    setModalScores({});
+  };
+
+  const handleModalScoreChange = (kriteriaId, value) => {
     const numValue = parseInt(value);
     if (value === '' || (numValue >= 0 && numValue <= 100)) {
-      setScores((prev) => ({
+      setModalScores((prev) => ({
         ...prev,
-        [businessId]: {
-          ...prev[businessId],
-          [kriteriaId]: value,
-        },
+        [kriteriaId]: value,
       }));
     }
   };
 
-  const handleSubmitScore = async (businessId, kriteriaId) => {
-    const nilai = scores[businessId]?.[kriteriaId];
+  const handleSubmitScores = async () => {
+    // Validate all scores are filled
+    const emptyScores = category.kriteria.filter(
+      (k) => !modalScores[k.id] || modalScores[k.id] === ''
+    );
 
-    if (nilai === '' || nilai === undefined) {
-      toast.error('Nilai tidak boleh kosong');
+    if (emptyScores.length > 0) {
+      toast.error('Semua kriteria harus diisi');
+      return;
+    }
+
+    if (
+      !confirm(
+        `Apakah Anda yakin ingin menyimpan nilai untuk "${selectedBusiness.namaProduk}"?`
+      )
+    ) {
       return;
     }
 
     try {
       setSubmitting(true);
-      await assessmentAPI.submitScore({
-        usahaId: businessId,
-        kategoriId,
-        kriteriaId,
-        nilai: parseInt(nilai),
-      });
+
+      // Submit all scores for this business
+      const promises = category.kriteria.map((kriteria) =>
+        assessmentAPI.submitScore({
+          usahaId: selectedBusiness.id,
+          kategoriId,
+          kriteriaId: kriteria.id,
+          nilai: parseInt(modalScores[kriteria.id]),
+        })
+      );
+
+      await Promise.all(promises);
+
       toast.success('Nilai berhasil disimpan');
+      handleCloseModal();
+      fetchData(); // Refresh data
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menyimpan nilai');
     } finally {
@@ -106,51 +171,15 @@ export default function PenilaianFormPage() {
     }
   };
 
-  const handleSubmitAll = async () => {
-    if (!confirm('Apakah Anda yakin ingin menyimpan semua nilai?')) {
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      let successCount = 0;
-      let failCount = 0;
-
-      for (const businessId of Object.keys(scores)) {
-        for (const kriteriaId of Object.keys(scores[businessId])) {
-          const nilai = scores[businessId][kriteriaId];
-          if (nilai !== '' && nilai !== undefined) {
-            try {
-              await assessmentAPI.submitScore({
-                usahaId: businessId,
-                kategoriId,
-                kriteriaId,
-                nilai: parseInt(nilai),
-              });
-              successCount++;
-            } catch (error) {
-              failCount++;
-              console.error('Error submitting score:', error);
-            }
-          }
-        }
-      }
-
-      if (failCount === 0) {
-        toast.success(`Semua nilai berhasil disimpan (${successCount} nilai)`);
-        router.push(`/penilaian/${eventId}`);
-      } else {
-        toast.error(
-          `${successCount} nilai berhasil, ${failCount} nilai gagal disimpan`
-        );
-      }
-    } catch (error) {
-      console.error('Error submitting all scores:', error);
-      toast.error('Terjadi kesalahan saat menyimpan nilai');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  // Filter businesses based on search query
+  const filteredBusinesses = businesses.filter((business) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      business.namaProduk.toLowerCase().includes(query) ||
+      business.nomorBooth?.toLowerCase().includes(query) ||
+      business.kategori.toLowerCase().includes(query)
+    );
+  });
 
   if (loading) {
     return (
@@ -193,15 +222,15 @@ export default function PenilaianFormPage() {
             {category.nama}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {event.nama} - Masukkan nilai untuk setiap kriteria penilaian
+            {event.nama} - {category.deskripsi || 'Penilaian peserta'}
           </p>
         </div>
       </div>
 
       {/* Alert */}
       {!canAssess && (
-        <Card className="border-yellow-200 bg-yellow-50 pt-5 pb-6 dark:border-yellow-800 dark:bg-yellow-950">
-          <CardContent className="pt-0">
+        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
+          <CardContent className="py-4">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
               ⚠️ Penilaian hanya dapat dilakukan saat event sedang berlangsung
             </p>
@@ -210,17 +239,20 @@ export default function PenilaianFormPage() {
       )}
 
       {/* Kriteria Info */}
-      <Card className="gap-3 pt-5 pb-6">
+      <Card>
         <CardHeader>
           <CardTitle>Kriteria Penilaian</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {category.kriteria.map((kriteria) => (
+            {category.kriteria.map((kriteria, index) => (
               <div
                 key={kriteria.id}
                 className="rounded-lg border p-4 text-center"
               >
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  (K{index + 1})
+                </p>
                 <p className="font-semibold">{kriteria.nama}</p>
                 <p className="mt-2 text-2xl font-bold text-[#fba635]">
                   {kriteria.bobot}%
@@ -231,28 +263,40 @@ export default function PenilaianFormPage() {
         </CardContent>
       </Card>
 
-      {/* Assessment Form */}
-      <Card className="gap-3 pt-5 pb-6">
+      {/* Search & Table */}
+      <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Form Penilaian ({businesses.length} Peserta)</CardTitle>
-            {canAssess && (
-              <Button
-                onClick={handleSubmitAll}
-                disabled={submitting}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {submitting ? 'Menyimpan...' : 'Simpan Semua'}
-              </Button>
-            )}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle>Daftar Peserta ({filteredBusinesses.length})</CardTitle>
+
+            {/* Search Bar */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Cari peserta..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          {businesses.length === 0 ? (
+          {filteredBusinesses.length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-gray-500">
-                Belum ada peserta yang disetujui untuk dinilai
+                {searchQuery
+                  ? 'Tidak ada peserta yang sesuai dengan pencarian'
+                  : 'Belum ada peserta yang disetujui untuk dinilai'}
               </p>
             </div>
           ) : (
@@ -262,75 +306,73 @@ export default function PenilaianFormPage() {
                   <TableRow>
                     <TableHead className="w-12">No</TableHead>
                     <TableHead>Nama Produk</TableHead>
+                    <TableHead>Kategori</TableHead>
                     <TableHead>Booth</TableHead>
-                    {category.kriteria.map((kriteria) => (
+                    {category.kriteria.map((kriteria, index) => (
                       <TableHead key={kriteria.id} className="text-center">
-                        {kriteria.nama}
-                        <br />
-                        <span className="text-xs text-gray-500">
-                          ({kriteria.bobot}%)
-                        </span>
+                        K{index + 1}
                       </TableHead>
                     ))}
                     <TableHead className="text-center">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {businesses.map((business, index) => (
-                    <TableRow key={business.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell className="font-medium">
-                        {business.namaProduk}
-                      </TableCell>
-                      <TableCell>
-                        <Badge>{business.nomorBooth || '-'}</Badge>
-                      </TableCell>
-                      {category.kriteria.map((kriteria) => (
-                        <TableCell key={kriteria.id} className="text-center">
-                          <Input
-                            type="number"
-                            min="0"
-                            max="100"
-                            placeholder="0-100"
-                            value={scores[business.id]?.[kriteria.id] || ''}
-                            onChange={(e) =>
-                              handleScoreChange(
-                                business.id,
-                                kriteria.id,
-                                e.target.value
-                              )
-                            }
-                            disabled={!canAssess || submitting}
-                            className="w-20 text-center"
-                          />
+                  {filteredBusinesses.map((business, index) => {
+                    const hasAllScores = category.kriteria.every(
+                      (k) => existingScores[business.id]?.[k.id] !== undefined
+                    );
+
+                    return (
+                      <TableRow key={business.id}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell className="font-medium">
+                          {business.namaProduk}
                         </TableCell>
-                      ))}
-                      <TableCell className="text-center">
-                        {canAssess && (
-                          <div className="flex flex-col gap-2">
-                            {category.kriteria.map((kriteria) => (
-                              <Button
-                                key={kriteria.id}
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  handleSubmitScore(business.id, kriteria.id)
-                                }
-                                disabled={
-                                  submitting ||
-                                  !scores[business.id]?.[kriteria.id]
-                                }
-                                className="text-xs"
+                        <TableCell>
+                          <Badge variant="outline">{business.kategori}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge>{business.nomorBooth || '-'}</Badge>
+                        </TableCell>
+                        {category.kriteria.map((kriteria) => {
+                          const score =
+                            existingScores[business.id]?.[kriteria.id];
+                          return (
+                            <TableCell
+                              key={kriteria.id}
+                              className="text-center"
+                            >
+                              <span
+                                className={`font-semibold ${
+                                  score !== undefined
+                                    ? 'text-green-600'
+                                    : 'text-gray-400'
+                                }`}
                               >
-                                <Save className="mr-1 h-3 w-3" />
-                                {kriteria.nama.slice(0, 8)}
-                              </Button>
-                            ))}
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                                {score !== undefined ? score : '-'}
+                              </span>
+                            </TableCell>
+                          );
+                        })}
+                        <TableCell className="text-center">
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenModal(business)}
+                            disabled={!canAssess}
+                            variant={hasAllScores ? 'outline' : 'default'}
+                            className={
+                              hasAllScores
+                                ? ''
+                                : 'bg-[#fba635] hover:bg-[#fdac58]'
+                            }
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            {hasAllScores ? 'Edit Nilai' : 'Beri Nilai'}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
@@ -338,20 +380,76 @@ export default function PenilaianFormPage() {
         </CardContent>
       </Card>
 
+      {/* Modal for Scoring */}
+      <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Beri Nilai</DialogTitle>
+            <DialogDescription>
+              {selectedBusiness?.namaProduk} - Booth{' '}
+              {selectedBusiness?.nomorBooth}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {category.kriteria.map((kriteria) => (
+              <div key={kriteria.id} className="space-y-2">
+                <Label htmlFor={kriteria.id}>
+                  {kriteria.nama}{' '}
+                  <span className="text-sm text-gray-500">
+                    (Bobot: {kriteria.bobot}%)
+                  </span>
+                </Label>
+                <Input
+                  id={kriteria.id}
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="Masukkan nilai 0-100"
+                  value={modalScores[kriteria.id] || ''}
+                  onChange={(e) =>
+                    handleModalScoreChange(kriteria.id, e.target.value)
+                  }
+                  disabled={submitting}
+                />
+              </div>
+            ))}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handleCloseModal}
+              disabled={submitting}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleSubmitScores}
+              disabled={submitting}
+              className="bg-[#fba635] hover:bg-[#fdac58]"
+            >
+              {submitting ? 'Menyimpan...' : 'Simpan Nilai'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Legend */}
-      <Card className="pt-5 pb-6">
-        <CardContent className="pt-0">
+      <Card>
+        <CardContent className="py-0">
           <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
             <p>
               <strong>Petunjuk:</strong>
             </p>
             <ul className="list-inside list-disc space-y-1">
+              <li>Klik tombol Beri Nilai untuk membuka form penilaian</li>
               <li>Masukkan nilai antara 0-100 untuk setiap kriteria</li>
+              <li>Semua kriteria harus diisi sebelum dapat menyimpan</li>
               <li>
-                Anda dapat menyimpan nilai per kriteria atau semua sekaligus
+                Nilai yang sudah disimpan dapat diubah dengan klik Edit Nilai
               </li>
-              <li>Penilaian hanya dapat dilakukan saat event berlangsung</li>
-              <li>Nilai yang sudah disimpan dapat diubah kembali</li>
+              <li>Gunakan search bar untuk mencari peserta tertentu</li>
             </ul>
           </div>
         </CardContent>

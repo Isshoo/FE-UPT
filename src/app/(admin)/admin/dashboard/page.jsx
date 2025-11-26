@@ -106,7 +106,7 @@ export default function AdminDashboard() {
           height={300}
         />
         <BarChartCard
-          title="Fakultas Peserta Marketplace (jennis Usaha Mahasiswa)"
+          title="Fakultas Peserta Marketplace (jenis Usaha Mahasiswa)"
           data={marketplaceAnalytics.facultyComparison}
           dataKey="count"
           xAxisKey="fakultas"

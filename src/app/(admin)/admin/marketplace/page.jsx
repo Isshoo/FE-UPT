@@ -38,6 +38,7 @@ import PaginationControls from '@/components/ui/pagination-controls';
 import toast from 'react-hot-toast';
 
 import { exportAPI, downloadBlob } from '@/lib/api';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default function AdminMarketplacePage() {
   const [events, setEvents] = useState([]);
@@ -173,7 +174,7 @@ export default function AdminMarketplacePage() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 <Download className="mr-2 h-4 w-4" />
-                Export Data
+                Ekspor Data
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -239,11 +240,16 @@ export default function AdminMarketplacePage() {
                   handleFilterChange('tahunAjaran', value)
                 }
               >
-                <SelectTrigger className="w-full min-w-[110px]">
+                <SelectTrigger className="w-full min-w-[140px]">
                   <SelectValue placeholder="Tahun Ajaran" />
                 </SelectTrigger>
                 <SelectContent>
-                  {tahunAjaranOptions.map((tahun) => (
+                  {!tahunAjaranOptions.length && (
+                    <SelectItem disabled>
+                      Tidak ada tahun ajaran tersedia
+                    </SelectItem>
+                  )}
+                  {tahunAjaranOptions?.map((tahun) => (
                     <SelectItem key={tahun} value={tahun}>
                       {tahun}
                     </SelectItem>
@@ -287,8 +293,12 @@ export default function AdminMarketplacePage() {
       {/* Events List */}
       {events.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="mb-4 text-gray-500">Belum ada event</p>
+          <CardContent className="flex flex-col items-center justify-center py-6">
+            <EmptyState
+              icon={Calendar}
+              title="Belum Ada Event"
+              description="Belum ada event marketplace yang tersedia saat ini. Silakan buat event baru."
+            />
             <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
               <Link href="/admin/marketplace/create">
                 <Plus className="mr-2 h-5 w-5" />

@@ -251,6 +251,7 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
                       NIM <span className="text-red-500">*</span>
                     </Label>
                     <Input
+                      type="number"
                       placeholder="NIM"
                       value={anggota.nim}
                       onChange={(e) =>

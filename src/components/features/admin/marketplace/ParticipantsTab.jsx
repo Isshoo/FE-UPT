@@ -209,19 +209,18 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                       {!isLocked && (
                         <TableCell>
                           <div className="flex gap-2">
-                            {!business.disetujui &&
-                              business.tipeUsaha === 'UMKM_LUAR' && (
-                                <Button
-                                  size="sm"
-                                  onClick={() =>
-                                    handleApproveBusiness(business.id)
-                                  }
-                                  className="bg-green-600 hover:bg-green-700"
-                                >
-                                  <Check className="mr-1 h-3 w-3" />
-                                  Setujui
-                                </Button>
-                              )}
+                            {!business.disetujui && (
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  handleApproveBusiness(business.id)
+                                }
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                <Check className="mr-1 h-3 w-3" />
+                                Setujui
+                              </Button>
+                            )}
                             {business.disetujui && !business.nomorBooth && (
                               <Button
                                 size="sm"

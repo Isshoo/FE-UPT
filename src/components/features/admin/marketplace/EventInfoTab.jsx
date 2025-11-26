@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { formatDate } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,7 +64,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                 Tanggal Pelaksanaan
               </p>
               <p className="font-semibold">
-                {formatDate(event.tanggalPelaksanaan)}
+                {formatDateTime(event.tanggalPelaksanaan)}
               </p>
             </div>
 
@@ -80,7 +80,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                 Pendaftaran Dibuka
               </p>
               <p className="font-semibold">
-                {formatDate(event.mulaiPendaftaran)}
+                {formatDateTime(event.mulaiPendaftaran)}
               </p>
             </div>
 
@@ -89,7 +89,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                 Pendaftaran Ditutup
               </p>
               <p className="font-semibold">
-                {formatDate(event.akhirPendaftaran)}
+                {formatDateTime(event.akhirPendaftaran)}
               </p>
             </div>
           </div>

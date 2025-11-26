@@ -104,4 +104,9 @@ export const marketplaceAPI = {
     );
     return response.data;
   },
+
+  getMyHistory: async () => {
+    const response = await apiClient.get('/marketplace/my-history');
+    return response.data;
+  },
 };

@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
-import EventInfoForm from '@/components/features/admin/marketplace/EventInfoForm';
-import SponsorForm from '@/components/features/admin/marketplace/SponsorForm';
-import AssessmentForm from '@/components/features/admin/marketplace/AssessmentForm';
+import EventInfoForm from '@/components/features/admin/marketplace/create/EventInfoForm';
+import SponsorForm from '@/components/features/admin/marketplace/create/SponsorForm';
+import AssessmentForm from '@/components/features/admin/marketplace/create/AssessmentForm';
 
 const STEPS = [
   { id: 1, name: 'Informasi Event', component: EventInfoForm },

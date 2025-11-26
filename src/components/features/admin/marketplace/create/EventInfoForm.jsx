@@ -10,9 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { SEMESTER_OPTIONS } from '@/lib/constants';
+import { generateTahunAjaranOptions, SEMESTER_OPTIONS } from '@/lib/constants';
 
 export default function EventInfoForm({ data, onUpdate }) {
+  const tahunAjaranOptions = generateTahunAjaranOptions();
   const handleChange = (field, value) => {
     onUpdate({ [field]: value });
   };
@@ -76,13 +77,21 @@ export default function EventInfoForm({ data, onUpdate }) {
           <Label htmlFor="tahunAjaran">
             Tahun Ajaran <span className="text-red-500">*</span>
           </Label>
-          <Input
-            id="tahunAjaran"
-            placeholder="e.g., 2024/2025"
+          <Select
             value={data.tahunAjaran}
-            onChange={(e) => handleChange('tahunAjaran', e.target.value)}
-            required
-          />
+            onValueChange={(value) => handleChange('tahunAjaran', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Pilih tahun ajaran" />
+            </SelectTrigger>
+            <SelectContent>
+              {tahunAjaranOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Lokasi */}
@@ -106,7 +115,7 @@ export default function EventInfoForm({ data, onUpdate }) {
           </Label>
           <Input
             id="tanggalPelaksanaan"
-            type="date"
+            type="datetime-local"
             value={data.tanggalPelaksanaan}
             onChange={(e) => handleChange('tanggalPelaksanaan', e.target.value)}
             required
@@ -136,7 +145,7 @@ export default function EventInfoForm({ data, onUpdate }) {
           </Label>
           <Input
             id="mulaiPendaftaran"
-            type="date"
+            type="datetime-local"
             value={data.mulaiPendaftaran}
             onChange={(e) => handleChange('mulaiPendaftaran', e.target.value)}
             required
@@ -150,7 +159,7 @@ export default function EventInfoForm({ data, onUpdate }) {
           </Label>
           <Input
             id="akhirPendaftaran"
-            type="date"
+            type="datetime-local"
             value={data.akhirPendaftaran}
             onChange={(e) => handleChange('akhirPendaftaran', e.target.value)}
             required
