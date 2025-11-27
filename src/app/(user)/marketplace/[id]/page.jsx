@@ -67,6 +67,7 @@ export default function UserEventDetailPage() {
       setLoading(true);
       const response = await marketplaceAPI.getEventById(eventId);
       setEvent(response.data);
+      console.log('Event Data:', response.data);
 
       // Check user registration after getting event data
       if (isAuthenticated && user?.role === ROLES.USER && response.data) {
@@ -132,11 +133,7 @@ export default function UserEventDetailPage() {
     };
 
     const status =
-      userRegistration.disetujui === null
-        ? 'PENDING'
-        : userRegistration.disetujui
-          ? 'APPROVED'
-          : 'REJECTED';
+      userRegistration.disetujui === false ? 'PENDING' : 'APPROVED';
 
     const config = statusConfig[status];
     const Icon = config.icon;
@@ -213,7 +210,7 @@ export default function UserEventDetailPage() {
       {/* User Registration Status */}
       {userRegistration && (
         <Card className="border-2 border-blue-500 bg-blue-50 dark:bg-blue-950">
-          <CardContent className="pt-6">
+          <CardContent className="pt-0">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-blue-500 p-3">
                 <FileText className="h-6 w-6 text-white" />
@@ -228,7 +225,7 @@ export default function UserEventDetailPage() {
                 <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
                   Kategori: <strong>{userRegistration.kategori}</strong>
                 </p>
-                {userRegistration.disetujui === null && (
+                {userRegistration.disetujui === false && (
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Pendaftaran Anda sedang menunggu persetujuan dari admin.
                   </p>
@@ -242,14 +239,6 @@ export default function UserEventDetailPage() {
                         Nomor booth:{' '}
                         <strong>{userRegistration.nomorBooth}</strong>
                       </>
-                    )}
-                  </p>
-                )}
-                {userRegistration.disetujui === false && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Maaf, pendaftaran Anda ditolak.
-                    {userRegistration.alasanPenolakan && (
-                      <> Alasan: {userRegistration.alasanPenolakan}</>
                     )}
                   </p>
                 )}
