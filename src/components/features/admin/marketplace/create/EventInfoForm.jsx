@@ -14,6 +14,7 @@ import { generateTahunAjaranOptions, SEMESTER_OPTIONS } from '@/lib/constants';
 
 export default function EventInfoForm({ data, onUpdate }) {
   const tahunAjaranOptions = generateTahunAjaranOptions();
+
   const handleChange = (field, value) => {
     onUpdate({ [field]: value });
   };

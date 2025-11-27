@@ -37,6 +37,7 @@ import ParticipantsTab from '@/components/features/admin/marketplace/Participant
 import AssessmentTab from '@/components/features/admin/marketplace/AssessmentTab';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
+import { formatDateTime } from '@/lib/utils';
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -79,19 +80,19 @@ export default function EventDetailPage() {
         semester: event.semester,
         tahunAjaran: event.tahunAjaran,
         lokasi: event.lokasi,
-        tanggalPelaksanaan: formatDateForInput(event.tanggalPelaksanaan),
-        mulaiPendaftaran: formatDateForInput(event.mulaiPendaftaran),
-        akhirPendaftaran: formatDateForInput(event.akhirPendaftaran),
+        tanggalPelaksanaan: formatDateTime(event.tanggalPelaksanaan),
+        mulaiPendaftaran: formatDateTime(event.mulaiPendaftaran),
+        akhirPendaftaran: formatDateTime(event.akhirPendaftaran),
         kuotaPeserta: event.kuotaPeserta.toString(),
       });
       setSelectedStatus(event.status);
     }
   }, [event]);
 
-  const formatDateForInput = (dateString) => {
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 16);
-  };
+  // const formatDateForInput = (dateString) => {
+  //   const date = new Date(dateString);
+  //   return date.toISOString().slice(0, 16);
+  // };
 
   const fetchEventDetail = async () => {
     try {

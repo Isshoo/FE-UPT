@@ -262,7 +262,7 @@ export default function UserEventDetailPage() {
       {/* Registration Info */}
       {isRegistrationOpen && !userRegistration && (
         <Card className="border-2 border-[#fba635] bg-orange-50 dark:bg-orange-950">
-          <CardContent className="flex flex-col gap-4 pt-6 md:flex-row md:items-center md:justify-between">
+          <CardContent className="flex flex-col gap-4 pt-0 md:flex-row md:items-center md:justify-between">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-[#fba635] p-3">
                 <Calendar className="h-6 w-6 text-white" />

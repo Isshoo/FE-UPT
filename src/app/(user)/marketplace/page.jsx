@@ -56,6 +56,7 @@ export default function UserMarketplacePage() {
     tahunAjaran: '',
     status: '',
   });
+  const [tahunAjaranOptions, setTahunAjaranOptions] = useState([]);
 
   useEffect(() => {
     fetchEvents();
@@ -76,6 +77,21 @@ export default function UserMarketplacePage() {
         (event) => event.status !== 'DRAFT'
       );
       setEvents(publicEvents);
+
+      // Extract unique tahun ajaran from events
+      const uniqueTahunAjaran = [
+        ...new Set(
+          publicEvents.map((event) => event.tahunAjaran).filter(Boolean)
+        ),
+      ].sort((a, b) => {
+        // Sort descending (newest first)
+        const yearA = parseInt(a.split('/')[0]);
+        const yearB = parseInt(b.split('/')[0]);
+        return yearB - yearA;
+      });
+
+      setTahunAjaranOptions(uniqueTahunAjaran);
+
       setPagination((prev) => ({
         ...prev,
         total: response.pagination?.total || 0,
@@ -233,9 +249,9 @@ export default function UserMarketplacePage() {
       </div> */}
 
       {/* Filters */}
-      <Card className="gap-2 pt-6 pb-6">
-        <CardContent>
-          <div className="flex flex-col gap-3 md:flex-row">
+      <Card className="gap-2 pt-5 pb-6">
+        <CardContent className="flex flex-col gap-3 md:flex-row">
+          <div className="flex w-full flex-1 flex-col gap-3 md:flex-row">
             <div className="flex w-full flex-col gap-3 sm:flex-row">
               <div className="relative w-full">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -246,12 +262,13 @@ export default function UserMarketplacePage() {
                   className="pl-9"
                 />
               </div>
-
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Select
                 value={filters.semester}
                 onValueChange={(value) => handleFilterChange('semester', value)}
               >
-                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
+                <SelectTrigger className="w-full min-w-[110px]">
                   <SelectValue placeholder="Semester" />
                 </SelectTrigger>
                 <SelectContent>
@@ -262,25 +279,34 @@ export default function UserMarketplacePage() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className="flex w-full flex-col gap-3 sm:flex-row">
-              <div className="relative w-full">
-                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Tahun Ajaran (e.g., 2024/2025)"
-                  value={filters.tahunAjaran}
-                  onChange={(e) =>
-                    handleFilterChange('tahunAjaran', e.target.value)
-                  }
-                  className="pl-9"
-                />
-              </div>
+              <Select
+                value={filters.tahunAjaran}
+                onValueChange={(value) =>
+                  handleFilterChange('tahunAjaran', value)
+                }
+              >
+                <SelectTrigger className="w-full min-w-[140px]">
+                  <SelectValue placeholder="Tahun Ajaran" />
+                </SelectTrigger>
+                <SelectContent>
+                  {!tahunAjaranOptions.length && (
+                    <SelectItem disabled>
+                      Tidak ada tahun ajaran tersedia
+                    </SelectItem>
+                  )}
+                  {tahunAjaranOptions?.map((tahun) => (
+                    <SelectItem key={tahun} value={tahun}>
+                      {tahun}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
               <Select
                 value={filters.status}
                 onValueChange={(value) => handleFilterChange('status', value)}
               >
-                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
+                <SelectTrigger className="w-full min-w-[110px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -294,7 +320,7 @@ export default function UserMarketplacePage() {
             </div>
           </div>
 
-          <div className="mt-4 flex w-full justify-end gap-2">
+          <div className="flex justify-end gap-2">
             <Button onClick={handleReset} variant="outline">
               Reset
             </Button>

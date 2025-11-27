@@ -16,7 +16,6 @@ export const EVENT_STATUS = {
 };
 
 export const EVENT_STATUS_LABELS = {
-  DRAFT: 'Draft',
   TERBUKA: 'Terbuka',
   PERSIAPAN: 'Persiapan',
   BERLANGSUNG: 'Berlangsung',
