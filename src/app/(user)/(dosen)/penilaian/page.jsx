@@ -126,9 +126,9 @@ export default function PenilaianPage() {
           {events.map(({ event, categories }) => (
             <Card key={event.id} className="gap-3">
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col items-start justify-between md:flex-row">
                   <div className="flex-1">
-                    <div className="mb-2 flex items-center gap-2">
+                    <div className="mb-2 flex flex-wrap items-center gap-2 space-y-1">
                       <CardTitle>{event.nama}</CardTitle>
                       <Badge
                         variant={
@@ -140,7 +140,7 @@ export default function PenilaianPage() {
                         {event.status}
                       </Badge>
                     </div>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="mb-2 flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
                         {formatDate(event.tanggalPelaksanaan)}
@@ -151,22 +151,22 @@ export default function PenilaianPage() {
                       </div>
                     </div>
                   </div>
-                  <Button asChild>
-                    <Link href={`/penilaian/${event.id}`}>
-                      Lihat Detail
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((category) => (
+                      <Badge key={category.id} variant="outline">
+                        {category.nama}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => (
-                    <Badge key={category.id} variant="outline">
-                      {category.nama}
-                    </Badge>
-                  ))}
-                </div>
+                <Button asChild>
+                  <Link href={`/penilaian/${event.id}`}>
+                    Lihat Detail
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           ))}

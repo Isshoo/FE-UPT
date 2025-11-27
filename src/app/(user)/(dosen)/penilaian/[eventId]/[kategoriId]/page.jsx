@@ -228,11 +228,20 @@ export default function PenilaianFormPage() {
       </div>
 
       {/* Alert */}
-      {!canAssess && (
+      {!canAssess ? (
         <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
           <CardContent className="py-0">
             <p className="text-sm text-yellow-800 dark:text-yellow-300">
               ⚠️ Penilaian hanya dapat dilakukan saat event sedang berlangsung
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
+          <CardContent className="py-0">
+            <p className="text-sm text-yellow-800 dark:text-yellow-300">
+              Beri nilai dengan menekan tombol Beri Nilai di kolom Aksi pada
+              tabel
             </p>
           </CardContent>
         </Card>
