@@ -70,8 +70,8 @@ export default function CTASection() {
                   size="lg"
                   className="bg-white text-lg text-[#174c4e] hover:bg-gray-100"
                 >
-                  <Link href={ROUTES.USER_MARKETPLACE}>
-                    Lihat Event Marketplace
+                  <Link href={ROUTES.ABOUT}>
+                    Tentang Kami
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>

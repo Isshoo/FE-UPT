@@ -44,19 +44,19 @@ export default function HeroSection() {
                 size="lg"
                 className="bg-[#fba635] text-lg hover:bg-[#fdac58]"
               >
-                <Link href={ROUTES.REGISTER}>
+                <Link href={ROUTES.USER_MARKETPLACE}>
                   Mulai Sekarang
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button
+              {/* <Button
                 asChild
                 size="lg"
                 variant="outline"
                 className="border-white text-lg text-black hover:bg-white/10 hover:text-white dark:text-white"
               >
                 <Link href={ROUTES.ABOUT}>Pelajari Lebih Lanjut</Link>
-              </Button>
+              </Button> */}
             </div>
           </motion.div>
 
