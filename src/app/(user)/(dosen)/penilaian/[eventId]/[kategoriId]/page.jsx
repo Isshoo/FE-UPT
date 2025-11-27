@@ -322,6 +322,7 @@ export default function PenilaianFormPage() {
                         K{index + 1}
                       </TableHead>
                     ))}
+                    <TableHead className="text-center">Total</TableHead>
                     <TableHead className="text-center">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -363,6 +364,17 @@ export default function PenilaianFormPage() {
                             </TableCell>
                           );
                         })}
+                        {/* NILAI rata-rata */}
+                        <TableCell className="text-center font-bold text-[#fba635]">
+                          {category.kriteria.length > 0
+                            ? (
+                                Object.values(
+                                  existingScores[business.id] || {}
+                                ).reduce((a, b) => a + b, 0) /
+                                category.kriteria.length
+                              ).toFixed(2)
+                            : '-'}
+                        </TableCell>
                         <TableCell className="text-center">
                           <Button
                             size="sm"
