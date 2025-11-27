@@ -382,8 +382,8 @@ export default function UserMarketplacePage() {
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <Users className="h-4 w-4 flex-shrink-0" />
                       <span>
-                        {event._count?.usaha || 0} / {event.kuotaPeserta}{' '}
-                        Peserta
+                        Kuota {': '}
+                        {event.kuotaPeserta} Peserta
                       </span>
                     </div>
                     <div className="border-t pt-3">
