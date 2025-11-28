@@ -103,7 +103,6 @@ export default function AdminUsersPage() {
           page: pagination.page,
           limit: pagination.limit,
         }),
-        usersAPI.getStatistics(),
       ]);
 
       setUsers(usersResponse.data.users || usersResponse.data);
