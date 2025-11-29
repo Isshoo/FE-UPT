@@ -30,19 +30,32 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronLeft, Lock, Unlock, Edit2, RefreshCw } from 'lucide-react';
+import {
+  ChevronLeft,
+  Lock,
+  Unlock,
+  Edit2,
+  RefreshCw,
+  // Info,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import EventInfoTab from '@/components/features/admin/marketplace/EventInfoTab';
 import ParticipantsTab from '@/components/features/admin/marketplace/ParticipantsTab';
 import AssessmentTab from '@/components/features/admin/marketplace/AssessmentTab';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
-import { formatDateTime } from '@/lib/utils';
+import {
+  toDatetimeLocal,
+  toUTC,
+  // getUserTimezone,
+  isValidDateTime,
+} from '@/lib/utils/dateUtils';
 
 export default function EventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id;
+  // const userTimezone = getUserTimezone();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,25 +87,21 @@ export default function EventDetailPage() {
 
   useEffect(() => {
     if (event) {
+      // Convert UTC dates to local timezone for editing
       setEditForm({
         nama: event.nama,
         deskripsi: event.deskripsi,
         semester: event.semester,
         tahunAjaran: event.tahunAjaran,
         lokasi: event.lokasi,
-        tanggalPelaksanaan: formatDateTime(event.tanggalPelaksanaan),
-        mulaiPendaftaran: formatDateTime(event.mulaiPendaftaran),
-        akhirPendaftaran: formatDateTime(event.akhirPendaftaran),
+        tanggalPelaksanaan: toDatetimeLocal(event.tanggalPelaksanaan),
+        mulaiPendaftaran: toDatetimeLocal(event.mulaiPendaftaran),
+        akhirPendaftaran: toDatetimeLocal(event.akhirPendaftaran),
         kuotaPeserta: event.kuotaPeserta.toString(),
       });
       setSelectedStatus(event.status);
     }
   }, [event]);
-
-  // const formatDateForInput = (dateString) => {
-  //   const date = new Date(dateString);
-  //   return date.toISOString().slice(0, 16);
-  // };
 
   const fetchEventDetail = async () => {
     try {
@@ -126,15 +135,93 @@ export default function EventDetailPage() {
     }
   };
 
+  const validateEditForm = () => {
+    const {
+      nama,
+      semester,
+      tahunAjaran,
+      tanggalPelaksanaan,
+      mulaiPendaftaran,
+      akhirPendaftaran,
+      kuotaPeserta,
+    } = editForm;
+
+    if (!nama || !semester || !tahunAjaran || !kuotaPeserta) {
+      toast.error('Mohon lengkapi semua field yang wajib');
+      return false;
+    }
+
+    if (!tanggalPelaksanaan || !mulaiPendaftaran || !akhirPendaftaran) {
+      toast.error('Mohon isi semua tanggal');
+      return false;
+    }
+
+    // Validate datetime strings
+    if (
+      !isValidDateTime(tanggalPelaksanaan) ||
+      !isValidDateTime(mulaiPendaftaran) ||
+      !isValidDateTime(akhirPendaftaran)
+    ) {
+      toast.error('Format tanggal tidak valid');
+      return false;
+    }
+
+    // Validate date logic (in local time)
+    const eventDate = new Date(tanggalPelaksanaan);
+    const regStart = new Date(mulaiPendaftaran);
+    const regEnd = new Date(akhirPendaftaran);
+
+    if (regStart >= regEnd) {
+      toast.error('Tanggal mulai pendaftaran harus sebelum tanggal akhir');
+      return false;
+    }
+
+    if (regEnd >= eventDate) {
+      toast.error(
+        'Tanggal akhir pendaftaran harus sebelum tanggal pelaksanaan'
+      );
+      return false;
+    }
+
+    return true;
+  };
+
   const handleEditEvent = async () => {
+    if (!validateEditForm()) {
+      return;
+    }
+
     try {
       setUpdating(true);
-      await marketplaceAPI.updateEvent(eventId, editForm);
+
+      // Convert local datetime to UTC ISO strings
+      const dataToSend = {
+        ...editForm,
+        tanggalPelaksanaan: toUTC(
+          new Date(editForm.tanggalPelaksanaan)
+        ).toISOString(),
+        mulaiPendaftaran: toUTC(
+          new Date(editForm.mulaiPendaftaran)
+        ).toISOString(),
+        akhirPendaftaran: toUTC(
+          new Date(editForm.akhirPendaftaran)
+        ).toISOString(),
+        kuotaPeserta: parseInt(editForm.kuotaPeserta),
+      };
+
+      console.log('Updating event with UTC dates:', {
+        tanggalPelaksanaan: dataToSend.tanggalPelaksanaan,
+        mulaiPendaftaran: dataToSend.mulaiPendaftaran,
+        akhirPendaftaran: dataToSend.akhirPendaftaran,
+      });
+
+      await marketplaceAPI.updateEvent(eventId, dataToSend);
       toast.success('Event berhasil diperbarui');
       setShowEditDialog(false);
       fetchEventDetail();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal memperbarui event');
+      console.error('Update event error:', error);
     } finally {
       setUpdating(false);
     }
@@ -391,7 +478,16 @@ export default function EventDetailPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 pb-2">
+            {/* Timezone Info Banner */}
+            {/* <div className="flex items-start gap-2 rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-900/20 dark:text-blue-300">
+              <Info className="mt-0 h-4 w-4 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Timezone: {userTimezone}</p>
+                <p className="text-xs">Waktu akan disimpan dalam UTC</p>
+              </div>
+            </div> */}
+
             <div className="space-y-2">
               <Label htmlFor="nama">Nama Event *</Label>
               <Input
@@ -430,8 +526,8 @@ export default function EventDetailPage() {
                     <SelectValue placeholder="Pilih semester" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="GANJIL">Ganjil</SelectItem>
-                    <SelectItem value="GENAP">Genap</SelectItem>
+                    <SelectItem value="Ganjil">Ganjil</SelectItem>
+                    <SelectItem value="Genap">Genap</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -474,6 +570,9 @@ export default function EventDetailPage() {
                   })
                 }
               />
+              {/* <p className="text-xs text-gray-500">
+                Waktu dalam timezone Anda ({userTimezone})
+              </p> */}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -490,6 +589,9 @@ export default function EventDetailPage() {
                     })
                   }
                 />
+                {/* <p className="text-xs text-gray-500">
+                  Waktu dalam timezone Anda ({userTimezone})
+                </p> */}
               </div>
 
               <div className="space-y-2">
@@ -505,6 +607,9 @@ export default function EventDetailPage() {
                     })
                   }
                 />
+                {/* <p className="text-xs text-gray-500">
+                  Waktu dalam timezone Anda ({userTimezone})
+                </p> */}
               </div>
             </div>
 

@@ -1,6 +1,9 @@
-/* eslint-disable no-unused-vars */
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import {
+  formatDateTime as formatDateTimeTZ,
+  formatDate as formatDateTZ,
+} from './dateUtils';
 
 export { debounce } from './debounce';
 
@@ -8,26 +11,20 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Format date with timezone support
+ * @deprecated Use formatDate from dateUtils instead
+ */
 export function formatDate(date, format = 'dd MMM yyyy') {
-  if (!date) return '-';
-  const d = new Date(date);
-  return d.toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return formatDateTZ(date, format);
 }
 
+/**
+ * Format datetime with timezone support
+ * @deprecated Use formatDateTime from dateUtils instead
+ */
 export function formatDateTime(date) {
-  if (!date) return '-';
-  const d = new Date(date);
-  return d.toLocaleString('id-ID', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatDateTimeTZ(date, 'dd MMM yyyy HH:mm');
 }
 
 export function formatCurrency(amount) {

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { toUTC, isValidDateTime } from '@/lib/utils/dateUtils';
 import EventInfoForm from '@/components/features/admin/marketplace/create/EventInfoForm';
 import SponsorForm from '@/components/features/admin/marketplace/create/SponsorForm';
 import AssessmentForm from '@/components/features/admin/marketplace/create/AssessmentForm';
@@ -42,6 +43,13 @@ export default function CreateEventPage() {
   });
 
   const handleNext = () => {
+    // Validate current step before proceeding
+    if (currentStep === 1) {
+      if (!validateEventInfo()) {
+        return;
+      }
+    }
+
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -57,13 +65,62 @@ export default function CreateEventPage() {
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
+  const validateEventInfo = () => {
+    const {
+      nama,
+      semester,
+      tahunAjaran,
+      tanggalPelaksanaan,
+      mulaiPendaftaran,
+      akhirPendaftaran,
+    } = formData;
+
+    if (!nama || !semester || !tahunAjaran) {
+      toast.error('Mohon lengkapi semua field yang wajib');
+      return false;
+    }
+
+    if (!tanggalPelaksanaan || !mulaiPendaftaran || !akhirPendaftaran) {
+      toast.error('Mohon isi semua tanggal');
+      return false;
+    }
+
+    // Validate datetime strings
+    if (
+      !isValidDateTime(tanggalPelaksanaan) ||
+      !isValidDateTime(mulaiPendaftaran) ||
+      !isValidDateTime(akhirPendaftaran)
+    ) {
+      toast.error('Format tanggal tidak valid');
+      return false;
+    }
+
+    // Validate date logic (in local time)
+    const eventDate = new Date(tanggalPelaksanaan);
+    const regStart = new Date(mulaiPendaftaran);
+    const regEnd = new Date(akhirPendaftaran);
+
+    if (regStart >= regEnd) {
+      toast.error('Tanggal mulai pendaftaran harus sebelum tanggal akhir');
+      return false;
+    }
+
+    if (regEnd >= eventDate) {
+      toast.error(
+        'Tanggal akhir pendaftaran harus sebelum tanggal pelaksanaan'
+      );
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
-      // Validate
-      if (!formData.nama || !formData.semester || !formData.tahunAjaran) {
-        toast.error('Mohon lengkapi semua field yang wajib');
+      // Validate event info
+      if (!validateEventInfo()) {
         return;
       }
 
@@ -87,12 +144,32 @@ export default function CreateEventPage() {
         }
       }
 
-      const response = await marketplaceAPI.createEvent(formData);
+      // Convert dates to UTC ISO strings
+      const dataToSend = {
+        ...formData,
+        tanggalPelaksanaan: toUTC(
+          new Date(formData.tanggalPelaksanaan)
+        ).toISOString(),
+        mulaiPendaftaran: toUTC(
+          new Date(formData.mulaiPendaftaran)
+        ).toISOString(),
+        akhirPendaftaran: toUTC(
+          new Date(formData.akhirPendaftaran)
+        ).toISOString(),
+      };
+
+      console.log('Data to send (UTC):', {
+        tanggalPelaksanaan: dataToSend.tanggalPelaksanaan,
+        mulaiPendaftaran: dataToSend.mulaiPendaftaran,
+        akhirPendaftaran: dataToSend.akhirPendaftaran,
+      });
+
+      const response = await marketplaceAPI.createEvent(dataToSend);
       toast.success('Event berhasil dibuat!');
       router.push(`${ROUTES.ADMIN_MARKETPLACE}/${response.data.id}`);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal membuat event');
-      console.error(error);
+      console.error('Create event error:', error);
     } finally {
       setLoading(false);
     }

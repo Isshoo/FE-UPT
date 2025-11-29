@@ -11,9 +11,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { generateTahunAjaranOptions, SEMESTER_OPTIONS } from '@/lib/constants';
+import {
+  toDatetimeLocal,
+  //  getUserTimezone
+} from '@/lib/utils/dateUtils';
+// import { Info } from 'lucide-react';
 
 export default function EventInfoForm({ data, onUpdate }) {
   const tahunAjaranOptions = generateTahunAjaranOptions();
+  // const userTimezone = getUserTimezone();
 
   const handleChange = (field, value) => {
     onUpdate({ [field]: value });
@@ -21,6 +27,18 @@ export default function EventInfoForm({ data, onUpdate }) {
 
   return (
     <div className="space-y-6">
+      {/* Timezone Info Banner */}
+      {/* <div className="flex items-start gap-2 rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-900/20 dark:text-blue-300">
+        <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
+        <div>
+          <p className="font-medium">Timezone Anda: {userTimezone}</p>
+          <p className="mt-1 text-xs">
+            Semua waktu akan disimpan dalam UTC dan ditampilkan sesuai timezone
+            Anda
+          </p>
+        </div>
+      </div> */}
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Nama Event */}
         <div className="space-y-2 md:col-span-2">
@@ -117,10 +135,13 @@ export default function EventInfoForm({ data, onUpdate }) {
           <Input
             id="tanggalPelaksanaan"
             type="datetime-local"
-            value={data.tanggalPelaksanaan}
+            value={toDatetimeLocal(data.tanggalPelaksanaan)}
             onChange={(e) => handleChange('tanggalPelaksanaan', e.target.value)}
             required
           />
+          {/* <p className="text-xs text-gray-500">
+            Waktu dalam timezone Anda ({userTimezone})
+          </p> */}
         </div>
 
         {/* Kuota Peserta */}
@@ -147,10 +168,13 @@ export default function EventInfoForm({ data, onUpdate }) {
           <Input
             id="mulaiPendaftaran"
             type="datetime-local"
-            value={data.mulaiPendaftaran}
+            value={toDatetimeLocal(data.mulaiPendaftaran)}
             onChange={(e) => handleChange('mulaiPendaftaran', e.target.value)}
             required
           />
+          {/* <p className="text-xs text-gray-500">
+            Waktu dalam timezone Anda ({userTimezone})
+          </p> */}
         </div>
 
         {/* Akhir Pendaftaran */}
@@ -161,10 +185,13 @@ export default function EventInfoForm({ data, onUpdate }) {
           <Input
             id="akhirPendaftaran"
             type="datetime-local"
-            value={data.akhirPendaftaran}
+            value={toDatetimeLocal(data.akhirPendaftaran)}
             onChange={(e) => handleChange('akhirPendaftaran', e.target.value)}
             required
           />
+          {/* <p className="text-xs text-gray-500">
+            Waktu dalam timezone Anda ({userTimezone})
+          </p> */}
         </div>
       </div>
     </div>
