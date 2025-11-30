@@ -1,23 +1,28 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store';
 import { useNotificationStore } from '@/store';
 
 export default function AuthProvider({ children }) {
-  const initialize = useAuthStore((state) => state.initialize);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isInitialized = useAuthStore((state) => state.isInitialized);
+  const initialize = useAuthStore((state) => state.initialize);
 
   const { fetchUnreadCount, reset: resetNotifications } =
     useNotificationStore();
 
-  // Effect 1: Initialize auth (hanya sekali)
-  useEffect(() => {
+  // Memoize initialize to prevent unnecessary re-renders
+  const handleInitialize = useCallback(() => {
     if (!isInitialized) {
       initialize();
     }
-  }, [initialize, isInitialized]);
+  }, [isInitialized, initialize]);
+
+  // Effect 1: Initialize auth (hanya sekali)
+  useEffect(() => {
+    handleInitialize();
+  }, [handleInitialize]);
 
   // Effect 2: Handle notifications berdasarkan auth status
   useEffect(() => {

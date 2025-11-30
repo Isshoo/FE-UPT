@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
 import { ROUTES } from '@/lib/constants/routes';
@@ -9,11 +9,13 @@ import { ROLES } from '@/lib/constants/labels';
 export default function GuestRoute({ children }) {
   const router = useRouter();
   const { isAuthenticated, user, isLoading, isInitialized } = useAuthStore();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (!isInitialized || isLoading) return; // tunggu sampai siap
 
     if (isAuthenticated) {
+      setIsRedirecting(true);
       if (user?.role === ROLES.ADMIN) {
         router.replace(ROUTES.ADMIN_DASHBOARD);
       } else {
@@ -22,7 +24,8 @@ export default function GuestRoute({ children }) {
     }
   }, [isAuthenticated, user, isInitialized, isLoading, router]);
 
-  if (!isInitialized || isLoading) {
+  // Show loading while initializing or redirecting
+  if (!isInitialized || isLoading || isRedirecting) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
@@ -30,8 +33,13 @@ export default function GuestRoute({ children }) {
     );
   }
 
+  // Don't render if authenticated (show loading instead)
   if (isAuthenticated) {
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
   }
 
   return <>{children}</>;

@@ -14,7 +14,12 @@ export const useAuthStore = create(
       error: null,
 
       initialize: async () => {
-        const token = localStorage.getItem('token');
+        // Check if already initialized
+        if (get().isInitialized) {
+          return;
+        }
+
+        const { token } = get();
         if (!token) {
           set({ isInitialized: true });
           return;
@@ -32,7 +37,7 @@ export const useAuthStore = create(
             isInitialized: true,
           });
         } catch (error) {
-          localStorage.removeItem('token');
+          // Token invalid, clear auth state
           set({
             user: null,
             token: null,
@@ -50,15 +55,14 @@ export const useAuthStore = create(
           const response = await authAPI.login(credentials);
           const { user, token } = response.data;
 
-          localStorage.setItem('token', token);
-
           set({
             user,
             token,
             isAuthenticated: true,
             isLoading: false,
+            isInitialized: true,
           });
-          return { success: true };
+          return { success: true, user };
         } catch (error) {
           const errorMessage = error.response?.data?.message || 'Login gagal';
           set({ error: errorMessage, isLoading: false });
@@ -73,15 +77,14 @@ export const useAuthStore = create(
           const response = await authAPI.register(userData);
           const { user, token } = response.data;
 
-          localStorage.setItem('token', token);
-
           set({
             user,
             token,
             isAuthenticated: true,
             isLoading: false,
+            isInitialized: true,
           });
-          return { success: true };
+          return { success: true, user };
         } catch (error) {
           const errorMessage =
             error.response?.data?.message || 'Registrasi gagal';
@@ -93,15 +96,25 @@ export const useAuthStore = create(
       // Logout
       logout: async () => {
         try {
-          console.log('Logging Out..');
+          // Call API to invalidate token on server
+          const { token } = get();
+          if (token) {
+            try {
+              await authAPI.logout();
+            } catch (error) {
+              // Even if API call fails, still logout locally
+              console.error('Logout API error:', error);
+            }
+          }
         } catch (error) {
           console.error('Logout error:', error);
         } finally {
-          localStorage.removeItem('token');
+          // Clear auth state (Zustand persist will handle localStorage)
           set({
             user: null,
             token: null,
             isAuthenticated: false,
+            isInitialized: false,
             error: null,
           });
         }
@@ -109,7 +122,7 @@ export const useAuthStore = create(
 
       // Get current user
       getCurrentUser: async () => {
-        const token = localStorage.getItem('token');
+        const { token } = get();
 
         if (!token) {
           set({
@@ -132,7 +145,7 @@ export const useAuthStore = create(
             isLoading: false,
           });
         } catch (error) {
-          localStorage.removeItem('token');
+          // Token invalid, clear auth state
           set({
             user: null,
             token: null,
@@ -140,6 +153,17 @@ export const useAuthStore = create(
             isLoading: false,
           });
         }
+      },
+
+      // Clear auth state (for 401 handler)
+      clearAuth: () => {
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isInitialized: false,
+          error: null,
+        });
       },
 
       // Clear error
@@ -150,10 +174,8 @@ export const useAuthStore = create(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
-        isLoading: state.isLoading,
         token: state.token,
         isInitialized: state.isInitialized,
-        error: state.error,
       }),
     }
   )

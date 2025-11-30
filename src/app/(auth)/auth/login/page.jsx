@@ -34,7 +34,9 @@ export default function LoginPage() {
 
     if (result.success) {
       toast.success('Login berhasil!');
-      const user = useAuthStore.getState().user;
+      
+      // Use user from response, not from getState()
+      const user = result.user;
 
       // Redirect based on role
       if (user?.role === ROLES.ADMIN) {

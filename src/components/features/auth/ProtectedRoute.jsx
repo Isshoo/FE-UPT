@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
 import { ROUTES } from '@/lib/constants/routes';
@@ -9,25 +9,30 @@ import { ROLES } from '@/lib/constants/labels';
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const router = useRouter();
   const { isAuthenticated, user, isLoading, isInitialized } = useAuthStore();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (!isInitialized || isLoading) return;
 
     if (!isAuthenticated) {
+      setIsRedirecting(true);
       router.replace(ROUTES.LOGIN);
       return;
     }
 
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+      setIsRedirecting(true);
       if (user?.role === ROLES.ADMIN) {
         router.replace(ROUTES.ADMIN_DASHBOARD);
       } else {
         router.replace(ROUTES.HOME);
       }
+      return;
     }
   }, [isAuthenticated, user, isInitialized, isLoading, allowedRoles, router]);
 
-  if (isLoading) {
+  // Show loading while initializing or redirecting
+  if (!isInitialized || isLoading || isRedirecting) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
@@ -35,12 +40,22 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     );
   }
 
+  // Don't render if not authenticated
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
   }
 
+  // Don't render if role not allowed
   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-    return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
   }
 
   return <>{children}</>;
