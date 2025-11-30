@@ -21,6 +21,7 @@ apiClient.interceptors.request.use(
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        // eslint-disable-next-line no-unused-vars
       } catch (error) {
         // Fallback to localStorage if store not available
         const token = localStorage.getItem('token');
@@ -51,6 +52,7 @@ apiClient.interceptors.response.use(
         try {
           const { useAuthStore } = require('@/store');
           useAuthStore.getState().clearAuth();
+          // eslint-disable-next-line no-unused-vars
         } catch (storeError) {
           // Fallback: clear localStorage
           localStorage.removeItem('token');
@@ -72,7 +74,8 @@ apiClient.interceptors.response.use(
       if (error.code === 'ECONNABORTED') {
         error.message = 'Request timeout. Silakan coba lagi.';
       } else if (error.message === 'Network Error') {
-        error.message = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+        error.message =
+          'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
       } else {
         error.message = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
       }
