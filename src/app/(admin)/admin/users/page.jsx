@@ -161,6 +161,9 @@ export default function AdminUsersPage() {
 
   const handleEdit = (user) => {
     setSelectedUser(user);
+    if (user.fakultas) {
+      setProdiOptions(PRODI_BY_FAKULTAS[user.fakultas] || []);
+    }
     setFormData({
       email: user.email,
       nama: user.nama,
@@ -169,9 +172,6 @@ export default function AdminUsersPage() {
       prodi: user.prodi || '',
       password: '', // Not needed for edit
     });
-    if (user.fakultas) {
-      setProdiOptions(PRODI_BY_FAKULTAS[user.fakultas] || []);
-    }
     setEditDialogOpen(true);
   };
 
