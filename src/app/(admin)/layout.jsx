@@ -2,7 +2,7 @@
 
 import { Sidebar } from '@/components/common/layout';
 import { ProtectedRoute } from '@/components/features/auth';
-import { ROLES } from '@/lib/constants';
+import { ROLES } from '@/lib/constants/labels';
 
 export default function AdminLayout({ children }) {
   return (

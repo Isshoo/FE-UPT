@@ -7,12 +7,12 @@ import { marketplaceAPI } from '@/lib/api';
 import { useAuthStore } from '@/store';
 import {
   EVENT_STATUS_LABELS,
-  EVENT_STATUS_COLORS,
   BUSINESS_TYPE_LABELS,
-  ROUTES,
   ROLES,
-} from '@/lib/constants';
-import { formatDateTime } from '@/lib/utils';
+} from '@/lib/constants/labels';
+import { EVENT_STATUS_COLORS } from '@/lib/constants/colors';
+import { ROUTES } from '@/lib/constants/routes';
+import { formatDateTime } from '@/lib/utils/date';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {

@@ -10,11 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { generateTahunAjaranOptions, SEMESTER_OPTIONS } from '@/lib/constants';
+import { SEMESTER_OPTIONS } from '@/lib/constants/labels';
+import { generateTahunAjaranOptions } from '@/lib/constants/tahunAjaran';
 import {
   toDatetimeLocal,
   //  getUserTimezone
-} from '@/lib/utils/dateUtils';
+} from '@/lib/utils/date';
 // import { Info } from 'lucide-react';
 
 export default function EventInfoForm({ data, onUpdate }) {

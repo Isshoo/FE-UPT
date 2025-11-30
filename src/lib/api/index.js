@@ -1,4 +1,4 @@
-export { default as apiClient } from './client';
+export { default as apiClient } from '../../config/apiClient';
 export { authAPI } from './auth';
 export { marketplaceAPI } from './marketplace';
 export { assessmentAPI } from './assessment';

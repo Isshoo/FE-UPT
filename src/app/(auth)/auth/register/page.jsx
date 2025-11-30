@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/labels';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,7 +53,7 @@ export default function RegisterPage() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
+        <CardTitle className="text-center text-2xl font-bold">
           Buat Akun Baru
         </CardTitle>
       </CardHeader>
@@ -120,11 +120,11 @@ export default function RegisterPage() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
           Sudah punya akun?{' '}
           <Link
             href={ROUTES.LOGIN}
-            className="text-[#fba635] hover:underline font-medium"
+            className="font-medium text-[#fba635] hover:underline"
           >
             Login di sini
           </Link>

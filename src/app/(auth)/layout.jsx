@@ -2,7 +2,8 @@
 
 import { GuestRoute } from '@/components/features/auth';
 import Link from 'next/link';
-import { ROUTES, APP_NAME } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/routes';
+import { APP_NAME } from '@/config/environment';
 
 export default function AuthLayout({ children }) {
   return (

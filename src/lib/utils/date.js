@@ -1,13 +1,8 @@
 // lib/dateUtils.js
+import { DEFAULT_TIMEZONE } from '@/config/environment';
 import { format, parseISO } from 'date-fns';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
-// Default timezone - bisa di-override per user
-const DEFAULT_TIMEZONE = 'Asia/Makassar';
-
-/**
- * Get user's timezone from browser
- */
 export function getUserTimezone() {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -16,24 +11,12 @@ export function getUserTimezone() {
   }
 }
 
-/**
- * Convert local datetime to UTC for API
- * @param {Date|string} localDateTime - Local date/time
- * @param {string} timezone - User timezone (default: auto-detect)
- * @returns {Date} UTC Date object
- */
 export function toUTC(localDateTime, timezone = getUserTimezone()) {
   const date =
     typeof localDateTime === 'string' ? new Date(localDateTime) : localDateTime;
   return fromZonedTime(date, timezone);
 }
 
-/**
- * Convert UTC from API to user local time
- * @param {string} utcDateTime - ISO string from API
- * @param {string} timezone - User timezone (default: auto-detect)
- * @returns {Date} Local Date object
- */
 export function fromUTC(utcDateTime, timezone = getUserTimezone()) {
   if (!utcDateTime) return null;
   const date =
@@ -41,13 +24,6 @@ export function fromUTC(utcDateTime, timezone = getUserTimezone()) {
   return toZonedTime(date, timezone);
 }
 
-/**
- * Format datetime for display
- * @param {Date|string} date - Date to format
- * @param {string} formatStr - Format string (date-fns format)
- * @param {string} timezone - User timezone
- * @returns {string} Formatted date string
- */
 export function formatDateTime(
   date,
   formatStr = 'dd MMM yyyy HH:mm',
@@ -63,18 +39,10 @@ export function formatDateTime(
   return format(zonedDate, formatStr);
 }
 
-/**
- * Format date only (no time)
- */
 export function formatDate(date, formatStr = 'dd MMM yyyy') {
   return formatDateTime(date, formatStr);
 }
 
-/**
- * Format for datetime-local input (HTML5)
- * @param {Date|string} date - Date to format
- * @returns {string} Format: YYYY-MM-DDTHH:mm
- */
 export function toDatetimeLocal(date, timezone = getUserTimezone()) {
   if (!date) return '';
 
@@ -86,9 +54,6 @@ export function toDatetimeLocal(date, timezone = getUserTimezone()) {
   return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
 }
 
-/**
- * Validate datetime string
- */
 export function isValidDateTime(dateString) {
   try {
     const date = new Date(dateString);
@@ -98,9 +63,6 @@ export function isValidDateTime(dateString) {
   }
 }
 
-/**
- * Get relative time (e.g., "2 hours ago")
- */
 export function getRelativeTime(date, timezone = getUserTimezone()) {
   if (!date) return '';
 
@@ -119,34 +81,22 @@ export function getRelativeTime(date, timezone = getUserTimezone()) {
   return formatDate(zonedDate);
 }
 
-/**
- * Check if date is in the past
- */
 export function isPast(date, timezone = getUserTimezone()) {
   if (!date) return false;
   const zonedDate = fromUTC(date, timezone);
   return zonedDate < new Date();
 }
 
-/**
- * Check if date is in the future
- */
 export function isFuture(date, timezone = getUserTimezone()) {
   if (!date) return false;
   const zonedDate = fromUTC(date, timezone);
   return zonedDate > new Date();
 }
 
-/**
- * Get current datetime in ISO format (UTC)
- */
 export function nowUTC() {
   return new Date().toISOString();
 }
 
-/**
- * Get current datetime in user timezone
- */
 export function nowLocal(timezone = getUserTimezone()) {
   return toZonedTime(new Date(), timezone);
 }

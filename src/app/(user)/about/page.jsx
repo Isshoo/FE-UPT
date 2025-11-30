@@ -18,7 +18,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/routes';
 import Image from 'next/image';
 
 export default function AboutPage() {

@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, Moon, Sun, User, LogOut, LogIn } from 'lucide-react';
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { useAuthStore, useThemeStore } from '@/store';
-import { ROUTES, APP_NAME, ROLES } from '@/lib/constants';
+import { APP_NAME } from '@/config/environment';
+import { ROUTES } from '@/lib/constants/routes';
+import { ROLES } from '@/lib/constants/labels';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -16,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import NotificationBell from './NotificationBell';
-import { getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils/helpers';
 import Image from 'next/image';
 
 export default function Header() {

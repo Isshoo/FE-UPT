@@ -18,7 +18,7 @@ import {
   KATEGORI_USAHA,
   FAKULTAS_OPTIONS,
   PRODI_BY_FAKULTAS,
-} from '@/lib/constants';
+} from '@/lib/constants/labels';
 import { usersAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 

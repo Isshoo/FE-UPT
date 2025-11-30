@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Check, X, Edit2 } from 'lucide-react';
-import { BUSINESS_TYPE_LABELS } from '@/lib/constants';
+import { BUSINESS_TYPE_LABELS } from '@/lib/constants/labels';
 import { marketplaceAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 

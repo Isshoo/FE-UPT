@@ -8,9 +8,9 @@ import {
   UMKM_STAGE_NAMES,
   UMKM_STAGE_DESCRIPTIONS,
   UMKM_STAGE_STATUS_LABELS,
-  UMKM_STAGE_STATUS_COLORS,
   KATEGORI_USAHA,
-} from '@/lib/constants';
+} from '@/lib/constants/labels';
+import { UMKM_STAGE_STATUS_COLORS } from '@/lib/constants/colors';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

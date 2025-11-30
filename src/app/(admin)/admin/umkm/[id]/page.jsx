@@ -7,8 +7,8 @@ import {
   UMKM_STAGE_NAMES,
   UMKM_STAGE_DESCRIPTIONS,
   UMKM_STAGE_STATUS_LABELS,
-  UMKM_STAGE_STATUS_COLORS,
-} from '@/lib/constants';
+} from '@/lib/constants/labels';
+import { UMKM_STAGE_STATUS_COLORS } from '@/lib/constants/colors';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';

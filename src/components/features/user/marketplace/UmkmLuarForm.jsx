@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { KATEGORI_USAHA } from '@/lib/constants';
+import { KATEGORI_USAHA } from '@/lib/constants/labels';
 import toast from 'react-hot-toast';
 
 export default function UmkmLuarForm({ onSubmit, isSubmitting }) {

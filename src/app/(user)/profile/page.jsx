@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store';
 import { authAPI, umkmAPI, marketplaceAPI } from '@/lib/api';
-import { UMKM_STAGE_NAMES } from '@/lib/constants';
+import { UMKM_STAGE_NAMES } from '@/lib/constants/labels';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils/date';
 
 export default function ProfilePage() {
   const searchParams = useSearchParams();

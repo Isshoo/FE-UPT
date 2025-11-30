@@ -7,8 +7,8 @@ import { useAuthStore } from '@/store';
 import {
   UMKM_STAGE_NAMES,
   UMKM_STAGE_STATUS_LABELS,
-  UMKM_STAGE_STATUS_COLORS,
-} from '@/lib/constants';
+} from '@/lib/constants/labels';
+import { UMKM_STAGE_STATUS_COLORS } from '@/lib/constants/colors';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

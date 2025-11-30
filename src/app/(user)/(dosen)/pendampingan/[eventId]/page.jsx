@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { assessmentAPI, marketplaceAPI } from '@/lib/api';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils/date';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

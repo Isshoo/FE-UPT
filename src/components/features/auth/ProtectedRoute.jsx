@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
-import { ROUTES, ROLES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/routes';
+import { ROLES } from '@/lib/constants/labels';
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const router = useRouter();

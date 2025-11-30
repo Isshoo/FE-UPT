@@ -7,7 +7,7 @@ import {
   KATEGORI_USAHA,
   UMKM_STAGE_NAMES,
   UMKM_STAGE_STATUS_LABELS,
-} from '@/lib/constants';
+} from '@/lib/constants/labels';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

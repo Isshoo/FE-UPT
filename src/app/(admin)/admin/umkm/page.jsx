@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { umkmAPI } from '@/lib/api';
-import { KATEGORI_USAHA, UMKM_STAGE_NAMES } from '@/lib/constants';
+import { KATEGORI_USAHA, UMKM_STAGE_NAMES } from '@/lib/constants/labels';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';

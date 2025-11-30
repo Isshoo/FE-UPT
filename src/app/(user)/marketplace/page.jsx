@@ -3,12 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { marketplaceAPI } from '@/lib/api';
-import {
-  EVENT_STATUS_LABELS,
-  EVENT_STATUS_COLORS,
-  SEMESTER_OPTIONS,
-} from '@/lib/constants';
-import { formatDate } from '@/lib/utils';
+import { EVENT_STATUS_LABELS, SEMESTER_OPTIONS } from '@/lib/constants/labels';
+import { EVENT_STATUS_COLORS } from '@/lib/constants/colors';
+import { formatDate } from '@/lib/utils/date';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';

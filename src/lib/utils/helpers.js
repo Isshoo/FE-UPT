@@ -1,32 +1,3 @@
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import {
-  formatDateTime as formatDateTimeTZ,
-  formatDate as formatDateTZ,
-} from './dateUtils';
-
-export { debounce } from './debounce';
-
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
-
-/**
- * Format date with timezone support
- * @deprecated Use formatDate from dateUtils instead
- */
-export function formatDate(date, format = 'dd MMM yyyy') {
-  return formatDateTZ(date, format);
-}
-
-/**
- * Format datetime with timezone support
- * @deprecated Use formatDateTime from dateUtils instead
- */
-export function formatDateTime(date) {
-  return formatDateTimeTZ(date, 'dd MMM yyyy HH:mm');
-}
-
 export function formatCurrency(amount) {
   if (!amount) return 'Rp 0';
   return new Intl.NumberFormat('id-ID', {

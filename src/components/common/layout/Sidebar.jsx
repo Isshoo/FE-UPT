@@ -13,9 +13,10 @@ import {
   Moon,
   SquareArrowOutUpLeft,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/tailwind';
 import { useAuthStore, useThemeStore } from '@/store';
-import { ROUTES, APP_NAME } from '@/lib/constants';
+import { APP_NAME } from '@/config/environment';
+import { ROUTES } from '@/lib/constants/routes';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +26,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import NotificationBell from './NotificationBell';
-import { getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils/helpers';
 import Image from 'next/image';
 
 const menuItems = [

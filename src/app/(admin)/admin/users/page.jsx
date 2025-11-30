@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { usersAPI } from '@/lib/api';
-import { FAKULTAS_OPTIONS, PRODI_BY_FAKULTAS } from '@/lib/constants';
+import { FAKULTAS_OPTIONS, PRODI_BY_FAKULTAS } from '@/lib/constants/labels';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

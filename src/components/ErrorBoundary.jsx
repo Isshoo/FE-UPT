@@ -5,7 +5,7 @@ import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/labels';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

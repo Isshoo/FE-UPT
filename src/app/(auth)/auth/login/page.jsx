@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store';
-import { ROUTES, ROLES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/routes';
+import { ROLES } from '@/lib/constants/labels';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,7 +35,7 @@ export default function LoginPage() {
     if (result.success) {
       toast.success('Login berhasil!');
       const user = useAuthStore.getState().user;
-      
+
       // Redirect based on role
       if (user?.role === ROLES.ADMIN) {
         router.push(ROUTES.ADMIN_DASHBOARD);
@@ -49,7 +50,7 @@ export default function LoginPage() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
+        <CardTitle className="text-center text-2xl font-bold">
           Masuk ke Akun Anda
         </CardTitle>
       </CardHeader>
@@ -90,11 +91,11 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
           Belum punya akun?{' '}
           <Link
             href={ROUTES.REGISTER}
-            className="text-[#fba635] hover:underline font-medium"
+            className="font-medium text-[#fba635] hover:underline"
           >
             Daftar di sini
           </Link>

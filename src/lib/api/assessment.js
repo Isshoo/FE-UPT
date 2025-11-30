@@ -1,4 +1,4 @@
-import apiClient from './client';
+import apiClient from '../../config/apiClient';
 
 export const assessmentAPI = {
   // Categories

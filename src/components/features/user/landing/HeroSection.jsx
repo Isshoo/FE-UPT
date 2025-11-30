@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants/routes';
 
 export default function HeroSection() {
   return (

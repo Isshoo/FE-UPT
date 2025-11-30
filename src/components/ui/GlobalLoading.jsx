@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { onLoadingChange } from '@/lib/api/client';
+import { onLoadingChange } from '@/config/apiClient';
 
 export default function GlobalLoading() {
   const [isLoading, setIsLoading] = useState(false);

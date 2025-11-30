@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { assessmentAPI } from '@/lib/api';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils/date';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

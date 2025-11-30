@@ -9,7 +9,8 @@ import {
   Instagram,
   Twitter,
 } from 'lucide-react';
-import { APP_NAME, ROUTES } from '@/lib/constants';
+import { APP_NAME } from '@/config/environment';
+import { ROUTES } from '@/lib/constants/routes';
 
 export default function Footer() {
   return (
