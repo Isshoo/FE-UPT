@@ -13,7 +13,9 @@ import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, isLoading } = useAuthStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const register = useAuthStore((state) => state.register);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

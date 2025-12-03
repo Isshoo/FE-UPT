@@ -14,7 +14,9 @@ import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuthStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const login = useAuthStore((state) => state.login);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const [formData, setFormData] = useState({
     email: '',
     password: '',

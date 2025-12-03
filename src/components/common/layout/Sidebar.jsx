@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Store,
@@ -54,12 +54,16 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
-  const { theme, toggleTheme } = useThemeStore();
+  const router = useRouter();
+  // Use specific selectors to prevent unnecessary re-renders
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
 
-  const handleLogout = () => {
-    logout();
-    window.location.href = ROUTES.LOGIN;
+  const handleLogout = async () => {
+    await logout();
+    router.push(ROUTES.LOGIN);
   };
 
   return (

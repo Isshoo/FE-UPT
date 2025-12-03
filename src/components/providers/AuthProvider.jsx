@@ -5,12 +5,15 @@ import { useAuthStore } from '@/store';
 import { useNotificationStore } from '@/store';
 
 export default function AuthProvider({ children }) {
+  // Use specific selectors to prevent unnecessary re-renders
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const isInitialized = useAuthStore((state) => state.isInitialized);
   const initialize = useAuthStore((state) => state.initialize);
 
-  const { fetchUnreadCount, reset: resetNotifications } =
-    useNotificationStore();
+  const fetchUnreadCount = useNotificationStore(
+    (state) => state.fetchUnreadCount
+  );
+  const resetNotifications = useNotificationStore((state) => state.reset);
 
   // Memoize initialize to prevent unnecessary re-renders
   const handleInitialize = useCallback(() => {
@@ -44,7 +47,9 @@ export default function AuthProvider({ children }) {
       // Reset notifications jika tidak authenticated
       resetNotifications();
     }
-  }, [isInitialized, isAuthenticated, fetchUnreadCount, resetNotifications]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // fetchUnreadCount and resetNotifications are stable from Zustand
+  }, [isInitialized, isAuthenticated]);
 
   return <>{children}</>;
 }
