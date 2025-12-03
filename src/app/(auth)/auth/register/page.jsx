@@ -51,9 +51,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md gap-1">
       <CardHeader>
-        <CardTitle className="text-center text-2xl font-bold">
+        <CardTitle className="text-center text-xl font-bold">
           Buat Akun Baru
         </CardTitle>
       </CardHeader>

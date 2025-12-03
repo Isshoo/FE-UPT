@@ -4,6 +4,7 @@ import { GuestRoute } from '@/components/features/auth';
 import Link from 'next/link';
 import { ROUTES } from '@/lib/constants/routes';
 import { APP_NAME } from '@/config/environment';
+import { Card } from '@/components/ui/card';
 
 export default function AuthLayout({ children }) {
   return (
@@ -33,7 +34,16 @@ export default function AuthLayout({ children }) {
         </div>
 
         {/* Right Side - Form */}
-        <div className="flex flex-1 items-center justify-center bg-white p-8 dark:bg-gray-900">
+        <div className="flex flex-1 flex-col items-center justify-center bg-white p-8 dark:bg-gray-900">
+          {/* Beranda */}
+          <Card className="mb-4 block w-full max-w-md bg-gradient-to-br from-[#174c4e] to-[#072526] py-1 text-center lg:hidden">
+            <Link href={ROUTES.HOME} className="n">
+              <span className="text-3xl font-bold text-[#fba635]">
+                {APP_NAME}
+              </span>
+            </Link>
+          </Card>
+
           {children}
         </div>
       </div>

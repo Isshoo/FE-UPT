@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     if (result.success) {
       toast.success('Login berhasil!');
-      
+
       // Use user from response, not from getState()
       const user = result.user;
 
@@ -50,9 +50,9 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md gap-1">
       <CardHeader>
-        <CardTitle className="text-center text-2xl font-bold">
+        <CardTitle className="text-center text-xl font-bold">
           Masuk ke Akun Anda
         </CardTitle>
       </CardHeader>
