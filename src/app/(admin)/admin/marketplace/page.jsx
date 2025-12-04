@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { marketplaceAPI } from '@/lib/api';
+import { useMarketplaceStore } from '@/store';
 import { EVENT_STATUS_LABELS, SEMESTER_OPTIONS } from '@/lib/constants/labels';
 import { EVENT_STATUS_COLORS } from '@/lib/constants/colors';
 import { formatDate } from '@/lib/utils/date';
@@ -32,96 +32,50 @@ import {
 import { Download, FileSpreadsheet } from 'lucide-react';
 import { Plus, Search, Calendar, MapPin, Users } from 'lucide-react';
 import PaginationControls from '@/components/ui/pagination-controls';
-import toast from 'react-hot-toast';
 
 import { exportAPI, downloadBlob } from '@/lib/api';
 import EmptyState from '@/components/ui/EmptyState';
 
 export default function AdminMarketplacePage() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 0,
-  });
-  const [filters, setFilters] = useState({
-    search: '',
-    semester: '',
-    tahunAjaran: '',
-    status: '',
-  });
-  const [tahunAjaranOptions, setTahunAjaranOptions] = useState([]);
+  // Use Zustand store with specific selectors
+  const events = useMarketplaceStore((state) => state.events);
+  const isLoading = useMarketplaceStore((state) => state.isLoading);
+  const pagination = useMarketplaceStore((state) => state.pagination);
+  const filters = useMarketplaceStore((state) => state.filters);
+  const tahunAjaranOptions = useMarketplaceStore(
+    (state) => state.tahunAjaranOptions
+  );
+  const fetchEvents = useMarketplaceStore((state) => state.fetchEvents);
+  const setFilters = useMarketplaceStore((state) => state.setFilters);
+  const setPagination = useMarketplaceStore((state) => state.setPagination);
+  const resetFilters = useMarketplaceStore((state) => state.resetFilters);
 
   useEffect(() => {
-    fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, pagination.limit]);
-
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const response = await marketplaceAPI.getEvents({
-        ...filters,
-        page: pagination.page,
-        limit: pagination.limit,
-      });
-
-      const eventData = response.data.events || response.data;
-      setEvents(eventData);
-
-      // Extract unique tahun ajaran from events
-      const uniqueTahunAjaran = [
-        ...new Set(eventData.map((event) => event.tahunAjaran).filter(Boolean)),
-      ].sort((a, b) => {
-        // Sort descending (newest first)
-        const yearA = parseInt(a.split('/')[0]);
-        const yearB = parseInt(b.split('/')[0]);
-        return yearB - yearA;
-      });
-
-      setTahunAjaranOptions(uniqueTahunAjaran);
-
-      setPagination((prev) => ({
-        ...prev,
-        total: response.pagination?.total || 0,
-        totalPages: response.pagination?.totalPages || 0,
-      }));
-    } catch (error) {
-      toast.error('Gagal memuat data event');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Admin can see all events including DRAFT
+    fetchEvents({ includeDraft: true });
+  }, [pagination.page, pagination.limit, filters, fetchEvents]);
 
   const handleSearch = () => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    fetchEvents();
+    setPagination({ page: 1 });
+    fetchEvents({ page: 1, includeDraft: true });
   };
 
   const handlePageChange = (newPage) => {
-    setPagination((prev) => ({ ...prev, page: newPage }));
+    setPagination({ page: newPage });
   };
 
   const handlePageSizeChange = (newLimit) => {
-    setPagination({ page: 1, limit: newLimit, total: 0, totalPages: 0 });
+    setPagination({ page: 1, limit: newLimit });
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters({ [key]: value });
   };
 
   const handleReset = () => {
-    setFilters((prev) => ({
-      ...prev,
-      search: '',
-      semester: '',
-      tahunAjaran: '',
-      status: '',
-    }));
-    fetchEvents();
+    resetFilters();
+    setPagination({ page: 1 });
+    fetchEvents({ page: 1, includeDraft: true });
   };
 
   const handleExportMarketplace = async (format) => {
@@ -148,7 +102,7 @@ export default function AdminMarketplacePage() {
     downloadBlob(response.data, filename);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>

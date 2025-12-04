@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { assessmentAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,65 +13,27 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
 import { ChevronLeft, Trophy, Award } from 'lucide-react';
-import toast from 'react-hot-toast';
-
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
+import { useAssessmentDetail } from '@/lib/hooks/features/useAssessmentDetail';
 
 export default function AssessmentDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { id: eventId, kategoriId } = params;
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [settingWinner, setSettingWinner] = useState(false);
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kategoriId]);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await assessmentAPI.getScoresByCategory(kategoriId);
-      setData(response.data);
-    } catch (error) {
-      toast.error('Gagal memuat data penilaian');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSetWinner = async (usahaId) => {
-    if (
-      !confirm(
-        'Apakah Anda yakin ingin menetapkan pemenang untuk kategori ini?'
-      )
-    ) {
-      return;
-    }
-
-    try {
-      setSettingWinner(true);
-      await assessmentAPI.setWinner(kategoriId, usahaId);
-      toast.success('Pemenang berhasil ditetapkan');
-      fetchData();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Gagal menetapkan pemenang');
-    } finally {
-      setSettingWinner(false);
-    }
-  };
+  const { data, loading, error, settingWinner, refetch, handleSetWinner } =
+    useAssessmentDetail(kategoriId);
 
   const handleExportAssessment = async (format) => {
-    const response = await exportAPI.exportAssessment(kategoriId, format);
-    const filename = `hasil-penilaian-${kategori?.nama}-${new Date().getTime()}.xlsx`;
-    downloadBlob(response.data, filename);
+    try {
+      const response = await exportAPI.exportAssessment(kategoriId, format);
+      const filename = `hasil-penilaian-${data?.kategori?.nama || 'assessment'}-${new Date().getTime()}.xlsx`;
+      downloadBlob(response.data, filename);
+    } catch (err) {
+      console.error('Export error:', err);
+    }
   };
 
   if (loading) {
@@ -84,16 +44,21 @@ export default function AssessmentDetailPage() {
     );
   }
 
-  if (!data) {
+  if (error || !data) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center">
-        <p className="mb-4 text-gray-500">Data tidak ditemukan</p>
-        <Button asChild>
-          <Link href={`/admin/marketplace/${eventId}`}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Kembali
-          </Link>
-        </Button>
+        <p className="mb-4 text-gray-500">{error || 'Data tidak ditemukan'}</p>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={refetch}>
+            Coba Lagi
+          </Button>
+          <Button asChild>
+            <Link href={`/admin/marketplace/${eventId}`}>
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Kembali
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -239,7 +204,7 @@ export default function AssessmentDetailPage() {
                             className="bg-yellow-600 hover:bg-yellow-700"
                           >
                             <Trophy className="mr-1 h-3 w-3" />
-                            Set Pemenang
+                            {settingWinner ? 'Memproses...' : 'Set Pemenang'}
                           </Button>
                         )}
                       </TableCell>

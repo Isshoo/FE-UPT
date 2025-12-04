@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { marketplaceAPI } from '@/lib/api';
-import { useAuthStore } from '@/store';
+import { useAuthStore, useMarketplaceStore } from '@/store';
 import {
   EVENT_STATUS_LABELS,
   BUSINESS_TYPE_LABELS,
@@ -51,48 +50,44 @@ export default function UserEventDetailPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id;
-  const { isAuthenticated, user } = useAuthStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const eventDetail = useMarketplaceStore((state) => state.eventDetail);
+  const isLoading = useMarketplaceStore((state) => state.isLoading);
+  const fetchEventDetail = useMarketplaceStore(
+    (state) => state.fetchEventDetail
+  );
 
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [userRegistration, setUserRegistration] = useState(null);
 
-  useEffect(() => {
-    fetchEventDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventId]);
+  // Wrap checkUserRegistration with useCallback
+  const checkUserRegistration = useCallback(
+    (eventData) => {
+      // Cek apakah user sudah mendaftar di event ini
+      if (eventData && eventData.usaha && user) {
+        const userBusiness = eventData.usaha.find(
+          (usaha) => usaha.pemilik.id === user.id
+        );
 
-  const fetchEventDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await marketplaceAPI.getEventById(eventId);
-      setEvent(response.data);
-      console.log('Event Data:', response.data);
-
-      // Check user registration after getting event data
-      if (isAuthenticated && user?.role === ROLES.USER && response.data) {
-        checkUserRegistration(response.data);
+        setUserRegistration(userBusiness || null);
+      } else {
+        setUserRegistration(null);
       }
-    } catch (error) {
-      toast.error('Gagal memuat detail event');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [user]
+  );
 
-  const checkUserRegistration = (eventData) => {
-    // Cek apakah user sudah mendaftar di event ini
-    if (eventData && eventData.usaha && user) {
-      const userBusiness = eventData.usaha.find(
-        (usaha) => usaha.pemilik.id === user.id
-      );
-
-      setUserRegistration(userBusiness || null);
-    } else {
-      setUserRegistration(null);
-    }
-  };
+  useEffect(() => {
+    fetchEventDetail(eventId).then((result) => {
+      if (result.success && result.data) {
+        // Check user registration after getting event data
+        if (isAuthenticated && user?.role === ROLES.USER && result.data) {
+          checkUserRegistration(result.data);
+        }
+      }
+    });
+  }, [eventId, isAuthenticated, user, fetchEventDetail, checkUserRegistration]);
 
   const handleRegister = () => {
     if (!isAuthenticated) {
@@ -146,7 +141,7 @@ export default function UserEventDetailPage() {
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
@@ -154,7 +149,7 @@ export default function UserEventDetailPage() {
     );
   }
 
-  if (!event) {
+  if (!eventDetail) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center">
         <p className="mb-4 text-gray-500">Event tidak ditemukan</p>
@@ -168,12 +163,13 @@ export default function UserEventDetailPage() {
     );
   }
 
+  const event = eventDetail;
   const isRegistrationOpen =
-    event.status === 'TERBUKA' &&
+    event?.status === 'TERBUKA' &&
     new Date() >= new Date(event.mulaiPendaftaran) &&
     new Date() <= new Date(event.akhirPendaftaran);
-  const isEventCompleted = event.status === 'SELESAI';
-  const approvedBusinesses = event.usaha?.filter((b) => b.disetujui) || [];
+  const isEventCompleted = event?.status === 'SELESAI';
+  const approvedBusinesses = event?.usaha?.filter((b) => b.disetujui) || [];
   const canRegister = isRegistrationOpen && !userRegistration;
 
   return (
