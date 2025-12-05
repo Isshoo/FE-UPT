@@ -1,28 +1,23 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Store,
-  // Briefcase,
   Users,
   LogOut,
   User,
   Sun,
   Moon,
-  SquareArrowOutUpLeft,
+  Menu,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/tailwind';
 import { useAuthStore, useThemeStore } from '@/store';
 import { APP_NAME } from '@/config/environment';
 import { ROUTES } from '@/lib/constants/routes';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import NotificationBell from './NotificationBell';
@@ -31,22 +26,17 @@ import Image from 'next/image';
 
 const menuItems = [
   {
-    title: 'Dashboard',
+    label: 'Dashboard',
     href: ROUTES.ADMIN_DASHBOARD,
     icon: LayoutDashboard,
   },
   {
-    title: 'Marketplace',
+    label: 'Marketplace',
     href: ROUTES.ADMIN_MARKETPLACE,
     icon: Store,
   },
-  // {
-  //   title: 'UMKM Binaan',
-  //   href: ROUTES.ADMIN_UMKM,
-  //   icon: Briefcase,
-  // },
   {
-    title: 'Pengguna',
+    label: 'Pengguna',
     href: ROUTES.ADMIN_USERS,
     icon: Users,
   },
@@ -55,11 +45,11 @@ const menuItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  // Use specific selectors to prevent unnecessary re-renders
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -68,232 +58,161 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Sidebar untuk Tablet & Desktop */}
-      <aside className="fixed top-0 left-0 z-40 hidden h-screen w-20 max-w-64 min-w-20 border-r bg-white md:block lg:w-full dark:border-gray-800 dark:bg-gray-900">
+      {/* Mobile Menu Button */}
+      <Button
+        variant="outline"
+        size="sm"
+        className={
+          isOpen
+            ? 'fixed top-4 left-50 z-50 duration-350 lg:hidden'
+            : 'fixed top-4 left-7 z-50 duration-600 lg:hidden'
+        }
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+      </Button>
+
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          'fixed top-0 left-0 z-40 h-screen w-64 border-r bg-white transition-transform duration-300 ease-in-out dark:border-gray-800 dark:bg-gray-900',
+          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        )}
+      >
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
-          <div className="flex h-24 items-center justify-center border-b pt-2 lg:justify-between lg:px-5 dark:border-gray-800">
+          <div className="border-b px-4 py-6 dark:border-gray-800">
             <Link
               href={ROUTES.HOME}
-              className="flex !cursor-pointer items-center"
+              className="flex items-center gap-2"
+              onClick={() => setIsOpen(false)}
             >
-              <div className="flex size-15 items-center justify-center rounded-lg border border-gray-300 bg-transparent shadow-md lg:size-10 lg:border-transparent lg:shadow-none">
-                {/* <span className="text-xl font-bold text-white">U</span> */}
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg">
                 <Image
                   src="/images/icon.png"
                   alt="Logo"
-                  width={30}
-                  height={30}
+                  width={50}
+                  height={50}
                   className="rounded-lg"
                 />
               </div>
-              <span className="hidden pl-0 text-xl font-bold text-[#fba635] lg:block">
-                {APP_NAME}
-              </span>
-              <SquareArrowOutUpLeft className="mt-0.5 ml-2 hidden h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
+              <div>
+                <h2 className="text-xl font-bold text-[#fba635]">{APP_NAME}</h2>
+                <p className="text-muted-foreground text-xs">Admin Panel</p>
+              </div>
             </Link>
-            <div className="hidden lg:mt-0.5 lg:block">
-              {<NotificationBell />}
+          </div>
+
+          {/* User Info */}
+          <div className="flex items-center justify-between border-b px-6 py-4 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-[#174c4e] text-white">
+                  {getInitials(user?.nama || 'User')}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">
+                  {user?.nama || 'User'}
+                </p>
+                <p className="text-muted-foreground text-xs capitalize">
+                  {user?.role || 'Admin'}
+                </p>
+              </div>
+            </div>
+            {/* Notification */}
+            <div className="flex items-center justify-end">
+              <NotificationBell />
             </div>
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-            <div className="mb-3.5 flex w-full items-center justify-center gap-3 rounded-lg border-y border-[#fba635] px-3 py-2.5 pl-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 lg:hidden lg:justify-start lg:pl-4 dark:text-gray-300 dark:hover:bg-gray-800">
-              {<NotificationBell />}
-            </div>
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname.includes(item.href);
+          <nav className="flex-1 overflow-y-auto p-4">
+            <ul className="space-y-1">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname.includes(item.href);
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex w-full items-center justify-center gap-3 rounded-lg px-3 py-2.5 pl-2.5 text-sm font-medium transition-colors lg:justify-start lg:pl-4',
-                    isActive
-                      ? 'bg-[#fba635] text-white'
-                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                  <p className="hidden lg:block">{item.title}</p>
-                </Link>
-              );
-            })}
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                        isActive
+                          ? 'bg-[#fba635] text-white'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </nav>
 
-          {/* User Profile & Logout */}
-          <div className="border-t p-4 dark:border-gray-800">
-            <div className="flex items-center justify-between">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex w-full items-center justify-start gap-3 pl-2.5 lg:pl-4"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-[#174c4e] text-white">
-                        {getInitials(user?.nama || 'User')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="hidden flex-col items-start text-sm lg:flex">
-                      <span className="font-medium">
-                        {user?.nama || 'User'}
-                      </span>
-                      <span className="text-xs text-gray-500 capitalize">
-                        {user?.role || 'Admin'}
-                      </span>
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="!md:ml-0 mb-1 ml-8 w-48"
-                >
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={ROUTES.USER_PROFILE}
-                      className="flex cursor-pointer items-center"
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Profil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="">
-                    {/* Theme Toggle */}
-                    <button
-                      onClick={toggleTheme}
-                      className="flex w-full cursor-pointer items-center"
-                    >
-                      {theme === 'light' ? (
-                        <>
-                          <Moon className="mr-2 h-5 w-5" />{' '}
-                          <p className="capitalize">Dark</p>
-                        </>
-                      ) : (
-                        <>
-                          <Sun className="mr-2 h-5 w-5" />{' '}
-                          <p className="capitalize">Light</p>
-                        </>
-                      )}
-                    </button>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full cursor-pointer items-center !text-red-600 hover:bg-red-50 hover:text-red-700"
-                    >
-                      <LogOut className="mr-2 h-4 w-4 pl-0.5 text-red-600" />
-                      Logout
-                    </button>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+          {/* Bottom Actions */}
+          <div className="space-y-2 border-t p-4 dark:border-gray-800">
+            {/* Profile */}
+            <Link
+              href={ROUTES.USER_PROFILE}
+              className=""
+              onClick={() => setIsOpen(false)}
+            >
+              <Button
+                variant="outline"
+                className="mb-2 w-full justify-start p-0"
+                size="sm"
+              >
+                <User className="mr-2 h-4 w-4" />
+                Profil
+              </Button>
+            </Link>
+
+            {/* Theme Toggle */}
+            <Button
+              variant="outline"
+              className="mb-2 w-full justify-start p-0"
+              size="sm"
+              onClick={toggleTheme}
+            >
+              {theme === 'light' ? (
+                <>
+                  <Moon className="mr-2 h-4 w-4" />
+                  <span>Dark Mode</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="mr-2 h-4 w-4" />
+                  <span>Light Mode</span>
+                </>
+              )}
+            </Button>
+
+            {/* Logout */}
+            <Button
+              variant="outline"
+              className="w-full justify-start p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+              size="sm"
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
           </div>
         </div>
       </aside>
-
-      {/* Mobile Top Bar (hanya untuk layar sangat kecil) */}
-      <div className="fixed top-0 right-0 left-0 z-40 flex h-18 items-center justify-between border-b bg-white px-4 sm:hidden dark:border-gray-800 dark:bg-gray-900">
-        <Link href={ROUTES.HOME} className="flex items-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
-            {/* <span className="text-xl font-bold text-white">U</span> */}
-            <Image
-              src="/images/icon.png"
-              alt="Logo"
-              width={30}
-              height={30}
-              className="rounded-lg"
-            />
-          </div>
-          <span className="pl-2 text-xl font-bold text-[#fba635]">
-            {APP_NAME}
-          </span>
-          <SquareArrowOutUpLeft className="mt-0.5 ml-2 h-4 w-4 text-[#174c4e] lg:block dark:text-white" />
-        </Link>
-        <div className="flex gap-3">
-          <div className="lg:block">{<NotificationBell />}</div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#174c4e] text-white">
-                    {getInitials(user?.nama || 'User')}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link
-                  href={ROUTES.USER_PROFILE}
-                  className="flex cursor-pointer items-center"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Profil
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <button
-                  onClick={toggleTheme}
-                  className="flex w-full cursor-pointer items-center"
-                >
-                  {theme === 'light' ? (
-                    <>
-                      <Moon className="mr-2 h-5 w-5" />
-                      <p className="capitalize">Dark</p>
-                    </>
-                  ) : (
-                    <>
-                      <Sun className="mr-2 h-5 w-5" />
-                      <p className="capitalize">Light</p>
-                    </>
-                  )}
-                </button>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <button
-                  onClick={handleLogout}
-                  className="flex w-full cursor-pointer items-center !text-red-600 hover:bg-red-50 hover:text-red-700"
-                >
-                  <LogOut className="mr-2 h-4 w-4 pl-0.5 text-red-600" />
-                  Logout
-                </button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Mobile Bottom Navigation (hanya untuk layar sangat kecil) */}
-      <nav className="fixed right-0 bottom-0 left-0 z-40 border-t bg-white md:hidden dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex items-center justify-around">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.includes(item.href);
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-1 flex-col items-center gap-1 py-3 text-xs font-medium transition-colors',
-                  isActive
-                    ? 'text-[#fba635]'
-                    : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                )}
-              >
-                <Icon className="h-6 w-6" />
-                <span className="text-[10px]">{item.title}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
     </>
   );
 }

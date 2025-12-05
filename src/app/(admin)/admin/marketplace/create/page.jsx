@@ -81,7 +81,11 @@ export default function CreateEventPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
       <div>
-        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+        >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Kembali
         </Button>

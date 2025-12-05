@@ -58,7 +58,9 @@ export default function EventDetailPage() {
 
   const eventDetail = useMarketplaceStore((state) => state.eventDetail);
   const isLoading = useMarketplaceStore((state) => state.isLoading);
-  const fetchEventDetail = useMarketplaceStore((state) => state.fetchEventDetail);
+  const fetchEventDetail = useMarketplaceStore(
+    (state) => state.fetchEventDetail
+  );
   const [activeTab, setActiveTab] = useState('info');
 
   // Dialog states
@@ -280,7 +282,7 @@ export default function EventDetailPage() {
         <Button
           variant="ghost"
           onClick={() => router.push(`/admin/marketplace/`)}
-          className="mb-4"
+          className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Kembali
@@ -358,7 +360,8 @@ export default function EventDetailPage() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="info">Informasi Event</TabsTrigger>
           <TabsTrigger value="participants">
-            Peserta ({eventDetail.usaha?.length || 0} / {eventDetail.kuotaPeserta})
+            Peserta ({eventDetail.usaha?.length || 0} /{' '}
+            {eventDetail.kuotaPeserta})
           </TabsTrigger>
           <TabsTrigger value="assessment">
             Penilaian ({eventDetail.kategoriPenilaian?.length || 0})
@@ -366,7 +369,10 @@ export default function EventDetailPage() {
         </TabsList>
 
         <TabsContent value="info" className="space-y-6">
-          <EventInfoTab event={eventDetail} onRefresh={() => fetchEventDetail(eventId)} />
+          <EventInfoTab
+            event={eventDetail}
+            onRefresh={() => fetchEventDetail(eventId)}
+          />
         </TabsContent>
 
         <TabsContent value="participants" className="w-full space-y-6">
@@ -378,7 +384,10 @@ export default function EventDetailPage() {
         </TabsContent>
 
         <TabsContent value="assessment" className="space-y-6">
-          <AssessmentTab event={eventDetail} onRefresh={() => fetchEventDetail(eventId)} />
+          <AssessmentTab
+            event={eventDetail}
+            onRefresh={() => fetchEventDetail(eventId)}
+          />
         </TabsContent>
       </Tabs>
 

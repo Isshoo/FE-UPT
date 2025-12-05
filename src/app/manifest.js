@@ -17,12 +17,12 @@ export default function manifest() {
         description: 'Jelajahi event marketplace',
         url: '/marketplace',
       },
-      {
-        name: 'UMKM Binaan',
-        short_name: 'UMKM',
-        description: 'Lihat UMKM binaan',
-        url: '/umkm',
-      },
+      // {
+      //   name: 'UMKM Binaan',
+      //   short_name: 'UMKM',
+      //   description: 'Lihat UMKM binaan',
+      //   url: '/umkm',
+      // },
       {
         name: 'Profil',
         short_name: 'Profil',

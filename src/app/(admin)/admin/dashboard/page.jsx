@@ -47,13 +47,17 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-4">
       {/* Header - Compact */}
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-sm text-gray-600">Overview statistik UPT-PIK</p>
+      <div className="flex flex-col justify-between gap-3 md:flex-row">
+        <div className="">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Overview statistik UPT-PIK
+          </p>
+        </div>
       </div>
 
       {/* Stats Cards - Smaller padding & text */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <StatsCard
           title="Peserta"
           value={generalStats.totalPeserta}

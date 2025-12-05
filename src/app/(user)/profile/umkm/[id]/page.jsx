@@ -182,7 +182,7 @@ export default function ManageUmkmPage() {
         <Button
           variant="ghost"
           onClick={() => router.push(`/profile?tab=umkm`)}
-          className="mb-4"
+          className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           Kembali ke Daftar UMKM Anda
