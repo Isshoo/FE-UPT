@@ -14,7 +14,8 @@ import { cn } from '@/lib/utils/tailwind';
 
 export function RegisterForm({ className, ...props }) {
   const router = useRouter();
-  const { register, isLoading } = useAuthStore();
+  const register = useAuthStore((state) => state.register);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

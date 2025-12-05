@@ -15,7 +15,8 @@ import { cn } from '@/lib/utils/tailwind';
 
 export function LoginForm({ className, ...props }) {
   const router = useRouter();
-  const { login, isLoading } = useAuthStore();
+  const login = useAuthStore((state) => state.login);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
