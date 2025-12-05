@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { marketplaceAPI } from '@/lib/api';
-import { useAuthStore } from '@/store';
+import { useAuthStore, useMarketplaceStore } from '@/store';
 import { ROLES } from '@/lib/constants/labels';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
@@ -18,10 +18,15 @@ export default function RegisterBusinessPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.id;
-  const { isAuthenticated, user } = useAuthStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const eventDetail = useMarketplaceStore((state) => state.eventDetail);
+  const isLoading = useMarketplaceStore((state) => state.isLoading);
+  const fetchEventDetail = useMarketplaceStore(
+    (state) => state.fetchEventDetail
+  );
 
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [businessType, setBusinessType] = useState('MAHASISWA');
 
@@ -31,34 +36,24 @@ export default function RegisterBusinessPage() {
       router.push(`${ROUTES.LOGIN}?redirect=/marketplace/${eventId}/register`);
       return;
     }
-    if (user?.role !== `${ROLES.USER}`) {
+    // Fix role comparison - use ROLES.USER directly, not string template
+    if (user?.role !== ROLES.USER) {
       router.push(ROUTES.USER_MARKETPLACE);
+      return;
     }
 
-    fetchEventDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventId, isAuthenticated]);
-
-  const fetchEventDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await marketplaceAPI.getEventById(eventId);
-
-      if (response.data.status !== 'TERBUKA') {
-        toast.error('Pendaftaran sudah ditutup');
-        router.push(`/marketplace/${eventId}`);
-        return;
+    fetchEventDetail(eventId).then((result) => {
+      if (result.success && result.data) {
+        if (result.data.status !== 'TERBUKA') {
+          toast.error('Pendaftaran sudah ditutup');
+          router.push(`/marketplace/${eventId}`);
+        }
+      } else {
+        toast.error('Gagal memuat detail event');
+        router.push('/marketplace');
       }
-
-      setEvent(response.data);
-    } catch (error) {
-      toast.error('Gagal memuat detail event');
-      console.error(error);
-      router.push('/marketplace');
-    } finally {
-      setLoading(false);
-    }
-  };
+    });
+  }, [eventId, isAuthenticated, user, router, fetchEventDetail]);
 
   const handleSubmit = async (formData) => {
     try {
@@ -86,7 +81,7 @@ export default function RegisterBusinessPage() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
@@ -94,6 +89,7 @@ export default function RegisterBusinessPage() {
     );
   }
 
+  const event = eventDetail;
   if (!event) {
     return null;
   }

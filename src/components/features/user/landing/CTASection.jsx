@@ -8,7 +8,8 @@ import { ROUTES } from '@/lib/constants/routes';
 import { useAuthStore } from '@/store';
 
 export default function CTASection() {
-  const { isAuthenticated } = useAuthStore();
+  // Use specific selector to prevent unnecessary re-renders
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <section className="py-20 lg:py-32">

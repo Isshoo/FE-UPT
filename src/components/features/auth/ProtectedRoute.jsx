@@ -8,7 +8,11 @@ import { ROLES } from '@/lib/constants/labels';
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading, isInitialized } = useAuthStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {

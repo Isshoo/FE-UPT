@@ -14,19 +14,23 @@ import PaginationControls from '@/components/ui/pagination-controls';
 export default function NotificationsPage() {
   const router = useRouter();
 
-  const {
-    notifications,
-    pagination,
-    isLoading,
-    fetchNotifications,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-  } = useNotificationStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const notifications = useNotificationStore((state) => state.notifications);
+  const pagination = useNotificationStore((state) => state.pagination);
+  const isLoading = useNotificationStore((state) => state.isLoading);
+  const fetchNotifications = useNotificationStore(
+    (state) => state.fetchNotifications
+  );
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  const deleteNotification = useNotificationStore(
+    (state) => state.deleteNotification
+  );
 
   useEffect(() => {
     fetchNotifications({ page: 1, limit: 20 });
-  }, [fetchNotifications]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount, fetchNotifications is stable from Zustand
 
   const handleNotificationClick = async (notification) => {
     if (!notification.sudahBaca) {

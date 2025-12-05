@@ -41,11 +41,15 @@ export const useNotificationStore = create((set, get) => ({
       const response = await notificationAPI.getUnreadCount();
       const { count } = response.data;
 
-      set({ unreadCount: count });
+      set({ unreadCount: count, error: null });
       return { success: true, count };
     } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || 'Gagal memuat jumlah notifikasi';
+      // Don't set error state for unread count failures (silent fail)
+      // Just log and return failure
       console.error('Failed to fetch unread count:', error);
-      return { success: false };
+      return { success: false, error: errorMessage };
     }
   },
 
@@ -54,7 +58,7 @@ export const useNotificationStore = create((set, get) => ({
     try {
       await notificationAPI.markAsRead(notificationId);
 
-      // Update local state
+      // Update local state (optimistic update)
       const { notifications, unreadCount } = get();
       const updatedNotifications = notifications.map((notif) =>
         notif.id === notificationId ? { ...notif, sudahBaca: true } : notif
@@ -63,12 +67,14 @@ export const useNotificationStore = create((set, get) => ({
       set({
         notifications: updatedNotifications,
         unreadCount: Math.max(0, unreadCount - 1),
+        error: null,
       });
 
       return { success: true };
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || 'Gagal menandai notifikasi';
+      set({ error: errorMessage });
       return { success: false, error: errorMessage };
     }
   },
@@ -78,7 +84,7 @@ export const useNotificationStore = create((set, get) => ({
     try {
       await notificationAPI.markAllAsRead();
 
-      // Update local state
+      // Update local state (optimistic update)
       const { notifications } = get();
       const updatedNotifications = notifications.map((notif) => ({
         ...notif,
@@ -88,12 +94,14 @@ export const useNotificationStore = create((set, get) => ({
       set({
         notifications: updatedNotifications,
         unreadCount: 0,
+        error: null,
       });
 
       return { success: true };
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || 'Gagal menandai semua notifikasi';
+      set({ error: errorMessage });
       return { success: false, error: errorMessage };
     }
   },
@@ -103,7 +111,7 @@ export const useNotificationStore = create((set, get) => ({
     try {
       await notificationAPI.deleteNotification(notificationId);
 
-      // Update local state
+      // Update local state (optimistic update)
       const { notifications, unreadCount } = get();
       const deletedNotif = notifications.find((n) => n.id === notificationId);
       const updatedNotifications = notifications.filter(
@@ -115,12 +123,14 @@ export const useNotificationStore = create((set, get) => ({
         unreadCount: deletedNotif?.sudahBaca
           ? unreadCount
           : Math.max(0, unreadCount - 1),
+        error: null,
       });
 
       return { success: true };
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || 'Gagal menghapus notifikasi';
+      set({ error: errorMessage });
       return { success: false, error: errorMessage };
     }
   },

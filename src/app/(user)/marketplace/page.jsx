@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { marketplaceAPI } from '@/lib/api';
+import { useMarketplaceStore } from '@/store';
 import { EVENT_STATUS_LABELS, SEMESTER_OPTIONS } from '@/lib/constants/labels';
 import { EVENT_STATUS_COLORS } from '@/lib/constants/colors';
 import { formatDate } from '@/lib/utils/date';
@@ -31,107 +31,55 @@ import {
   Users,
   // TrendingUp
 } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 import { EventCardSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function UserMarketplacePage() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 0,
-  });
-  const [filters, setFilters] = useState({
-    search: '',
-    semester: '',
-    tahunAjaran: '',
-    status: '',
-  });
-  const [tahunAjaranOptions, setTahunAjaranOptions] = useState([]);
+  // Use Zustand store with specific selectors
+  const events = useMarketplaceStore((state) => state.events);
+  const isLoading = useMarketplaceStore((state) => state.isLoading);
+  const error = useMarketplaceStore((state) => state.error);
+  const pagination = useMarketplaceStore((state) => state.pagination);
+  const filters = useMarketplaceStore((state) => state.filters);
+  const tahunAjaranOptions = useMarketplaceStore(
+    (state) => state.tahunAjaranOptions
+  );
+  const fetchEvents = useMarketplaceStore((state) => state.fetchEvents);
+  const setFilters = useMarketplaceStore((state) => state.setFilters);
+  const setPagination = useMarketplaceStore((state) => state.setPagination);
+  const resetFilters = useMarketplaceStore((state) => state.resetFilters);
 
   useEffect(() => {
     fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, pagination.limit]);
-
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await marketplaceAPI.getEvents({
-        ...filters,
-        page: pagination.page,
-        limit: pagination.limit,
-      });
-      // Filter out DRAFT events for non-admin users
-      const publicEvents = (response.data.events || response.data).filter(
-        (event) => event.status !== 'DRAFT'
-      );
-      setEvents(publicEvents);
-
-      // Extract unique tahun ajaran from events
-      const uniqueTahunAjaran = [
-        ...new Set(
-          publicEvents.map((event) => event.tahunAjaran).filter(Boolean)
-        ),
-      ].sort((a, b) => {
-        // Sort descending (newest first)
-        const yearA = parseInt(a.split('/')[0]);
-        const yearB = parseInt(b.split('/')[0]);
-        return yearB - yearA;
-      });
-
-      setTahunAjaranOptions(uniqueTahunAjaran);
-
-      setPagination((prev) => ({
-        ...prev,
-        total: response.pagination?.total || 0,
-        totalPages: response.pagination?.totalPages || 0,
-      }));
-    } catch (error) {
-      toast.error('Gagal memuat data event');
-      setError(error.message);
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [pagination.page, pagination.limit, filters, fetchEvents]);
 
   const handleSearch = () => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    fetchEvents();
+    setPagination({ page: 1 });
+    fetchEvents({ page: 1 });
   };
 
   const handlePageChange = (newPage) => {
-    setPagination((prev) => ({ ...prev, page: newPage }));
+    setPagination({ page: newPage });
   };
 
   const handlePageSizeChange = (newLimit) => {
-    setPagination({ page: 1, limit: newLimit, total: 0, totalPages: 0 });
+    setPagination({ page: 1, limit: newLimit });
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters({ [key]: value });
   };
 
   const handleReset = () => {
-    setFilters({
-      search: '',
-      semester: '',
-      tahunAjaran: '',
-      status: '',
-    });
-    setTimeout(() => fetchEvents(), 100);
+    resetFilters();
+    setPagination({ page: 1 });
+    fetchEvents({ page: 1 });
   };
 
   // Ganti bagian loading
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">

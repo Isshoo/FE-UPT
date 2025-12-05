@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { useMarketplaceStore } from '@/store';
 import Link from 'next/link';
 import { marketplaceAPI } from '@/lib/api';
 import { ROUTES } from '@/lib/constants/routes';
@@ -55,8 +56,9 @@ export default function EventDetailPage() {
   const eventId = params.id;
   // const userTimezone = getUserTimezone();
 
-  const [event, setEvent] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const eventDetail = useMarketplaceStore((state) => state.eventDetail);
+  const isLoading = useMarketplaceStore((state) => state.isLoading);
+  const fetchEventDetail = useMarketplaceStore((state) => state.fetchEventDetail);
   const [activeTab, setActiveTab] = useState('info');
 
   // Dialog states
@@ -79,44 +81,29 @@ export default function EventDetailPage() {
   });
 
   useEffect(() => {
-    fetchEventDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventId]);
+    fetchEventDetail(eventId);
+  }, [eventId, fetchEventDetail]);
 
   useEffect(() => {
-    if (event) {
+    if (eventDetail) {
       // Convert UTC dates to local timezone for editing
       setEditForm({
-        nama: event.nama,
-        deskripsi: event.deskripsi,
-        semester: event.semester,
-        tahunAjaran: event.tahunAjaran,
-        lokasi: event.lokasi,
-        tanggalPelaksanaan: toDatetimeLocal(event.tanggalPelaksanaan),
-        mulaiPendaftaran: toDatetimeLocal(event.mulaiPendaftaran),
-        akhirPendaftaran: toDatetimeLocal(event.akhirPendaftaran),
-        kuotaPeserta: event.kuotaPeserta?.toString(),
+        nama: eventDetail.nama,
+        deskripsi: eventDetail.deskripsi,
+        semester: eventDetail.semester,
+        tahunAjaran: eventDetail.tahunAjaran,
+        lokasi: eventDetail.lokasi,
+        tanggalPelaksanaan: toDatetimeLocal(eventDetail.tanggalPelaksanaan),
+        mulaiPendaftaran: toDatetimeLocal(eventDetail.mulaiPendaftaran),
+        akhirPendaftaran: toDatetimeLocal(eventDetail.akhirPendaftaran),
+        kuotaPeserta: eventDetail.kuotaPeserta?.toString(),
       });
-      setSelectedStatus(event.status);
+      setSelectedStatus(eventDetail.status);
     }
-  }, [event]);
-
-  const fetchEventDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await marketplaceAPI.getEventById(eventId);
-      console.log('Event Data:', response);
-      setEvent(response.data);
-    } catch (error) {
-      toast.error('Gagal memuat detail event');
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [eventDetail]);
 
   const handleUpdateStatus = async () => {
-    if (selectedStatus === event.status) {
+    if (selectedStatus === eventDetail?.status) {
       toast.error('Status tidak berubah');
       return;
     }
@@ -126,7 +113,7 @@ export default function EventDetailPage() {
       await marketplaceAPI.updateEvent(eventId, { status: selectedStatus });
       toast.success('Status event berhasil diperbarui');
       setShowStatusDialog(false);
-      fetchEventDetail();
+      fetchEventDetail(eventId);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal memperbarui status');
     } finally {
@@ -217,7 +204,7 @@ export default function EventDetailPage() {
       await marketplaceAPI.updateEvent(eventId, dataToSend);
       toast.success('Event berhasil diperbarui');
       setShowEditDialog(false);
-      fetchEventDetail();
+      fetchEventDetail(eventId);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal memperbarui event');
       console.error('Update event error:', error);
@@ -238,7 +225,7 @@ export default function EventDetailPage() {
     try {
       await marketplaceAPI.lockEvent(eventId);
       toast.success('Event berhasil dikunci');
-      fetchEventDetail();
+      fetchEventDetail(eventId);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal mengunci event');
     }
@@ -252,7 +239,7 @@ export default function EventDetailPage() {
     try {
       await marketplaceAPI.unlockEvent(eventId);
       toast.success('Event berhasil dibuka kembali');
-      fetchEventDetail();
+      fetchEventDetail(eventId);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal membuka kunci event');
     }
@@ -260,11 +247,11 @@ export default function EventDetailPage() {
 
   const handleExportEvent = async (format) => {
     const response = await exportAPI.exportEvent(eventId, format);
-    const filename = `laporan-event-${event.nama}-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+    const filename = `laporan-event-${eventDetail?.nama || 'event'}-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
     downloadBlob(response.data, filename);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
@@ -272,7 +259,7 @@ export default function EventDetailPage() {
     );
   }
 
-  if (!event) {
+  if (!eventDetail) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center">
         <p className="mb-4 text-gray-500">Event tidak ditemukan</p>
@@ -302,11 +289,11 @@ export default function EventDetailPage() {
         <div className="flex flex-col justify-between gap-3 sm:flex-row">
           <div className="flex-1">
             <div className="mb-2 flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{event.nama}</h1>
-              <Badge className={EVENT_STATUS_COLORS[event.status]}>
-                {EVENT_STATUS_LABELS[event.status]}
+              <h1 className="text-3xl font-bold">{eventDetail.nama}</h1>
+              <Badge className={EVENT_STATUS_COLORS[eventDetail.status]}>
+                {EVENT_STATUS_LABELS[eventDetail.status]}
               </Badge>
-              {event.terkunci && (
+              {eventDetail.terkunci && (
                 <Badge variant="outline">
                   <Lock className="mr-1 h-3 w-3" />
                   Terkunci
@@ -314,7 +301,7 @@ export default function EventDetailPage() {
               )}
             </div>
             <p className="text-gray-600 dark:text-gray-400">
-              {event.deskripsi}
+              {eventDetail.deskripsi}
             </p>
           </div>
 
@@ -326,7 +313,7 @@ export default function EventDetailPage() {
               variant="outline"
             />
 
-            {!event.terkunci ? (
+            {!eventDetail.terkunci ? (
               <>
                 <Button
                   variant="outline"
@@ -371,27 +358,27 @@ export default function EventDetailPage() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="info">Informasi Event</TabsTrigger>
           <TabsTrigger value="participants">
-            Peserta ({event.usaha?.length || 0} / {event.kuotaPeserta})
+            Peserta ({eventDetail.usaha?.length || 0} / {eventDetail.kuotaPeserta})
           </TabsTrigger>
           <TabsTrigger value="assessment">
-            Penilaian ({event.kategoriPenilaian?.length || 0})
+            Penilaian ({eventDetail.kategoriPenilaian?.length || 0})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="info" className="space-y-6">
-          <EventInfoTab event={event} onRefresh={fetchEventDetail} />
+          <EventInfoTab event={eventDetail} onRefresh={() => fetchEventDetail(eventId)} />
         </TabsContent>
 
         <TabsContent value="participants" className="w-full space-y-6">
           <ParticipantsTab
-            event={event}
-            onRefresh={fetchEventDetail}
-            isLocked={event.terkunci}
+            event={eventDetail}
+            onRefresh={() => fetchEventDetail(eventId)}
+            isLocked={eventDetail.terkunci}
           />
         </TabsContent>
 
         <TabsContent value="assessment" className="space-y-6">
-          <AssessmentTab event={event} onRefresh={fetchEventDetail} />
+          <AssessmentTab event={eventDetail} onRefresh={() => fetchEventDetail(eventId)} />
         </TabsContent>
       </Tabs>
 
@@ -458,7 +445,7 @@ export default function EventDetailPage() {
             </Button>
             <Button
               onClick={handleUpdateStatus}
-              disabled={updating || selectedStatus === event.status}
+              disabled={updating || selectedStatus === eventDetail?.status}
               className="bg-[#fba635] hover:bg-[#fdac58]"
             >
               {updating ? 'Memperbarui...' : 'Update Status'}

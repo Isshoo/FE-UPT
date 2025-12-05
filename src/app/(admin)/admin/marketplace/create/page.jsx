@@ -3,15 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { marketplaceAPI } from '@/lib/api';
+import { useMarketplaceStore } from '@/store';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { toUTC, isValidDateTime } from '@/lib/utils/date';
 import EventInfoForm from '@/components/features/admin/marketplace/create/EventInfoForm';
 import SponsorForm from '@/components/features/admin/marketplace/create/SponsorForm';
 import AssessmentForm from '@/components/features/admin/marketplace/create/AssessmentForm';
+import { useCreateEventForm } from '@/lib/hooks/features/useCreateEventForm';
 
 const STEPS = [
   { id: 1, name: 'Informasi Event', component: EventInfoForm },
@@ -21,99 +22,21 @@ const STEPS = [
 
 export default function CreateEventPage() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(1);
+  const fetchEventDetail = useMarketplaceStore(
+    (state) => state.fetchEventDetail
+  );
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    // Event Info
-    nama: '',
-    deskripsi: '',
-    semester: '',
-    tahunAjaran: '',
-    lokasi: '',
-    tanggalPelaksanaan: '',
-    mulaiPendaftaran: '',
-    akhirPendaftaran: '',
-    kuotaPeserta: '',
 
-    // Sponsors
-    sponsor: [],
-
-    // Assessment
-    kategoriPenilaian: [],
-  });
-
-  const handleNext = () => {
-    // Validate current step before proceeding
-    if (currentStep === 1) {
-      if (!validateEventInfo()) {
-        return;
-      }
-    }
-
-    if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleUpdateData = (data) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-  };
-
-  const validateEventInfo = () => {
-    const {
-      nama,
-      semester,
-      tahunAjaran,
-      tanggalPelaksanaan,
-      mulaiPendaftaran,
-      akhirPendaftaran,
-    } = formData;
-
-    if (!nama || !semester || !tahunAjaran) {
-      toast.error('Mohon lengkapi semua field yang wajib');
-      return false;
-    }
-
-    if (!tanggalPelaksanaan || !mulaiPendaftaran || !akhirPendaftaran) {
-      toast.error('Mohon isi semua tanggal');
-      return false;
-    }
-
-    // Validate datetime strings
-    if (
-      !isValidDateTime(tanggalPelaksanaan) ||
-      !isValidDateTime(mulaiPendaftaran) ||
-      !isValidDateTime(akhirPendaftaran)
-    ) {
-      toast.error('Format tanggal tidak valid');
-      return false;
-    }
-
-    // Validate date logic (in local time)
-    const eventDate = new Date(tanggalPelaksanaan);
-    const regStart = new Date(mulaiPendaftaran);
-    const regEnd = new Date(akhirPendaftaran);
-
-    if (regStart >= regEnd) {
-      toast.error('Tanggal mulai pendaftaran harus sebelum tanggal akhir');
-      return false;
-    }
-
-    if (regEnd >= eventDate) {
-      toast.error(
-        'Tanggal akhir pendaftaran harus sebelum tanggal pelaksanaan'
-      );
-      return false;
-    }
-
-    return true;
-  };
+  const {
+    currentStep,
+    formData,
+    handleUpdateData,
+    handleNext,
+    handlePrevious,
+    validateEventInfo,
+    validateAssessment,
+    prepareDataForSubmit,
+  } = useCreateEventForm();
 
   const handleSubmit = async () => {
     try {
@@ -124,39 +47,13 @@ export default function CreateEventPage() {
         return;
       }
 
-      // Validate kategoriPenilaian
-      if (formData.kategoriPenilaian.length === 0) {
-        toast.error('Minimal harus ada 1 kategori penilaian');
+      // Validate assessment
+      if (!validateAssessment()) {
         return;
       }
 
-      // Validate kriteria bobot = 100% for each category
-      for (const kategori of formData.kategoriPenilaian) {
-        const totalBobot = kategori.kriteria.reduce(
-          (sum, k) => sum + parseInt(k.bobot),
-          0
-        );
-        if (totalBobot !== 100) {
-          toast.error(
-            `Total bobot kriteria untuk "${kategori.nama}" harus 100%`
-          );
-          return;
-        }
-      }
-
-      // Convert dates to UTC ISO strings
-      const dataToSend = {
-        ...formData,
-        tanggalPelaksanaan: toUTC(
-          new Date(formData.tanggalPelaksanaan)
-        ).toISOString(),
-        mulaiPendaftaran: toUTC(
-          new Date(formData.mulaiPendaftaran)
-        ).toISOString(),
-        akhirPendaftaran: toUTC(
-          new Date(formData.akhirPendaftaran)
-        ).toISOString(),
-      };
+      // Prepare data with UTC conversion
+      const dataToSend = prepareDataForSubmit();
 
       console.log('Data to send (UTC):', {
         tanggalPelaksanaan: dataToSend.tanggalPelaksanaan,
@@ -166,6 +63,9 @@ export default function CreateEventPage() {
 
       const response = await marketplaceAPI.createEvent(dataToSend);
       toast.success('Event berhasil dibuat!');
+
+      // Update store with new event detail
+      await fetchEventDetail(response.data.id);
       router.push(`${ROUTES.ADMIN_MARKETPLACE}/${response.data.id}`);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal membuat event');

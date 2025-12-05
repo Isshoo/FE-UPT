@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store';
 import { authAPI, umkmAPI, marketplaceAPI } from '@/lib/api';
-import { UMKM_STAGE_NAMES } from '@/lib/constants/labels';
+import { UMKM_STAGE_NAMES, ROLES } from '@/lib/constants/labels';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,8 @@ export default function ProfilePage() {
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'profil';
 
-  const { user } = useAuthStore();
+  // Use specific selector to prevent unnecessary re-renders
+  const user = useAuthStore((state) => state.user);
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [changingPassword, setChangingPassword] = useState(false);
   const [myUmkms, setMyUmkms] = useState([]);
@@ -49,16 +50,16 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    const isDosen = user?.role === 'dosen';
-    const isAdmin = user?.role === 'admin';
+    // Use ROLES constants instead of string literals
+    const isDosen = user?.role === ROLES.DOSEN;
+    const isAdmin = user?.role === ROLES.ADMIN;
     if (activeTab === 'umkm' && !isDosen && !isAdmin) {
       fetchMyUmkms();
     }
     if (activeTab === 'riwayat' && !isDosen && !isAdmin) {
       fetchMarketplaceHistory();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+  }, [activeTab, user?.role]);
 
   const fetchMyUmkms = async () => {
     try {
@@ -154,8 +155,9 @@ export default function ProfilePage() {
     );
   }
 
-  const isDosen = user.role === 'DOSEN';
-  const isAdmin = user.role === 'ADMIN';
+  // Use ROLES constants for consistency
+  const isDosen = user.role === ROLES.DOSEN;
+  const isAdmin = user.role === ROLES.ADMIN;
   const showOnlyProfile = isDosen || isAdmin;
 
   return (

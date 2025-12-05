@@ -21,21 +21,25 @@ export default function NotificationBell() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    notifications,
-    unreadCount,
-    fetchNotifications,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-  } = useNotificationStore();
+  // Use specific selectors to prevent unnecessary re-renders
+  const notifications = useNotificationStore((state) => state.notifications);
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const fetchNotifications = useNotificationStore(
+    (state) => state.fetchNotifications
+  );
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  const deleteNotification = useNotificationStore(
+    (state) => state.deleteNotification
+  );
 
   // Fetch notifications when dropdown opens
   useEffect(() => {
     if (isOpen) {
       fetchNotifications({ page: 1, limit: 10 });
     }
-  }, [isOpen, fetchNotifications]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]); // Only depend on isOpen, fetchNotifications is stable from Zustand
 
   const handleNotificationClick = async (notification) => {
     // Mark as read

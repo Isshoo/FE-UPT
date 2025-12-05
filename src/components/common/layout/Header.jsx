@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, Moon, Sun, User, LogOut, LogIn } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils/tailwind';
@@ -23,8 +23,13 @@ import Image from 'next/image';
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuthStore();
-  const { theme, toggleTheme } = useThemeStore();
+  const router = useRouter();
+  // Use specific selectors to prevent unnecessary re-renders
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+  const theme = useThemeStore((state) => state.theme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isDosen = user?.role === ROLES.DOSEN;
@@ -43,9 +48,9 @@ export default function Header() {
     { title: 'Tentang Kami', href: ROUTES.ABOUT },
   ];
 
-  const handleLogout = () => {
-    logout();
-    window.location.href = ROUTES.LOGIN;
+  const handleLogout = async () => {
+    await logout();
+    router.push(ROUTES.LOGIN);
   };
 
   return (
