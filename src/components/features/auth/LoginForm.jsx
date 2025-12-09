@@ -92,7 +92,33 @@ export function LoginForm({ className, ...props }) {
               </div>
             </div>
           </div>
+          {/* Desktop Hero Section */}
+          <div className="bg-muted relative hidden md:block">
+            {/* Background Image */}
+            <Image
+              src="/images/auth-bg.jpg"
+              alt="Auth Background"
+              fill
+              className="object-cover"
+              priority
+            />
 
+            {/* Gradient Overlay with blur effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#174c4e]/80 via-[#0a3738]/70 to-[#072526]/80 backdrop-blur-sm" />
+
+            {/* Content */}
+            <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="relative z-10 text-center text-white">
+                <h2 className="mb-4 text-2xl font-bold drop-shadow-lg">
+                  Akses Event Marketplace Menarik
+                </h2>
+                <p className="text-gray-200 drop-shadow-md">
+                  Platform terintegrasi untuk mengelola event marketplace dan
+                  bisnis
+                </p>
+              </div>
+            </div>
+          </div>
           {/* Form Section */}
           <form
             onSubmit={handleSubmit}
@@ -157,34 +183,6 @@ export function LoginForm({ className, ...props }) {
               </p>
             </div>
           </form>
-
-          {/* Desktop Hero Section */}
-          <div className="bg-muted relative hidden md:block">
-            {/* Background Image */}
-            <Image
-              src="/images/auth-bg.jpg"
-              alt="Auth Background"
-              fill
-              className="object-cover"
-              priority
-            />
-
-            {/* Gradient Overlay with blur effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#174c4e]/80 via-[#0a3738]/70 to-[#072526]/80 backdrop-blur-sm" />
-
-            {/* Content */}
-            <div className="absolute inset-0 flex items-center justify-center p-8">
-              <div className="relative z-10 text-center text-white">
-                <h2 className="mb-4 text-2xl font-bold drop-shadow-lg">
-                  Akses Event Marketplace Menarik
-                </h2>
-                <p className="text-gray-200 drop-shadow-md">
-                  Platform terintegrasi untuk mengelola event marketplace dan
-                  bisnis
-                </p>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
