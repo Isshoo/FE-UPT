@@ -126,7 +126,7 @@ export default function ProfilePage() {
   const showOnlyProfile = isDosen || isAdmin;
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="container mx-auto mt-20 max-w-4xl space-y-6 px-4 py-8">
       {/* Header */}
       <div>
         <h1 className="mb-2 text-3xl font-bold">Profil Saya</h1>

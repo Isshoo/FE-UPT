@@ -81,7 +81,7 @@ export default function UserMarketplacePage() {
   // Ganti bagian loading
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto mt-20 px-4 py-8">
         <div className="mb-6">
           <div className="h-8 w-48 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
           <div className="mt-2 h-4 w-64 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -100,7 +100,7 @@ export default function UserMarketplacePage() {
   // Ganti bagian error
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto mt-20 px-4 py-8">
         <ErrorMessage
           title="Gagal Memuat Event"
           message={error}
@@ -113,7 +113,7 @@ export default function UserMarketplacePage() {
   // Ganti bagian empty state
   if (events.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto mt-20 px-4 py-8">
         <h1 className="mb-2 text-3xl font-bold">Marketplace</h1>
         <p className="mb-6 text-gray-600">Daftar event marketplace/bazaar</p>
         <EmptyState
@@ -126,7 +126,7 @@ export default function UserMarketplacePage() {
   }
 
   return (
-    <div className="container mx-auto space-y-8 px-4 py-8">
+    <div className="container mx-auto mt-20 space-y-8 px-4 py-8">
       {/* Hero Section */}
       <div className="space-y-4 text-center">
         <h1 className="text-4xl font-bold md:text-5xl">

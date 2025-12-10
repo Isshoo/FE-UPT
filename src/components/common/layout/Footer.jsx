@@ -15,7 +15,7 @@ import { ROUTES } from '@/lib/constants/routes';
 export default function Footer() {
   return (
     <footer className="border-t bg-slate-50 dark:border-gray-800 dark:bg-gray-900">
-      <div className="container mx-auto px-4 pt-12 pb-8">
+      <div className="container mx-auto px-4 pt-12 pb-4">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand & Description */}
           <div>
@@ -161,8 +161,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 border-t pt-6 dark:border-gray-800">
-          <div className="flex flex-col items-center justify-center gap-4 text-sm text-gray-600 md:flex-row dark:text-gray-400">
+        <div className="mt-6 border-t pt-4 dark:border-gray-800">
+          <div className="flex flex-col items-center justify-center gap-4 text-xs text-gray-600 md:flex-row dark:text-gray-400">
             <p>
               © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
             </p>

@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
+import { cn } from '@/lib/utils/tailwind';
 
 export default function NotificationBell() {
   const router = useRouter();
@@ -76,7 +77,11 @@ export default function NotificationBell() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+        >
           <Bell className="!size-6" />
           {unreadCount > 0 && (
             <Badge

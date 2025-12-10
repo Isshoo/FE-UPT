@@ -83,7 +83,7 @@ export default function RegisterBusinessPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="mt-20 flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
       </div>
     );
@@ -95,7 +95,7 @@ export default function RegisterBusinessPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="container mx-auto mt-20 max-w-4xl space-y-6 px-4 py-8">
       {/* Header */}
       <div>
         <Button

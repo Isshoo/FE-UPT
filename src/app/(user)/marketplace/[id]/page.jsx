@@ -143,7 +143,7 @@ export default function UserEventDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="mt-20 flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
       </div>
     );
@@ -151,7 +151,7 @@ export default function UserEventDetailPage() {
 
   if (!eventDetail) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center">
+      <div className="mt-20 flex min-h-[400px] flex-col items-center justify-center">
         <p className="mb-4 text-gray-500">Event tidak ditemukan</p>
         <Button asChild>
           <Link href="/marketplace">
@@ -170,7 +170,7 @@ export default function UserEventDetailPage() {
   const canRegister = isRegistrationOpen && !userRegistration;
 
   return (
-    <div className="container mx-auto space-y-8 px-4 py-8">
+    <div className="container mx-auto mt-20 space-y-8 px-4 py-8">
       {/* Header */}
       <div>
         <Button

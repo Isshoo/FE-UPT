@@ -91,7 +91,7 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="mt-18 min-h-screen">
       {/* Hero Section */}
       <section className="relative flex min-h-[86vh] items-center justify-center overflow-hidden bg-gradient-to-br from-[#174c4e] via-[#0a3738] to-[#072526]">
         <div className="absolute inset-0">

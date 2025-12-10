@@ -24,7 +24,6 @@ import Image from 'next/image';
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  // Use specific selectors to prevent unnecessary re-renders
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logout = useAuthStore((state) => state.logout);
@@ -47,13 +46,12 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80">
+    <header className="fixed top-0 z-50 w-full border-b bg-white/90 shadow-md backdrop-blur-md transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/90">
       <div className="container mx-auto flex h-18 items-center justify-between px-4">
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center">
           <div className="flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 bg-white shadow-md">
-              {/* <span className="text-xl font-bold text-white">U</span> */}
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
               <Image
                 src="/images/icon.png"
                 alt="Logo"
@@ -63,7 +61,10 @@ export default function Header() {
               />
             </div>
             <span
-              className={`text-xl font-bold ${theme === 'light' ? 'text-[#174c4e]' : 'text-[#fba635]'}`}
+              className={cn(
+                'text-xl font-bold transition-colors',
+                theme === 'light' ? 'text-[#174c4e]' : 'text-[#fba635]'
+              )}
             >
               {APP_NAME}
             </span>
@@ -98,7 +99,7 @@ export default function Header() {
             variant="ghost"
             size="lg"
             onClick={toggleTheme}
-            className="!px-1 md:inline-flex"
+            className="!px-1 text-gray-700 hover:bg-gray-100 md:inline-flex dark:text-gray-300 dark:hover:bg-gray-800"
           >
             {theme === 'light' ? (
               <Moon className="mx-0 !size-6 sm:mx-2" />
@@ -113,7 +114,11 @@ export default function Header() {
           {/* Auth Buttons */}
           {!isAuthenticated ? (
             <div className="hidden items-center gap-2 md:flex">
-              <Button variant="ghost" asChild>
+              <Button
+                variant="ghost"
+                asChild
+                className="text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
                 <Link href={ROUTES.LOGIN}>Login</Link>
               </Button>
               <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
@@ -184,7 +189,7 @@ export default function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="text-gray-700 hover:bg-gray-100 lg:hidden dark:text-gray-300 dark:hover:bg-gray-800"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             <Menu className="!size-6" />
@@ -194,7 +199,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t md:hidden dark:border-gray-800">
+        <div className="border-t bg-white md:hidden dark:border-gray-800 dark:bg-gray-900">
           <nav className="container mx-auto flex flex-col gap-2 p-4">
             {menuItems.map((item) => (
               <Link
