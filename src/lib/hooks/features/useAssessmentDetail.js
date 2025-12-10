@@ -18,8 +18,18 @@ export const useAssessmentDetail = (kategoriId) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await assessmentAPI.getScoresByCategory(kategoriId);
-      setData(response.data);
+      // Fetch scores and kategori details (includes event status and pemenang)
+      const [scoresResponse, kategoriResponse] = await Promise.all([
+        assessmentAPI.getScoresByCategory(kategoriId),
+        assessmentAPI.getCategoryById(kategoriId),
+      ]);
+
+      // Merge data with event info and pemenang
+      setData({
+        ...scoresResponse.data,
+        event: kategoriResponse.data?.event,
+        pemenang: kategoriResponse.data?.pemenang,
+      });
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || 'Gagal memuat data penilaian';

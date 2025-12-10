@@ -64,7 +64,39 @@ export default function AssessmentDetailPage() {
     );
   }
 
-  const { kategori, kriteria, businesses } = data;
+  const { kategori, kriteria, businesses, event, pemenang } = data;
+
+  // Check if we can set winner: event must be SELESAI and no winner set
+  const canSetWinner = event?.status === 'SELESAI' && !pemenang;
+  const isEventSelesai = event?.status === 'SELESAI';
+
+  // Get highest score and find all businesses with that score (for tie detection)
+  const highestScore = businesses.length > 0 ? businesses[0].totalScore : 0;
+  const tiedTopScorers = businesses.filter(
+    (b) => b.totalScore === highestScore && highestScore > 0
+  );
+  const hasTie = tiedTopScorers.length > 1;
+
+  // Function to check if a business is a top scorer (eligible for manual winner selection in tie)
+  const isTopScorer = (business) => {
+    return tiedTopScorers.some((t) => t.usahaId === business.usahaId);
+  };
+
+  // Check if business is the set winner
+  const isWinner = (business) => {
+    return pemenang && business.usahaId === pemenang.id;
+  };
+
+  // Sort businesses: winner always at top, then by score
+  const sortedBusinesses = [...businesses].sort((a, b) => {
+    // Winner always first
+    if (pemenang) {
+      if (a.usahaId === pemenang.id) return -1;
+      if (b.usahaId === pemenang.id) return 1;
+    }
+    // Then by score descending
+    return b.totalScore - a.totalScore;
+  });
 
   return (
     <div className="space-y-6">
@@ -156,15 +188,17 @@ export default function AssessmentDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {businesses.map((business, index) => (
+                  {sortedBusinesses.map((business, index) => (
                     <TableRow
                       key={business.usahaId}
                       className={
-                        index === 0 ? 'bg-yellow-50 dark:bg-yellow-950' : ''
+                        isWinner(business)
+                          ? 'bg-yellow-50 dark:bg-yellow-950'
+                          : ''
                       }
                     >
                       <TableCell className="font-bold">
-                        {index === 0 ? (
+                        {isWinner(business) ? (
                           <Trophy className="h-5 w-5 text-yellow-500" />
                         ) : (
                           index + 1
@@ -197,16 +231,44 @@ export default function AssessmentDetailPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        {index === 0 && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleSetWinner(business.usahaId)}
-                            disabled={settingWinner}
-                            className="bg-yellow-600 hover:bg-yellow-700"
-                          >
-                            <Trophy className="mr-1 h-3 w-3" />
-                            {settingWinner ? 'Memproses...' : 'Set Pemenang'}
-                          </Button>
+                        {/* Show actions for top scorers (handles tie scenario) */}
+                        {isTopScorer(business) && (
+                          <>
+                            {/* Winner already set */}
+                            {pemenang && business.usahaId === pemenang.id ? (
+                              <Badge className="bg-green-600 text-white">
+                                <Trophy className="mr-1 h-3 w-3" />
+                                Pemenang
+                              </Badge>
+                            ) : pemenang ? null : canSetWinner ? (
+                              // Can set winner: event SELESAI and no pemenang yet
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  handleSetWinner(business.usahaId)
+                                }
+                                disabled={settingWinner}
+                                className="bg-yellow-600 hover:bg-yellow-700"
+                              >
+                                <Trophy className="mr-1 h-3 w-3" />
+                                {settingWinner
+                                  ? 'Memproses...'
+                                  : hasTie
+                                    ? 'Pilih Pemenang'
+                                    : 'Set Pemenang'}
+                              </Button>
+                            ) : !isEventSelesai ? (
+                              // Event not finished yet (only show badge for rank 1)
+                              index === 0 && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-gray-500"
+                                >
+                                  Event belum selesai
+                                </Badge>
+                              )
+                            ) : null}
+                          </>
                         )}
                       </TableCell>
                     </TableRow>
