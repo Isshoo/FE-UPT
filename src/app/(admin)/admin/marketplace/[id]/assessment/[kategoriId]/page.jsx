@@ -13,7 +13,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ChevronLeft, Trophy, Award } from 'lucide-react';
+import {
+  ChevronLeft,
+  Trophy,
+  Award,
+  Target,
+  Users,
+  Star,
+  Medal,
+  Store,
+  Info,
+} from 'lucide-react';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
 import { useAssessmentDetail } from '@/lib/hooks/features/useAssessmentDetail';
@@ -48,12 +58,13 @@ export default function AssessmentDetailPage() {
   if (error || !data) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center">
+        <Award className="mb-4 h-10 w-10 text-gray-400" />
         <p className="mb-4 text-gray-500">{error || 'Data tidak ditemukan'}</p>
         <div className="flex gap-2">
           <Button variant="outline" onClick={refetch}>
             Coba Lagi
           </Button>
-          <Button asChild>
+          <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
             <Link href={`/admin/marketplace/${eventId}`}>
               <ChevronLeft className="mr-2 h-4 w-4" />
               Kembali
@@ -66,90 +77,126 @@ export default function AssessmentDetailPage() {
 
   const { kategori, kriteria, businesses, event, pemenang } = data;
 
-  // Check if we can set winner: event must be SELESAI and no winner set
   const canSetWinner = event?.status === 'SELESAI' && !pemenang;
   const isEventSelesai = event?.status === 'SELESAI';
 
-  // Get highest score and find all businesses with that score (for tie detection)
   const highestScore = businesses.length > 0 ? businesses[0].totalScore : 0;
   const tiedTopScorers = businesses.filter(
     (b) => b.totalScore === highestScore && highestScore > 0
   );
   const hasTie = tiedTopScorers.length > 1;
 
-  // Function to check if a business is a top scorer (eligible for manual winner selection in tie)
   const isTopScorer = (business) => {
     return tiedTopScorers.some((t) => t.usahaId === business.usahaId);
   };
 
-  // Check if business is the set winner
   const isWinner = (business) => {
     return pemenang && business.usahaId === pemenang.id;
   };
 
-  // Sort businesses: winner always at top, then by score
   const sortedBusinesses = [...businesses].sort((a, b) => {
-    // Winner always first
     if (pemenang) {
       if (a.usahaId === pemenang.id) return -1;
       if (b.usahaId === pemenang.id) return 1;
     }
-    // Then by score descending
     return b.totalScore - a.totalScore;
   });
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/admin/marketplace/${eventId}`)}
-          className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-        >
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Kembali ke Detail Event
-        </Button>
+  const avgScore =
+    businesses.length > 0
+      ? (
+          businesses.reduce((acc, b) => acc + b.totalScore, 0) /
+          businesses.length
+        ).toFixed(1)
+      : 0;
 
-        <div className="flex flex-row items-start justify-between">
-          <div>
-            <h1 className="flex items-center gap-3 text-3xl font-bold">
-              <Award className="h-8 w-8 text-[#fba635]" />
-              {kategori.nama}
-            </h1>
-            {kategori.deskripsi && (
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
-                {kategori.deskripsi}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center justify-between">
-            <ExportButton
-              onExport={handleExportAssessment}
-              formats={['excel', 'pdf']}
-              label="Export Hasil"
-              size="sm"
-            />
+  return (
+    <div className="space-y-4">
+      {/* Compact Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/admin/marketplace/${eventId}`)}
+            className="h-8 bg-slate-100 px-2 hover:bg-slate-200 dark:bg-gray-800"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#fba635] to-[#174c4e]">
+              <Medal className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                {kategori.nama}
+              </h1>
+              {kategori.deskripsi && (
+                <p className="text-sm text-gray-500">{kategori.deskripsi}</p>
+              )}
+            </div>
           </div>
         </div>
+        <ExportButton
+          onExport={handleExportAssessment}
+          formats={['excel', 'pdf']}
+          label="Export"
+          size="sm"
+        />
       </div>
 
-      {/* Kriteria Info */}
-      <Card className="gap-3">
-        <CardHeader>
-          <CardTitle>Kriteria Penilaian</CardTitle>
+      {/* Compact Stats Row */}
+      <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
+          <Users className="h-4 w-4 text-blue-500" />
+          <span className="text-sm text-gray-500">Peserta:</span>
+          <span className="font-bold">{businesses.length}</span>
+        </div>
+        <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
+          <Target className="h-4 w-4 text-green-500" />
+          <span className="text-sm text-gray-500">Kriteria:</span>
+          <span className="font-bold">{kriteria.length}</span>
+        </div>
+        <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
+          <Star className="h-4 w-4 text-purple-500" />
+          <span className="text-sm text-gray-500">Rata-rata:</span>
+          <span className="font-bold text-purple-600">{avgScore}</span>
+        </div>
+        <div className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-900">
+          <Trophy className="h-4 w-4 text-yellow-500" />
+          <span className="text-sm text-gray-500">Tertinggi:</span>
+          <span className="font-bold text-yellow-600">{highestScore}</span>
+        </div>
+        {pemenang && (
+          <div className="flex items-center gap-2 rounded-lg border-2 border-yellow-300 bg-yellow-50 px-3 py-2 dark:border-yellow-700 dark:bg-yellow-900/20">
+            <Trophy className="h-4 w-4 text-yellow-600" />
+            <span className="text-sm font-medium text-yellow-700 dark:text-yellow-400">
+              Pemenang: {pemenang.namaProduk}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Compact Kriteria */}
+      <Card className="overflow-hidden rounded-xl border-0 pt-0 shadow-sm">
+        <CardHeader className="border-b bg-gray-50/50 px-4 py-2 dark:bg-gray-900/50">
+          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+            <Target className="h-4 w-4 text-[#fba635]" />
+            Kriteria Penilaian
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <CardContent className="p-3">
+          <div className="flex flex-wrap gap-2">
             {kriteria.map((k, index) => (
-              <div key={k.id} className="rounded-lg border p-4 text-center">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  (K{index + 1})
-                </p>
-                <p className="font-semibold">{k.nama}</p>
-                <p className="mt-2 text-2xl font-bold text-[#fba635]">
-                  {k.bobot}%
-                </p>
+              <div
+                key={k.id}
+                className="flex items-center gap-2 rounded-lg border bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-800"
+              >
+                <span className="text-xs font-bold text-gray-400">
+                  K{index + 1}
+                </span>
+                <span className="text-sm font-medium">{k.nama}</span>
+                <Badge className="bg-[#fba635] text-xs">{k.bobot}%</Badge>
               </div>
             ))}
           </div>
@@ -157,32 +204,44 @@ export default function AssessmentDetailPage() {
       </Card>
 
       {/* Scores Table */}
-      <Card className="gap-1">
-        <CardHeader>
-          <CardTitle>Hasil Penilaian ({businesses.length})</CardTitle>
+      <Card className="overflow-hidden rounded-xl border-0 pt-0 shadow-sm">
+        <CardHeader className="border-b bg-gray-50/50 px-4 py-2 dark:bg-gray-900/50">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <Award className="h-4 w-4 text-[#fba635]" />
+              Hasil Penilaian
+            </CardTitle>
+            <Badge variant="secondary" className="text-xs">
+              {businesses.length} peserta
+            </Badge>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {businesses.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-gray-500">Belum ada peserta yang dinilai</p>
+              <Users className="mx-auto mb-2 h-8 w-8 text-gray-300" />
+              <p className="text-sm text-gray-500">
+                Belum ada peserta yang dinilai
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">Rank</TableHead>
-                    <TableHead>Nama Produk</TableHead>
-                    <TableHead>Kategori</TableHead>
-                    <TableHead>Pemilik</TableHead>
-                    <TableHead>Booth</TableHead>
+                  <TableRow className="bg-gray-50/80 text-xs dark:bg-gray-900/50">
+                    <TableHead className="w-12 text-center">#</TableHead>
+                    <TableHead>Produk</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Pemilik
+                    </TableHead>
+                    <TableHead className="text-center">Booth</TableHead>
                     {kriteria.map((k, index) => (
                       <TableHead key={k.id} className="text-center">
                         K{index + 1}
                       </TableHead>
                     ))}
                     <TableHead className="text-center font-bold">
-                      Total Score
+                      Total
                     </TableHead>
                     <TableHead className="text-center">Aksi</TableHead>
                   </TableRow>
@@ -191,80 +250,101 @@ export default function AssessmentDetailPage() {
                   {sortedBusinesses.map((business, index) => (
                     <TableRow
                       key={business.usahaId}
-                      className={
+                      className={`text-sm ${
                         isWinner(business)
-                          ? 'bg-yellow-50 dark:bg-yellow-950'
-                          : ''
-                      }
+                          ? 'bg-yellow-50 dark:bg-yellow-950/30'
+                          : index === 0 && !pemenang
+                            ? 'bg-green-50/50 dark:bg-green-950/20'
+                            : ''
+                      }`}
                     >
-                      <TableCell className="font-bold">
+                      <TableCell className="text-center">
                         {isWinner(business) ? (
-                          <Trophy className="h-5 w-5 text-yellow-500" />
+                          <Trophy className="mx-auto h-4 w-4 text-yellow-500" />
                         ) : (
-                          index + 1
+                          <span
+                            className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                              index === 0
+                                ? 'bg-green-100 text-green-700'
+                                : index === 1
+                                  ? 'bg-gray-100 text-gray-600'
+                                  : index === 2
+                                    ? 'bg-orange-100 text-orange-600'
+                                    : 'text-gray-400'
+                            }`}
+                          >
+                            {index + 1}
+                          </span>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium">
-                        {business.namaProduk}
-                      </TableCell>
-                      <TableCell>{business.kategoriUsaha}</TableCell>
-                      <TableCell>{business.pemilik}</TableCell>
                       <TableCell>
-                        <Badge>{business.nomorBooth || '-'}</Badge>
+                        <div className="flex items-center gap-2">
+                          <Store className="h-4 w-4 text-gray-400" />
+                          <div>
+                            <p className="font-medium">{business.namaProduk}</p>
+                            <p className="text-xs text-gray-400 md:hidden">
+                              {business.pemilik}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden text-gray-600 md:table-cell">
+                        {business.pemilik}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-xs">
+                          {business.nomorBooth || '-'}
+                        </Badge>
                       </TableCell>
                       {business.scoreDetails.map((score) => (
                         <TableCell
                           key={score.kriteriaId}
                           className="text-center"
                         >
-                          <div className="space-y-1">
-                            <div className="font-semibold">{score.nilai}</div>
-                            <div className="text-xs text-gray-500">
-                              ({score.weightedScore.toFixed(1)})
-                            </div>
+                          <div className="text-sm font-medium">
+                            {score.nilai}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            ({score.weightedScore.toFixed(1)})
                           </div>
                         </TableCell>
                       ))}
                       <TableCell className="text-center">
-                        <div className="text-lg font-bold text-[#fba635]">
+                        <span className="rounded bg-[#fba635]/10 px-2 py-1 text-sm font-bold text-[#fba635]">
                           {business.totalScore}
-                        </div>
+                        </span>
                       </TableCell>
                       <TableCell className="text-center">
-                        {/* Show actions for top scorers (handles tie scenario) */}
                         {isTopScorer(business) && (
                           <>
-                            {/* Winner already set */}
                             {pemenang && business.usahaId === pemenang.id ? (
-                              <Badge className="bg-green-600 text-white">
+                              <Badge className="bg-green-600 text-xs">
                                 <Trophy className="mr-1 h-3 w-3" />
                                 Pemenang
                               </Badge>
                             ) : pemenang ? null : canSetWinner ? (
-                              // Can set winner: event SELESAI and no pemenang yet
                               <Button
                                 size="sm"
                                 onClick={() =>
                                   handleSetWinner(business.usahaId)
                                 }
                                 disabled={settingWinner}
-                                className="bg-yellow-600 hover:bg-yellow-700"
+                                className="h-7 bg-yellow-500 px-2 text-xs hover:bg-yellow-600"
                               >
                                 <Trophy className="mr-1 h-3 w-3" />
                                 {settingWinner
-                                  ? 'Memproses...'
+                                  ? '...'
                                   : hasTie
-                                    ? 'Pilih Pemenang'
-                                    : 'Set Pemenang'}
+                                    ? 'Pilih'
+                                    : 'Set'}
                               </Button>
                             ) : !isEventSelesai ? (
-                              // Event not finished yet (only show badge for rank 1)
                               index === 0 && (
                                 <Badge
                                   variant="outline"
-                                  className="text-gray-500"
+                                  className="text-xs text-gray-400"
                                 >
-                                  Event belum selesai
+                                  Belum selesai
                                 </Badge>
                               )
                             ) : null}
@@ -280,22 +360,18 @@ export default function AssessmentDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Legend */}
-      <Card className="gap-3">
-        <CardContent className="pt-0">
-          <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-            <p>
-              <strong>Keterangan:</strong>
-            </p>
-            <ul className="list-inside list-disc space-y-1">
-              <li>Nilai pertama = nilai mentah (0-100)</li>
-              <li>Nilai dalam kurung = nilai terbobot (nilai × bobot / 100)</li>
-              <li>Total Score = jumlah dari semua nilai terbobot</li>
-              <li>Peserta diurutkan berdasarkan Total Score tertinggi</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Compact Legend */}
+      <div className="flex flex-wrap items-center gap-4 rounded-lg border bg-gray-50 px-4 py-3 text-xs text-gray-500 dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex items-center gap-1">
+          <Info className="h-3 w-3" />
+          <span className="font-medium">Keterangan:</span>
+        </div>
+        <span>Nilai = mentah (0-100)</span>
+        <span>|</span>
+        <span>(x.x) = terbobot</span>
+        <span>|</span>
+        <span>Total = Σ terbobot</span>
+      </div>
     </div>
   );
 }
