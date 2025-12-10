@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -14,9 +14,10 @@ import {
   Menu,
   X,
   ClipboardCheck,
+  ChevronLeft,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/tailwind';
-import { useAuthStore, useThemeStore } from '@/store';
+import { useAuthStore, useThemeStore, useSidebarStore } from '@/store';
 import { APP_NAME } from '@/config/environment';
 import { ROUTES } from '@/lib/constants/routes';
 import { ROLES } from '@/lib/constants/labels';
@@ -70,6 +71,8 @@ export default function Sidebar() {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const [isOpen, setIsOpen] = useState(false);
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed);
+  const toggleCollapse = useSidebarStore((state) => state.toggleCollapse);
 
   // Determine menu items based on role
   const menuItems =
@@ -81,35 +84,73 @@ export default function Sidebar() {
     router.push(ROUTES.LOGIN);
   };
 
+  // Close sidebar on Escape key
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  }, []);
+
+  // Add keyboard listener
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when mobile sidebar is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, handleKeyDown]);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button - Changed to lg breakpoint */}
       <Button
         variant="outline"
         size="sm"
         className={cn(
-          'fixed top-4 z-50 transition-all duration-350 xl:hidden',
+          'fixed top-4 z-50 transition-all duration-300 lg:hidden',
           isOpen ? 'left-[13rem]' : 'left-4'
         )}
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isOpen}
       >
         {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </Button>
 
-      {/* Overlay for mobile */}
+      {/* Overlay for mobile - Changed to lg breakpoint */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 xl:hidden"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden"
           onClick={() => setIsOpen(false)}
+          aria-hidden="true"
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Changed to lg breakpoint and added collapsed state */}
       <aside
         className={cn(
-          'fixed top-0 left-0 z-40 h-screen w-64 border-r bg-white transition-transform duration-300 ease-in-out dark:border-gray-800 dark:bg-gray-900',
-          isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'
+          'fixed top-0 left-0 z-40 h-screen border-r bg-white transition-all duration-300 ease-in-out dark:border-gray-800 dark:bg-gray-900',
+          // Mobile: slide in/out
+          isOpen ? 'translate-x-0' : '-translate-x-full',
+          // Desktop: always visible, can be collapsed
+          'lg:translate-x-0',
+          isCollapsed ? 'lg:w-20' : 'lg:w-64',
+          // Mobile width
+          'w-64'
         )}
+        role="navigation"
+        aria-label="Main navigation"
       >
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
@@ -128,7 +169,12 @@ export default function Sidebar() {
                   className="rounded-lg"
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div
+                className={cn(
+                  'min-w-0 flex-1 transition-opacity duration-200',
+                  isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
+                )}
+              >
                 <h2 className="truncate text-xl font-bold text-[#fba635]">
                   {APP_NAME}
                 </h2>
@@ -140,8 +186,25 @@ export default function Sidebar() {
           </div>
 
           {/* User Info */}
-          <div className="flex items-center justify-between gap-2 border-b px-4 py-4 dark:border-gray-800">
-            <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div
+            className={cn(
+              'flex items-center gap-2 border-b px-4 py-4 dark:border-gray-800',
+              isCollapsed ? 'lg:justify-center' : 'justify-between'
+            )}
+          >
+            {/* Show notification icon when collapsed, otherwise show user info */}
+            {isCollapsed ? (
+              <div className="hidden lg:block">
+                <NotificationBell />
+              </div>
+            ) : null}
+
+            <div
+              className={cn(
+                'flex min-w-0 flex-1 items-center gap-3',
+                isCollapsed && 'lg:hidden'
+              )}
+            >
               <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarFallback className="bg-[#174c4e] text-white">
                   {getInitials(user?.nama || 'User')}
@@ -156,8 +219,8 @@ export default function Sidebar() {
                 </p>
               </div>
             </div>
-            {/* Notification */}
-            <div className="flex-shrink-0">
+            {/* Notification - show when not collapsed */}
+            <div className={cn('flex-shrink-0', isCollapsed && 'lg:hidden')}>
               <NotificationBell />
             </div>
           </div>
@@ -175,20 +238,57 @@ export default function Sidebar() {
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       className={cn(
-                        'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                         isActive
-                          ? 'bg-[#fba635] text-white'
-                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                          ? 'bg-[#fba635] text-white shadow-md'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800',
+                        isCollapsed && 'lg:justify-center lg:px-2'
                       )}
+                      title={isCollapsed ? item.label : undefined}
                     >
-                      <Icon className="h-4 w-4 flex-shrink-0" />
-                      <span>{item.label}</span>
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      <span
+                        className={cn(
+                          'transition-opacity duration-200',
+                          isCollapsed
+                            ? 'lg:hidden lg:opacity-0'
+                            : 'lg:opacity-100'
+                        )}
+                      >
+                        {item.label}
+                      </span>
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
+
+          {/* Collapse Toggle Button - Desktop only */}
+          <div className="hidden border-t px-4 py-2 lg:block dark:border-gray-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-center"
+              onClick={toggleCollapse}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              <ChevronLeft
+                className={cn(
+                  'h-4 w-4 transition-transform duration-200',
+                  isCollapsed && 'rotate-180'
+                )}
+              />
+              <span
+                className={cn(
+                  'ml-2 transition-opacity duration-200',
+                  isCollapsed ? 'hidden opacity-0' : 'opacity-100'
+                )}
+              >
+                Collapse
+              </span>
+            </Button>
+          </div>
 
           {/* Bottom Actions */}
           <div className="space-y-2 border-t p-4 dark:border-gray-800">
@@ -203,30 +303,65 @@ export default function Sidebar() {
             >
               <Button
                 variant="outline"
-                className="mb-2 w-full justify-start"
+                className={cn(
+                  'mb-2 w-full',
+                  isCollapsed ? 'lg:justify-center lg:px-2' : 'justify-start'
+                )}
                 size="sm"
+                title={isCollapsed ? 'Profil' : undefined}
               >
-                <User className="mr-2 h-4 w-4" />
-                Profil
+                <User className="h-4 w-4" />
+                <span
+                  className={cn(
+                    'ml-2 transition-opacity duration-200',
+                    isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
+                  )}
+                >
+                  Profil
+                </span>
               </Button>
             </Link>
 
             {/* Theme Toggle */}
             <Button
               variant="outline"
-              className="w-full justify-start"
+              className={cn(
+                'w-full',
+                isCollapsed ? 'lg:justify-center lg:px-2' : 'justify-start'
+              )}
               size="sm"
               onClick={toggleTheme}
+              title={
+                isCollapsed
+                  ? theme === 'light'
+                    ? 'Dark Mode'
+                    : 'Light Mode'
+                  : undefined
+              }
             >
               {theme === 'light' ? (
                 <>
-                  <Moon className="mr-2 h-4 w-4" />
-                  <span>Dark Mode</span>
+                  <Moon className="h-4 w-4" />
+                  <span
+                    className={cn(
+                      'ml-2 transition-opacity duration-200',
+                      isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
+                    )}
+                  >
+                    Dark Mode
+                  </span>
                 </>
               ) : (
                 <>
-                  <Sun className="mr-2 h-4 w-4" />
-                  <span>Light Mode</span>
+                  <Sun className="h-4 w-4" />
+                  <span
+                    className={cn(
+                      'ml-2 transition-opacity duration-200',
+                      isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
+                    )}
+                  >
+                    Light Mode
+                  </span>
                 </>
               )}
             </Button>
@@ -234,12 +369,23 @@ export default function Sidebar() {
             {/* Logout */}
             <Button
               variant="outline"
-              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950 dark:hover:text-red-400"
+              className={cn(
+                'w-full text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950 dark:hover:text-red-400',
+                isCollapsed ? 'lg:justify-center lg:px-2' : 'justify-start'
+              )}
               size="sm"
               onClick={handleLogout}
+              title={isCollapsed ? 'Logout' : undefined}
             >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              <LogOut className="h-4 w-4" />
+              <span
+                className={cn(
+                  'ml-2 transition-opacity duration-200',
+                  isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
+                )}
+              >
+                Logout
+              </span>
             </Button>
           </div>
         </div>
