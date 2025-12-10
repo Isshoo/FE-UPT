@@ -124,6 +124,7 @@ export function LoginForm({ className, ...props }) {
           {/* Form Section */}
           <form
             onSubmit={handleSubmit}
+            disabled={isLoading}
             className="flex h-full items-center p-6 md:min-h-[460px] md:p-8"
           >
             <div className="flex w-full flex-col justify-center gap-6">
@@ -145,7 +146,6 @@ export function LoginForm({ className, ...props }) {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    disabled={isLoading}
                   />
                 </div>
 
@@ -161,7 +161,6 @@ export function LoginForm({ className, ...props }) {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    disabled={isLoading}
                   />
                 </div>
 

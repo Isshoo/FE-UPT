@@ -16,7 +16,6 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
-import { cn } from '@/lib/utils/tailwind';
 
 export default function NotificationBell() {
   const router = useRouter();

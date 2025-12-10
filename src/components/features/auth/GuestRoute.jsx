@@ -31,7 +31,7 @@ export default function GuestRoute({ children }) {
   }, [isAuthenticated, user, isInitialized, isLoading, router]);
 
   // Show loading while initializing or redirecting
-  if (!isInitialized || isLoading || isRedirecting) {
+  if (!isInitialized || isRedirecting) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>

@@ -9,7 +9,6 @@ import {
   Store,
   Plus,
   ChevronRight,
-  Clock,
   Package,
 } from 'lucide-react';
 import { dashboardAPI } from '@/lib/api';

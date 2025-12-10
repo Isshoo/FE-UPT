@@ -27,7 +27,6 @@ import PaginationControls from '@/components/ui/pagination-controls';
 import { Search, Calendar, MapPin, Users, X } from 'lucide-react';
 
 import { EventCardSkeleton } from '@/components/common/skeletons';
-import EmptyState from '@/components/ui/EmptyState';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function UserMarketplacePage() {

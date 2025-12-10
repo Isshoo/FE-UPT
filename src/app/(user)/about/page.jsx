@@ -3,7 +3,6 @@
 import AboutContent from '@/components/features/user/about/AboutContent';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Target,
@@ -24,12 +23,6 @@ import { ROUTES } from '@/lib/constants/routes';
 import Image from 'next/image';
 
 export default function AboutPage() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
   const missionItems = [
     {
       icon: BookOpen,
@@ -179,7 +172,7 @@ export default function AboutPage() {
               <div className="relative rounded-3xl border border-white/20 bg-white/10 p-8 backdrop-blur-md md:p-12">
                 {/* Quote marks */}
                 <div className="absolute top-4 left-6 font-serif text-6xl text-[#fba635]/30">
-                  "
+                  &quot;
                 </div>
                 <p className="relative text-lg leading-relaxed text-white md:text-xl">
                   Entrepreneurship Centre, Universitas Katolik De La Salle ingin

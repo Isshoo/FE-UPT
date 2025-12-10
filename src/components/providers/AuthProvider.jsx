@@ -49,6 +49,7 @@ export default function AuthProvider({ children }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     // fetchUnreadCount and resetNotifications are stable from Zustand
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, isAuthenticated]);
 
   return <>{children}</>;
