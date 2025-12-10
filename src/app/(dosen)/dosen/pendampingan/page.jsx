@@ -1,46 +1,138 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { assessmentAPI } from '@/lib/api';
-import { formatDate } from '@/lib/utils/date';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Calendar, ChevronRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Users, Search, Eye, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import PaginationControls from '@/components/ui/pagination-controls';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default function PendampinganPage() {
+  // Data states
   const [businesses, setBusinesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Filter & Pagination states
+  const [filters, setFilters] = useState({
+    search: '',
+    eventId: 'ALL',
+    status: 'ALL', // ALL, MENUNGGU, DISETUJUI
+  });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  // Unique Events for Filter
+  const eventOptions = useMemo(() => {
+    const events = businesses.map((b) => b.event);
+    const uniqueEvents = Array.from(new Set(events.map((e) => e.id))).map(
+      (id) => events.find((e) => e.id === id)
+    );
+    return uniqueEvents;
+  }, [businesses]);
 
   useEffect(() => {
     fetchMentoredBusinesses();
   }, []);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(filters.search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filters.search]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  }, [debouncedSearch, filters.eventId, filters.status]);
+
   const fetchMentoredBusinesses = async () => {
     try {
+      setLoading(true);
       const response = await assessmentAPI.getMentoredBusinesses();
-      setBusinesses(response.data);
+      setBusinesses(response.data || []);
     } catch (error) {
       toast.error('Gagal memuat data pendampingan');
       console.error(error);
+    } finally {
+      setLoading(false);
+      setIsInitialLoad(false);
     }
   };
 
-  // Group businesses by event
-  const groupedByEvent = businesses.reduce((acc, business) => {
-    const eventId = business.event.id;
-    if (!acc[eventId]) {
-      acc[eventId] = {
-        event: business.event,
-        businesses: [],
-      };
-    }
-    acc[eventId].businesses.push(business);
-    return acc;
-  }, {});
+  // Filter and Paginate Data
+  const filteredData = useMemo(() => {
+    return businesses.filter((item) => {
+      const matchesSearch =
+        item.namaProduk.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        item.pemilik.nama.toLowerCase().includes(debouncedSearch.toLowerCase());
 
-  const events = Object.values(groupedByEvent);
+      const matchesEvent =
+        filters.eventId === 'ALL' || item.event.id === filters.eventId;
+
+      const matchesStatus =
+        filters.status === 'ALL' ||
+        (filters.status === 'DISETUJUI' ? item.disetujui : !item.disetujui);
+
+      return matchesSearch && matchesEvent && matchesStatus;
+    });
+  }, [businesses, debouncedSearch, filters]);
+
+  const paginatedData = useMemo(() => {
+    const start = (pagination.page - 1) * pagination.limit;
+    const end = start + pagination.limit;
+    return filteredData.slice(start, end);
+  }, [filteredData, pagination]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleReset = () => {
+    setFilters({
+      search: '',
+      eventId: 'ALL',
+      status: 'ALL',
+    });
+    setDebouncedSearch('');
+  };
+
+  const hasActiveFilters =
+    filters.search || filters.eventId !== 'ALL' || filters.status !== 'ALL';
+
+  // Initial loading state
+  if (isInitialLoad && loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -52,114 +144,195 @@ export default function PendampinganPage() {
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="py-4">
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
-                <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-300" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Event
-                </p>
-                <p className="text-2xl font-bold">{events.length}</p>
-              </div>
+      {/* Filters */}
+      <Card className="overflow-hidden border-0 pt-0 shadow-sm">
+        <div className="h-1 bg-gradient-to-r from-[#174c4e] to-[#fba635]" />
+        <CardContent className="p-4 py-2">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Cari nama usaha atau mahasiswa..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                className="h-10 border-gray-200 bg-gray-50 pl-9 transition-all focus:bg-white dark:border-gray-700 dark:bg-gray-800"
+              />
             </div>
-          </CardContent>
-        </Card>
 
-        <Card className="hidden py-4 sm:block">
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
-                <Users className="h-6 w-6 text-green-600 dark:text-green-300" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Usaha Bimbingan
-                </p>
-                <p className="text-2xl font-bold">{businesses.length}</p>
-              </div>
+            {/* Filter Selects */}
+            <div className="flex flex-wrap gap-2">
+              <Select
+                value={filters.eventId}
+                onValueChange={(value) => handleFilterChange('eventId', value)}
+              >
+                <SelectTrigger className="h-10 w-full min-w-[150px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
+                  <SelectValue placeholder="Pilih Event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Event</SelectItem>
+                  {eventOptions.map((event) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.nama}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.status}
+                onValueChange={(value) => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className="h-10 w-full min-w-[130px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Status</SelectItem>
+                  <SelectItem value="MENUNGGU">Menunggu</SelectItem>
+                  <SelectItem value="DISETUJUI">Disetujui</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Reset Button */}
+              <Button
+                onClick={handleReset}
+                variant="ghost"
+                size="sm"
+                className="h-10 text-gray-500 hover:text-gray-700"
+                disabled={!hasActiveFilters}
+              >
+                <X className="mr-1 h-4 w-4" />
+                Reset
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card className="hidden py-4 sm:block">
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-yellow-100 p-3 dark:bg-yellow-900">
-                <Users className="h-6 w-6 text-yellow-600 dark:text-yellow-300" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Menunggu Persetujuan
-                </p>
-                <p className="text-2xl font-bold">
-                  {businesses.filter((b) => !b.disetujui).length}
-                </p>
-              </div>
+      {/* Businesses Table */}
+      <Card className="relative gap-2">
+        {/* Loading overlay for filter changes */}
+        {loading && !isInitialLoad && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px] dark:bg-gray-900/60">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#fba635] border-t-transparent"></div>
+          </div>
+        )}
+
+        <CardHeader>
+          <CardTitle>Daftar Usaha Bimbingan ({filteredData.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6">
+              <EmptyState
+                icon={Users}
+                title="Tidak Ada Data"
+                description={
+                  hasActiveFilters
+                    ? 'Tidak ada usaha bimbingan yang sesuai dengan filter.'
+                    : 'Belum ada usaha mahasiswa yang Anda dampingi.'
+                }
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">No</TableHead>
+                      <TableHead>Nama Usaha / Produk</TableHead>
+                      <TableHead>Event & Tahun</TableHead>
+                      <TableHead>Mahasiswa (Pemilik)</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-center">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedData.map((business, index) => (
+                      <TableRow key={business.id}>
+                        <TableCell>
+                          {(pagination.page - 1) * pagination.limit + index + 1}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {business.namaProduk}
+                          <div className="text-xs text-gray-500">
+                            {business.kategoriProduk}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col text-sm">
+                            <span className="font-medium">
+                              {business.event.nama}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {business.event.tahunAjaran}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col text-sm">
+                            <span className="font-medium">
+                              {business.pemilik.nama}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {business.pemilik.prodi?.nama || '-'}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={business.disetujui ? 'success' : 'warning'}
+                            className={
+                              business.disetujui
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                            }
+                          >
+                            {business.disetujui ? 'Disetujui' : 'Menunggu'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-center">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Link
+                                href={`/dosen/pendampingan/${business.event.id}`}
+                              >
+                                <Eye className="h-4 w-4 text-gray-500" />
+                                <span className="sr-only">Lihat Detail</span>
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-      {/* Events List */}
-      {events.length === 0 ? (
-        <Card className="pt-6 pb-5">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Users className="mb-4 h-16 w-16 text-gray-400" />
-            <p className="mb-2 text-lg text-gray-500">
-              Belum ada usaha mahasiswa yang Anda dampingi
-            </p>
-            <p className="text-sm text-gray-400">
-              Usaha mahasiswa yang memilih Anda sebagai pembimbing akan muncul
-              di sini
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {events.map(({ event, businesses }) => (
-            <Card key={event.id} className="pt-6 pb-5">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="mb-2">{event.nama}</CardTitle>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(event.tanggalPelaksanaan)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        {businesses.length} Usaha
-                      </div>
-                      <Badge
-                        variant={
-                          businesses.some((b) => !b.disetujui)
-                            ? 'default'
-                            : 'secondary'
-                        }
-                      >
-                        {businesses.filter((b) => !b.disetujui).length} Menunggu
-                        Persetujuan
-                      </Badge>
-                    </div>
-                  </div>
-                  <Button asChild>
-                    <Link href={`/dosen/pendampingan/${event.id}`}>
-                      Lihat Detail
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      )}
+              {/* Pagination */}
+              <PaginationControls
+                currentPage={pagination.page}
+                totalPages={Math.ceil(filteredData.length / pagination.limit)}
+                pageSize={pagination.limit}
+                totalItems={filteredData.length}
+                onPageChange={(page) =>
+                  setPagination((prev) => ({ ...prev, page }))
+                }
+                onPageSizeChange={(limit) =>
+                  setPagination((prev) => ({ ...prev, limit, page: 1 }))
+                }
+                pageSizeOptions={[5, 10, 20]}
+              />
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

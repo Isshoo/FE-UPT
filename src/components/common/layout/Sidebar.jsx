@@ -88,7 +88,7 @@ export default function Sidebar() {
         variant="outline"
         size="sm"
         className={cn(
-          'fixed top-4 z-50 transition-all duration-350 lg:hidden',
+          'fixed top-4 z-50 transition-all duration-350 xl:hidden',
           isOpen ? 'left-[13rem]' : 'left-4'
         )}
         onClick={() => setIsOpen(!isOpen)}
@@ -99,7 +99,7 @@ export default function Sidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 xl:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -108,7 +108,7 @@ export default function Sidebar() {
       <aside
         className={cn(
           'fixed top-0 left-0 z-40 h-screen w-64 border-r bg-white transition-transform duration-300 ease-in-out dark:border-gray-800 dark:bg-gray-900',
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'
         )}
       >
         <div className="flex h-full flex-col">

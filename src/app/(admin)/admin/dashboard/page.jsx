@@ -185,9 +185,52 @@ export default function AdminDashboard() {
 
         {/* Recent Activities - Right Side (1 col) */}
         <div className="space-y-6">
+          {/* Recent Businesses */}
+          <Card className="max-h-[357.6px] gap-1">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Package className="h-4 w-4 text-blue-500" />
+                  Pendaftaran Terbaru
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="overflow-y-auto pt-0">
+              <div className="space-y-3">
+                {recentActivities?.recentBusinesses?.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-gray-500">
+                    Belum ada pendaftaran
+                  </p>
+                ) : (
+                  recentActivities?.recentBusinesses
+                    ?.slice(0, 4)
+                    .map((business) => (
+                      <div
+                        key={business.id}
+                        className="flex items-center justify-between rounded-lg border p-3"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">
+                            {business.namaProduk}
+                          </p>
+                          <p className="truncate text-xs text-gray-500">
+                            {business.pemilik?.nama} • {business.event?.nama}
+                          </p>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {business.tipeUsaha === 'MAHASISWA'
+                            ? 'Mahasiswa'
+                            : 'UMKM'}
+                        </Badge>
+                      </div>
+                    ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
           {/* Recent Events */}
-          <Card className="gap-3">
-            <CardHeader className="pb-3">
+          <Card className="max-h-[357.6px] gap-1">
+            <CardHeader className="pb-0">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Calendar className="h-4 w-4 text-green-500" />
@@ -200,7 +243,7 @@ export default function AdminDashboard() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="overflow-y-auto pt-0">
               <div className="space-y-3">
                 {recentActivities?.recentEvents?.length === 0 ? (
                   <p className="py-4 text-center text-sm text-gray-500">
@@ -235,81 +278,6 @@ export default function AdminDashboard() {
                     </div>
                   ))
                 )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Businesses */}
-          <Card className="gap-3">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Package className="h-4 w-4 text-blue-500" />
-                  Pendaftaran Terbaru
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                {recentActivities?.recentBusinesses?.length === 0 ? (
-                  <p className="py-4 text-center text-sm text-gray-500">
-                    Belum ada pendaftaran
-                  </p>
-                ) : (
-                  recentActivities?.recentBusinesses
-                    ?.slice(0, 4)
-                    .map((business) => (
-                      <div
-                        key={business.id}
-                        className="flex items-center justify-between rounded-lg border p-3"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">
-                            {business.namaProduk}
-                          </p>
-                          <p className="truncate text-xs text-gray-500">
-                            {business.pemilik?.nama} • {business.event?.nama}
-                          </p>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {business.tipeUsaha === 'MAHASISWA'
-                            ? 'Mahasiswa'
-                            : 'UMKM'}
-                        </Badge>
-                      </div>
-                    ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="gap-3">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Aksi Cepat</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full justify-start"
-                >
-                  <Link href={ROUTES.ADMIN_MARKETPLACE}>
-                    <Store className="mr-2 h-4 w-4" />
-                    Kelola Marketplace
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full justify-start"
-                >
-                  <Link href={ROUTES.ADMIN_USERS}>
-                    <Users className="mr-2 h-4 w-4" />
-                    Kelola Pengguna
-                  </Link>
-                </Button>
               </div>
             </CardContent>
           </Card>

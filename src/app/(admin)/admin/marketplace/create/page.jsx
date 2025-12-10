@@ -76,7 +76,7 @@ export default function CreateEventPage() {
   const CurrentStepComponent = STEPS[currentStep - 1].component;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto space-y-6">
       {/* Header */}
       <div>
         <Button

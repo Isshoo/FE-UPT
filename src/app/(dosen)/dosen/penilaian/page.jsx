@@ -1,46 +1,136 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { assessmentAPI } from '@/lib/api';
 import { formatDate } from '@/lib/utils/date';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Award, Calendar, ClipboardList, ChevronRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Award, Calendar, Search, Eye, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import PaginationControls from '@/components/ui/pagination-controls';
+import EmptyState from '@/components/ui/EmptyState';
 
 export default function PenilaianPage() {
+  // Data states
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Filter & Pagination states
+  const [filters, setFilters] = useState({
+    search: '',
+    status: 'ALL', // ALL, BERLANGSUNG, SELESAI, AKAN_DATANG
+    eventId: 'ALL',
+  });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  // Unique Events for Filter
+  const eventOptions = useMemo(() => {
+    const events = categories.map((c) => c.event);
+    const uniqueEvents = Array.from(new Set(events.map((e) => e.id))).map(
+      (id) => events.find((e) => e.id === id)
+    );
+    return uniqueEvents;
+  }, [categories]);
 
   useEffect(() => {
     fetchAssignedCategories();
   }, []);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(filters.search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filters.search]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  }, [debouncedSearch, filters.status, filters.eventId]);
+
   const fetchAssignedCategories = async () => {
     try {
+      setLoading(true);
       const response = await assessmentAPI.getCategoriesByDosen();
-      setCategories(response.data);
+      setCategories(response.data || []);
     } catch (error) {
       toast.error('Gagal memuat data penilaian');
       console.error(error);
+    } finally {
+      setLoading(false);
+      setIsInitialLoad(false);
     }
   };
 
-  // Group categories by event
-  const groupedByEvent = categories.reduce((acc, category) => {
-    const eventId = category.event.id;
-    if (!acc[eventId]) {
-      acc[eventId] = {
-        event: category.event,
-        categories: [],
-      };
-    }
-    acc[eventId].categories.push(category);
-    return acc;
-  }, {});
+  // Filter and Paginate Data
+  const filteredData = useMemo(() => {
+    return categories.filter((item) => {
+      const matchesSearch = item.nama
+        .toLowerCase()
+        .includes(debouncedSearch.toLowerCase());
+      const matchesStatus =
+        filters.status === 'ALL' || item.event.status === filters.status;
+      const matchesEvent =
+        filters.eventId === 'ALL' || item.event.id === filters.eventId;
 
-  const events = Object.values(groupedByEvent);
+      return matchesSearch && matchesStatus && matchesEvent;
+    });
+  }, [categories, debouncedSearch, filters]);
+
+  const paginatedData = useMemo(() => {
+    const start = (pagination.page - 1) * pagination.limit;
+    const end = start + pagination.limit;
+    return filteredData.slice(start, end);
+  }, [filteredData, pagination]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleReset = () => {
+    setFilters({
+      search: '',
+      status: 'ALL',
+      eventId: 'ALL',
+    });
+    setDebouncedSearch('');
+  };
+
+  const hasActiveFilters =
+    filters.search || filters.status !== 'ALL' || filters.eventId !== 'ALL';
+
+  // Initial loading state
+  if (isInitialLoad && loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -52,126 +142,180 @@ export default function PenilaianPage() {
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="py-4 sm:block">
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900">
-                <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-300" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Event
-                </p>
-                <p className="text-2xl font-bold">{events.length}</p>
-              </div>
+      {/* Filters */}
+      <Card className="overflow-hidden border-0 pt-0 shadow-sm">
+        <div className="h-1 bg-gradient-to-r from-[#174c4e] to-[#fba635]" />
+        <CardContent className="p-4 py-2">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Cari kategori penilaian..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                className="h-10 border-gray-200 bg-gray-50 pl-9 transition-all focus:bg-white dark:border-gray-700 dark:bg-gray-800"
+              />
             </div>
-          </CardContent>
-        </Card>
 
-        <Card className="hidden py-4 sm:block">
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-purple-100 p-3 dark:bg-purple-900">
-                <Award className="h-6 w-6 text-purple-600 dark:text-purple-300" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Total Kategori
-                </p>
-                <p className="text-2xl font-bold">{categories.length}</p>
-              </div>
+            {/* Filter Selects */}
+            <div className="flex flex-wrap gap-2">
+              <Select
+                value={filters.eventId}
+                onValueChange={(value) => handleFilterChange('eventId', value)}
+              >
+                <SelectTrigger className="h-10 w-full min-w-[150px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
+                  <SelectValue placeholder="Pilih Event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Event</SelectItem>
+                  {eventOptions.map((event) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.nama}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.status}
+                onValueChange={(value) => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className="h-10 w-full min-w-[130px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
+                  <SelectValue placeholder="Status Event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">Semua Status</SelectItem>
+                  <SelectItem value="BERLANGSUNG">Berlangsung</SelectItem>
+                  <SelectItem value="SELESAI">Selesai</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Reset Button */}
+              <Button
+                onClick={handleReset}
+                variant="ghost"
+                size="sm"
+                className="h-10 text-gray-500 hover:text-gray-700"
+                disabled={!hasActiveFilters}
+              >
+                <X className="mr-1 h-4 w-4" />
+                Reset
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card className="hidden py-4 sm:block">
-          <CardContent className="pt-0">
-            <div className="flex items-center gap-4">
-              <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900">
-                <ClipboardList className="h-6 w-6 text-green-600 dark:text-green-300" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Event Aktif
-                </p>
-                <p className="text-2xl font-bold">
-                  {
-                    events.filter((e) => e.event.status === 'BERLANGSUNG')
-                      .length
-                  }
-                </p>
-              </div>
+      {/* Categories Table */}
+      <Card className="relative gap-2">
+        {/* Loading overlay for filter changes */}
+        {loading && !isInitialLoad && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px] dark:bg-gray-900/60">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#fba635] border-t-transparent"></div>
+          </div>
+        )}
+
+        <CardHeader>
+          <CardTitle>Daftar Penilaian ({filteredData.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6">
+              <EmptyState
+                icon={Award}
+                title="Tidak Ada Data"
+                description={
+                  hasActiveFilters
+                    ? 'Tidak ada penilaian yang sesuai dengan filter.'
+                    : 'Belum ada tugas penilaian untuk Anda.'
+                }
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Events List */}
-      {events.length === 0 ? (
-        <Card className="gap-3">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Award className="mb-4 h-16 w-16 text-gray-400" />
-            <p className="mb-2 text-lg text-gray-500">
-              Belum ada penugasan penilaian
-            </p>
-            <p className="text-sm text-gray-400">
-              Admin akan menugaskan Anda sebagai penilai untuk event tertentu
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          {events.map(({ event, categories }) => (
-            <Card key={event.id} className="gap-3">
-              <CardHeader>
-                <div className="flex flex-col items-start justify-between md:flex-row">
-                  <div className="flex-1">
-                    <div className="mb-2 flex flex-wrap items-center gap-2 space-y-1">
-                      <CardTitle>{event.nama}</CardTitle>
-                      <Badge
-                        variant={
-                          event.status === 'BERLANGSUNG'
-                            ? 'default'
-                            : 'secondary'
-                        }
-                      >
-                        {event.status}
-                      </Badge>
-                    </div>
-                    <div className="mb-2 flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(event.tanggalPelaksanaan)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Award className="h-4 w-4" />
-                        {categories.length} Kategori Penilaian
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                      <Badge key={category.id} variant="outline">
-                        {category.nama}
-                      </Badge>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">No</TableHead>
+                      <TableHead>Kategori Penilaian</TableHead>
+                      <TableHead>Nama Event</TableHead>
+                      <TableHead>Tanggal Pelaksanaan</TableHead>
+                      <TableHead>Status Event</TableHead>
+                      <TableHead className="text-center">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedData.map((category, index) => (
+                      <TableRow key={category.id}>
+                        <TableCell>
+                          {(pagination.page - 1) * pagination.limit + index + 1}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {category.nama}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{category.event.nama}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-gray-400" />
+                            {formatDate(category.event.tanggalPelaksanaan)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              category.event.status === 'BERLANGSUNG'
+                                ? 'default'
+                                : 'secondary'
+                            }
+                          >
+                            {category.event.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-center">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Link
+                                href={`/dosen/penilaian/${category.event.id}`}
+                              >
+                                <Eye className="h-4 w-4 text-gray-500" />
+                                <span className="sr-only">Lihat Detail</span>
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Button asChild>
-                  <Link href={`/dosen/penilaian/${event.id}`}>
-                    Lihat Detail
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              <PaginationControls
+                currentPage={pagination.page}
+                totalPages={Math.ceil(filteredData.length / pagination.limit)}
+                pageSize={pagination.limit}
+                totalItems={filteredData.length}
+                onPageChange={(page) =>
+                  setPagination((prev) => ({ ...prev, page }))
+                }
+                onPageSizeChange={(limit) =>
+                  setPagination((prev) => ({ ...prev, limit, page: 1 }))
+                }
+                pageSizeOptions={[5, 10, 20]}
+              />
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

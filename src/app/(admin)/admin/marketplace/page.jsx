@@ -9,13 +9,15 @@ import { formatDate } from '@/lib/utils/date';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import {
   Select,
   SelectContent,
@@ -29,8 +31,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Download, FileSpreadsheet, FileText } from 'lucide-react';
-import { Plus, Search, Calendar, MapPin, Users, X } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Eye } from 'lucide-react';
+import { Plus, Search, Calendar, X } from 'lucide-react';
 import PaginationControls from '@/components/ui/pagination-controls';
 
 import { exportAPI, downloadBlob } from '@/lib/api';
@@ -278,16 +280,19 @@ export default function AdminMarketplacePage() {
       </Card>
 
       {/* Events List */}
-      <div className="relative">
+      <Card className="relative gap-2">
+        {/* Loading overlay for filter changes */}
         {isLoading && !isInitialLoad && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60 backdrop-blur-[1px] dark:bg-gray-900/60">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#fba635] border-t-transparent"></div>
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px] dark:bg-gray-900/60">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#fba635] border-t-transparent"></div>
           </div>
         )}
-
-        {events.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-6">
+        <CardHeader>
+          <CardTitle>Daftar Event ({pagination.total})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {events.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6">
               <EmptyState
                 icon={Calendar}
                 title="Belum Ada Event"
@@ -299,67 +304,88 @@ export default function AdminMarketplacePage() {
                   Buat Event Pertama
                 </Link>
               </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {events.map((event) => (
-                <Link key={event.id} href={`/admin/marketplace/${event.id}`}>
-                  <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
-                    <CardHeader>
-                      <div className="mb-2 flex items-start justify-between">
-                        <Badge className={EVENT_STATUS_COLORS[event.status]}>
-                          {EVENT_STATUS_LABELS[event.status]}
-                        </Badge>
-                        {event.terkunci && (
-                          <Badge variant="outline" className="ml-2">
-                            🔒 Terkunci
-                          </Badge>
-                        )}
-                      </div>
-                      <CardTitle className="line-clamp-2">
-                        {event.nama}
-                      </CardTitle>
-                      <CardDescription className="line-clamp-2">
-                        {event.deskripsi}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(event.tanggalPelaksanaan)}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <MapPin className="h-4 w-4" />
-                        {event.lokasi}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                        <Users className="h-4 w-4" />
-                        {event._count?.usaha || 0} / {event.kuotaPeserta}{' '}
-                        Peserta
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">
-                        {event.semester} {event.tahunAjaran}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
             </div>
-            {/* Add Pagination */}
-            <PaginationControls
-              currentPage={pagination.page}
-              totalPages={pagination.totalPages}
-              pageSize={pagination.limit}
-              totalItems={pagination.total}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              pageSizeOptions={[6, 12, 24, 48]}
-            />
-          </div>
-        )}
-      </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">No</TableHead>
+                      <TableHead>Nama Event</TableHead>
+                      <TableHead>Semester / TA</TableHead>
+                      <TableHead>Tanggal</TableHead>
+                      <TableHead>Lokasi</TableHead>
+                      <TableHead>Peserta</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-center">Detail</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {events.map((event, index) => (
+                      <TableRow key={event.id}>
+                        <TableCell>
+                          {(pagination.page - 1) * pagination.limit + index + 1}
+                        </TableCell>
+                        <TableCell className="max-w-[200px] overflow-hidden font-medium text-ellipsis">
+                          {event.nama}
+                          {event.terkunci && (
+                            <span className="ml-2 text-xs text-gray-400">
+                              🔒
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {event.semester} {event.tahunAjaran}
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(event.tanggalPelaksanaan)}
+                        </TableCell>
+                        <TableCell className="max-w-[200px] overflow-hidden text-ellipsis">
+                          {event.lokasi}
+                        </TableCell>
+                        <TableCell>
+                          {event._count?.usaha || 0} / {event.kuotaPeserta}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={EVENT_STATUS_COLORS[event.status]}>
+                            {EVENT_STATUS_LABELS[event.status]}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex justify-center">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Link href={`/admin/marketplace/${event.id}`}>
+                                <Eye className="h-4 w-4 text-gray-500" />
+                                <span className="sr-only">Lihat Detail</span>
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              <PaginationControls
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                pageSize={pagination.limit}
+                totalItems={pagination.total}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+              />
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
