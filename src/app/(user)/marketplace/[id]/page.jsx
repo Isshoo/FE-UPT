@@ -270,7 +270,7 @@ export default function UserEventDetailPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="space-y-8 pt-20 lg:col-span-2"
+          className="min-w-0 space-y-8 pt-20 lg:col-span-2"
         >
           {/* About Event */}
           <Card className="overflow-hidden rounded-3xl border-0 shadow-lg">
