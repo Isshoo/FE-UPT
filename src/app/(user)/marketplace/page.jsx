@@ -353,12 +353,12 @@ export default function UserMarketplacePage() {
                           </CardDescription>
                         </CardHeader>
 
-                        <CardContent className="space-y-4 align-bottom">
+                        <CardContent className="space-y-4 overflow-hidden align-bottom">
                           {/* Info Items */}
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="space-y-2 overflow-hidden">
+                            <div className="line-clamp-2 flex w-full items-center gap-2 truncate overflow-hidden text-sm text-gray-600 dark:text-gray-400">
                               <MapPin className="h-4 w-4 text-[#fba635]" />
-                              <span className="truncate font-medium">
+                              <span className="truncate overflow-hidden font-medium text-ellipsis whitespace-nowrap">
                                 {event.lokasi}
                               </span>
                             </div>
