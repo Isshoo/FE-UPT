@@ -46,7 +46,7 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b bg-white/90 shadow-md backdrop-blur-md transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/90">
+    <header className="fixed top-0 z-50 w-full border-b bg-slate-50 shadow-lg backdrop-blur-md transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/90">
       <div className="container mx-auto flex h-18 items-center justify-between px-4">
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center">

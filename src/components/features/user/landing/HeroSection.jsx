@@ -78,7 +78,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <section className="relative mt-3 min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-30 dark:opacity-20">
         <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-[#fba635]/20 blur-3xl" />
@@ -105,7 +105,7 @@ export default function HeroSection() {
               className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#174c4e]/20 bg-[#174c4e]/5 px-4 py-2 text-sm font-medium text-[#174c4e] dark:border-[#fba635]/30 dark:bg-[#fba635]/10 dark:text-[#fba635]"
             >
               <Sparkles className="h-4 w-4" />
-              Platform UMKM & Event Marketplace
+              Platform Event Marketplace & UMKM
             </motion.div>
 
             {/* Title */}
@@ -129,8 +129,8 @@ export default function HeroSection() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="mb-8 max-w-lg text-lg text-gray-600 dark:text-gray-400"
             >
-              Platform terpadu untuk manajemen event marketplace, pembinaan
-              UMKM, dan pengembangan usaha mahasiswa di lingkungan kampus.
+              Platform terpadu untuk manajemen event marketplace dan
+              pengembangan usaha mahasiswa di lingkungan kampus.
             </motion.p>
 
             {/* Stats Row */}
@@ -193,12 +193,12 @@ export default function HeroSection() {
             className="relative"
           >
             {!loading && latestEvent ? (
-              <Card className="overflow-hidden border-0 bg-white/80 shadow-2xl backdrop-blur-sm dark:bg-gray-800/80">
+              <Card className="gap-0 overflow-hidden border-0 bg-white/80 pt-0 pb-0 shadow-2xl backdrop-blur-sm dark:bg-gray-800/80">
                 {/* Event Cover */}
-                <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[#174c4e] to-[#072526]">
-                  {latestEvent.cover ? (
+                <div className="relative h-50 overflow-hidden bg-gradient-to-br from-[#174c4e] to-[#072526]">
+                  {latestEvent.gambarCover ? (
                     <Image
-                      src={latestEvent.cover}
+                      src={latestEvent.gambarCover}
                       alt={latestEvent.nama}
                       fill
                       className="object-cover"
@@ -216,43 +216,67 @@ export default function HeroSection() {
                 </div>
 
                 {/* Event Details */}
-                <div className="p-6">
-                  <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
-                    {latestEvent.nama}
-                  </h3>
+                <div className="p-5">
+                  {/* Title with status */}
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <h3 className="text-lg leading-tight font-bold text-gray-900 dark:text-white">
+                      {latestEvent.nama}
+                    </h3>
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 border-[#174c4e] text-[#174c4e] dark:border-[#fba635] dark:text-[#fba635]"
+                    >
+                      {latestEvent.status}
+                    </Badge>
+                  </div>
 
-                  <div className="mb-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-[#fba635]" />
-                      {formatDate(latestEvent.tanggalPelaksanaan)}
+                  {/* Info Grid */}
+                  <div className="mb-4 grid grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-2.5 dark:bg-gray-700/50">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#fba635]/20">
+                        <Calendar className="h-4 w-4 text-[#fba635]" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Tanggal
+                        </p>
+                        <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                          {formatDate(latestEvent.tanggalPelaksanaan)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-[#fba635]" />
-                      {latestEvent.lokasi}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-[#fba635]" />
-                      {latestEvent._count?.usaha || 0} /{' '}
-                      {latestEvent.kuotaPeserta} Peserta
+                    <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-2.5 dark:bg-gray-700/50">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#174c4e]/20 dark:bg-[#fba635]/20">
+                        <MapPin className="h-4 w-4 text-[#174c4e] dark:text-[#fba635]" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Lokasi
+                        </p>
+                        <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                          {latestEvent.lokasi}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="mb-1 flex justify-between text-xs">
-                      <span className="text-gray-500">Kuota Terisi</span>
-                      <span className="font-medium text-[#174c4e] dark:text-[#fba635]">
-                        {Math.round(
-                          ((latestEvent._count?.usaha || 0) /
-                            latestEvent.kuotaPeserta) *
-                            100
-                        )}
-                        %
+                  {/* Progress Section */}
+                  <div className="mb-4 rounded-lg border border-gray-100 bg-gradient-to-r from-gray-50 to-white p-3 dark:border-gray-700 dark:from-gray-800 dark:to-gray-700/50">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-[#174c4e] dark:text-[#fba635]" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Kuota Peserta
+                        </span>
+                      </div>
+                      <span className="text-sm font-bold text-[#174c4e] dark:text-[#fba635]">
+                        {latestEvent._count?.usaha || 0} /{' '}
+                        {latestEvent.kuotaPeserta}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div className="h-2.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-[#174c4e] to-[#fba635]"
+                        className="h-full rounded-full bg-gradient-to-r from-[#174c4e] to-[#fba635] transition-all duration-500"
                         style={{
                           width: `${Math.min(
                             ((latestEvent._count?.usaha || 0) /
@@ -263,14 +287,23 @@ export default function HeroSection() {
                         }}
                       />
                     </div>
+                    <p className="mt-1.5 text-center text-xs text-gray-500 dark:text-gray-400">
+                      {Math.round(
+                        ((latestEvent._count?.usaha || 0) /
+                          latestEvent.kuotaPeserta) *
+                          100
+                      )}
+                      % terisi
+                    </p>
                   </div>
 
                   <Button
                     asChild
-                    className="w-full bg-[#fba635] hover:bg-[#fdac58]"
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-[#174c4e] to-[#fba635] text-white shadow-lg transition-all hover:opacity-90"
                   >
                     <Link href={`${ROUTES.USER_MARKETPLACE}/${latestEvent.id}`}>
-                      Lihat Detail
+                      Lihat Detail Event
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
