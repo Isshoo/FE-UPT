@@ -52,6 +52,9 @@ export default function PendampinganDetailPage() {
 
       setEvent(eventResponse.data);
       setBusinesses(businessesResponse.data);
+
+      console.log(businessesResponse.data);
+      console.log(eventResponse.data);
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
@@ -97,12 +100,12 @@ export default function PendampinganDetailPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-6">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <Button
           variant="ghost"
-          onClick={() => router.push('/pendampingan')}
+          onClick={() => router.push('/dosen/pendampingan')}
           className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />

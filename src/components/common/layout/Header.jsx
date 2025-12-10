@@ -32,18 +32,12 @@ export default function Header() {
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isDosen = user?.role === ROLES.DOSEN;
   const isAdmin = user?.role === ROLES.ADMIN;
+  const isDosen = user?.role === ROLES.DOSEN;
 
   const menuItems = [
     { title: 'Beranda', href: ROUTES.HOME },
     { title: 'Marketplace', href: ROUTES.USER_MARKETPLACE },
-    ...(isDosen
-      ? [
-          { title: 'Pendampingan', href: ROUTES.DOSEN_PENDAMPINGAN },
-          { title: 'Penilaian', href: ROUTES.DOSEN_PENILAIAN },
-        ]
-      : []),
     { title: 'Tentang Kami', href: ROUTES.ABOUT },
   ];
 
@@ -128,45 +122,58 @@ export default function Header() {
             </div>
           ) : (
             <>
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  asChild
-                  className="flex justify-center px-1 sm:px-3"
-                >
-                  <Button variant="ghost" className="gap-2 md:flex">
-                    <Avatar className="!size-7">
-                      <AvatarFallback className="bg-[#174c4e] text-sm text-white">
-                        {getInitials(user?.nama || 'User')}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="">
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={ROUTES.USER_PROFILE}
-                      className="flex cursor-pointer items-center"
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Profil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer !text-red-600"
+              {isDosen || isAdmin ? null : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    asChild
+                    className="flex justify-center px-1 sm:px-3"
                   >
-                    <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <Button variant="ghost" className="gap-2 md:flex">
+                      <Avatar className="!size-7">
+                        <AvatarFallback className="bg-[#174c4e] text-sm text-white">
+                          {getInitials(user?.nama || 'User')}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="">
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={ROUTES.USER_PROFILE}
+                        className="flex cursor-pointer items-center"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Profil
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer !text-red-600"
+                    >
+                      <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               {isAdmin && (
                 <Button
                   asChild
-                  className="hidden bg-[#fba635] hover:bg-[#fdac58] md:flex"
+                  className="ml-3 hidden bg-[#fba635] hover:bg-[#fdac58] md:flex"
                 >
                   <Link href={ROUTES.ADMIN_DASHBOARD}>
                     Admin Panel <LogIn />
+                  </Link>
+                </Button>
+              )}
+              {isDosen && (
+                <Button
+                  asChild
+                  className="ml-3 hidden bg-[#fba635] hover:bg-[#fdac58] md:flex"
+                >
+                  <Link href={ROUTES.DOSEN_DASHBOARD}>
+                    Dosen Panel <LogIn />
                   </Link>
                 </Button>
               )}
@@ -216,6 +223,15 @@ export default function Header() {
                 <div className="mt-2 flex flex-col gap-2 border-t pt-2 dark:border-gray-800">
                   <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
                     <Link href={ROUTES.ADMIN_DASHBOARD}>Admin Panel</Link>
+                  </Button>
+                </div>
+              </>
+            )}
+            {isDosen && (
+              <>
+                <div className="mt-2 flex flex-col gap-2 border-t pt-2 dark:border-gray-800">
+                  <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
+                    <Link href={ROUTES.DOSEN_DASHBOARD}>Dosen Panel</Link>
                   </Button>
                 </div>
               </>

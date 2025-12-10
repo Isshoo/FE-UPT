@@ -295,7 +295,7 @@ export default function EventDetailPage() {
                 <Button
                   variant="outline"
                   onClick={handleLockEvent}
-                  className="text-orange-600 hover:text-orange-700"
+                  className="hidden text-orange-600 hover:text-orange-700"
                 >
                   <Lock className="mr-2 h-4 w-4" />
                   Kunci Event

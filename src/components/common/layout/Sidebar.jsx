@@ -13,18 +13,20 @@ import {
   Moon,
   Menu,
   X,
+  ClipboardCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/tailwind';
 import { useAuthStore, useThemeStore } from '@/store';
 import { APP_NAME } from '@/config/environment';
 import { ROUTES } from '@/lib/constants/routes';
+import { ROLES } from '@/lib/constants/labels';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import NotificationBell from './NotificationBell';
 import { getInitials } from '@/lib/utils/helpers';
 import Image from 'next/image';
 
-const menuItems = [
+const ADMIN_MENU_ITEMS = [
   {
     label: 'Dashboard',
     href: ROUTES.ADMIN_DASHBOARD,
@@ -42,6 +44,24 @@ const menuItems = [
   },
 ];
 
+const DOSEN_MENU_ITEMS = [
+  {
+    label: 'Dashboard',
+    href: ROUTES.DOSEN_DASHBOARD,
+    icon: LayoutDashboard,
+  },
+  {
+    label: 'Penilaian',
+    href: ROUTES.DOSEN_PENILAIAN,
+    icon: ClipboardCheck,
+  },
+  {
+    label: 'Pendampingan',
+    href: ROUTES.DOSEN_PENDAMPINGAN,
+    icon: Users,
+  },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -50,6 +70,11 @@ export default function Sidebar() {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Determine menu items based on role
+  const menuItems =
+    user?.role === ROLES.DOSEN ? DOSEN_MENU_ITEMS : ADMIN_MENU_ITEMS;
+  const panelTitle = user?.role === ROLES.DOSEN ? 'Dosen Panel' : 'Admin Panel';
 
   const handleLogout = async () => {
     await logout();
@@ -62,11 +87,10 @@ export default function Sidebar() {
       <Button
         variant="outline"
         size="sm"
-        className={
-          isOpen
-            ? 'fixed top-4 left-50 z-50 duration-350 lg:hidden'
-            : 'fixed top-4 left-7 z-50 duration-600 lg:hidden'
-        }
+        className={cn(
+          'fixed top-4 z-50 transition-all duration-350 lg:hidden',
+          isOpen ? 'left-[13rem]' : 'left-4'
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -75,7 +99,7 @@ export default function Sidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -95,7 +119,7 @@ export default function Sidebar() {
               className="flex items-center gap-2"
               onClick={() => setIsOpen(false)}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
                 <Image
                   src="/images/icon.png"
                   alt="Logo"
@@ -104,17 +128,21 @@ export default function Sidebar() {
                   className="rounded-lg"
                 />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-[#fba635]">{APP_NAME}</h2>
-                <p className="text-muted-foreground text-xs">Admin Panel</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="truncate text-xl font-bold text-[#fba635]">
+                  {APP_NAME}
+                </h2>
+                <p className="text-muted-foreground truncate text-xs">
+                  {panelTitle}
+                </p>
               </div>
             </Link>
           </div>
 
           {/* User Info */}
-          <div className="flex items-center justify-between border-b px-6 py-4 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
+          <div className="flex items-center justify-between gap-2 border-b px-4 py-4 dark:border-gray-800">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarFallback className="bg-[#174c4e] text-white">
                   {getInitials(user?.nama || 'User')}
                 </AvatarFallback>
@@ -123,20 +151,20 @@ export default function Sidebar() {
                 <p className="truncate text-sm font-medium">
                   {user?.nama || 'User'}
                 </p>
-                <p className="text-muted-foreground text-xs capitalize">
+                <p className="text-muted-foreground truncate text-xs capitalize">
                   {user?.role || 'Admin'}
                 </p>
               </div>
             </div>
             {/* Notification */}
-            <div className="flex items-center justify-end">
+            <div className="flex-shrink-0">
               <NotificationBell />
             </div>
           </div>
 
           {/* Navigation Menu */}
           <nav className="flex-1 overflow-y-auto p-4">
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname.includes(item.href);
@@ -153,7 +181,7 @@ export default function Sidebar() {
                           : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
                       )}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4 flex-shrink-0" />
                       <span>{item.label}</span>
                     </Link>
                   </li>
@@ -166,13 +194,16 @@ export default function Sidebar() {
           <div className="space-y-2 border-t p-4 dark:border-gray-800">
             {/* Profile */}
             <Link
-              href={ROUTES.USER_PROFILE}
-              className=""
+              href={
+                user?.role === ROLES.DOSEN
+                  ? ROUTES.DOSEN_PROFILE
+                  : ROUTES.ADMIN_PROFILE
+              }
               onClick={() => setIsOpen(false)}
             >
               <Button
                 variant="outline"
-                className="mb-2 w-full justify-start p-0"
+                className="mb-2 w-full justify-start"
                 size="sm"
               >
                 <User className="mr-2 h-4 w-4" />
@@ -183,7 +214,7 @@ export default function Sidebar() {
             {/* Theme Toggle */}
             <Button
               variant="outline"
-              className="mb-2 w-full justify-start p-0"
+              className="w-full justify-start"
               size="sm"
               onClick={toggleTheme}
             >
@@ -203,7 +234,7 @@ export default function Sidebar() {
             {/* Logout */}
             <Button
               variant="outline"
-              className="w-full justify-start p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+              className="w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950 dark:hover:text-red-400"
               size="sm"
               onClick={handleLogout}
             >

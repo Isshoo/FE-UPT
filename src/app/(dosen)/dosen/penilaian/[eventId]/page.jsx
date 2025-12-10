@@ -51,12 +51,12 @@ export default function PenilaianEventDetailPage() {
   const canAssess = event?.status === 'BERLANGSUNG';
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-6">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <Button
           variant="ghost"
-          onClick={() => router.push('/penilaian')}
+          onClick={() => router.push('/dosen/penilaian')}
           className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
@@ -192,7 +192,7 @@ export default function PenilaianEventDetailPage() {
 
                   {/* Action Button */}
                   <Button asChild className="w-full" disabled={!canAssess}>
-                    <Link href={`/penilaian/${eventId}/${category.id}`}>
+                    <Link href={`/dosen/penilaian/${eventId}/${category.id}`}>
                       {canAssess ? 'Mulai Penilaian' : 'Lihat Detail'}
                       <ChevronRight className="ml-2 h-4 w-4" />
                     </Link>

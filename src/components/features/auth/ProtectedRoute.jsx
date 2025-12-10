@@ -28,6 +28,8 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
       setIsRedirecting(true);
       if (user?.role === ROLES.ADMIN) {
         router.replace(ROUTES.ADMIN_DASHBOARD);
+      } else if (user?.role === ROLES.DOSEN) {
+        router.replace(ROUTES.DOSEN_DASHBOARD);
       } else {
         router.replace(ROUTES.HOME);
       }

@@ -43,10 +43,10 @@ export default function PenilaianPage() {
   const events = Object.values(groupedByEvent);
 
   return (
-    <div className="container mx-auto space-y-8 px-4 py-8">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="mb-2 text-3xl font-bold md:text-4xl">Penilaian</h1>
+        <h1 className="mb-2 text-3xl font-bold">Penilaian</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Kelola penilaian untuk kategori yang Anda nilai
         </p>
@@ -162,7 +162,7 @@ export default function PenilaianPage() {
               </CardHeader>
               <CardContent>
                 <Button asChild>
-                  <Link href={`/penilaian/${event.id}`}>
+                  <Link href={`/dosen/penilaian/${event.id}`}>
                     Lihat Detail
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Link>

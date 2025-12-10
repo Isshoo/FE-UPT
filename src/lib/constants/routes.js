@@ -10,11 +10,14 @@ export const ROUTES = {
   USER_PROFILE: '/profile',
 
   // Dosen
-  DOSEN_PENDAMPINGAN: '/pendampingan',
-  DOSEN_PENILAIAN: '/penilaian',
+  DOSEN_DASHBOARD: '/dosen/dashboard',
+  DOSEN_PENDAMPINGAN: '/dosen/pendampingan',
+  DOSEN_PENILAIAN: '/dosen/penilaian',
+  DOSEN_PROFILE: '/dosen/profile',
 
   // Admin
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_MARKETPLACE: '/admin/marketplace',
   ADMIN_USERS: '/admin/users',
+  ADMIN_PROFILE: '/admin/profile',
 };

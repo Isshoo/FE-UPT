@@ -204,12 +204,12 @@ export default function PenilaianFormPage() {
   const canAssess = event.status === 'BERLANGSUNG';
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-6">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <Button
           variant="ghost"
-          onClick={() => router.push(`/penilaian/${eventId}`)}
+          onClick={() => router.push(`/dosen/penilaian/${eventId}`)}
           className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
