@@ -14,12 +14,8 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Trash2, UserCheck } from 'lucide-react';
-import {
-  KATEGORI_USAHA,
-  FAKULTAS_OPTIONS,
-  PRODI_BY_FAKULTAS,
-} from '@/lib/constants/labels';
-import { usersAPI } from '@/lib/api';
+import { KATEGORI_USAHA } from '@/lib/constants/labels';
+import { usersAPI, fakultasAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 export default function MahasiswaForm({ onSubmit, isSubmitting }) {
@@ -29,40 +25,76 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
     deskripsi: '',
     anggota: [{ nama: '', nim: '' }],
     ketuaId: '',
-    fakultas: '',
-    prodi: '',
+    fakultasId: '',
+    prodiId: '',
     pembimbingId: '',
     mataKuliah: '',
     telepon: '',
   });
 
+  const [fakultasList, setFakultasList] = useState([]);
+  const [prodiList, setProdiList] = useState([]);
   const [dosenList, setDosenList] = useState([]);
+  const [loadingFakultas, setLoadingFakultas] = useState(false);
+  const [loadingProdi, setLoadingProdi] = useState(false);
   const [loadingDosen, setLoadingDosen] = useState(false);
-  const [prodiOptions, setProdiOptions] = useState([]);
 
+  // Fetch fakultas on mount
   useEffect(() => {
-    if (formData.fakultas) {
-      setProdiOptions(PRODI_BY_FAKULTAS[formData.fakultas] || []);
+    fetchFakultas();
+  }, []);
+
+  // Fetch prodi when fakultas changes
+  useEffect(() => {
+    if (formData.fakultasId) {
+      fetchProdiByFakultas(formData.fakultasId);
       // Reset prodi and pembimbing when fakultas changes
-      setFormData((prev) => ({ ...prev, prodi: '', pembimbingId: '' }));
+      setFormData((prev) => ({ ...prev, prodiId: '', pembimbingId: '' }));
       setDosenList([]);
     }
-  }, [formData.fakultas]);
+  }, [formData.fakultasId]);
 
+  // Fetch dosen when prodi changes
   useEffect(() => {
-    if (formData.prodi) {
-      fetchDosenByProdi(formData.prodi);
+    if (formData.prodiId) {
+      fetchDosenByProdi(formData.prodiId);
     }
-  }, [formData.prodi]);
+  }, [formData.prodiId]);
 
-  const fetchDosenByProdi = async (prodi) => {
+  const fetchFakultas = async () => {
+    try {
+      setLoadingFakultas(true);
+      const response = await fakultasAPI.getAllFakultas();
+      setFakultasList(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch fakultas:', error);
+      toast.error('Gagal memuat data fakultas');
+    } finally {
+      setLoadingFakultas(false);
+    }
+  };
+
+  const fetchProdiByFakultas = async (fakultasId) => {
+    try {
+      setLoadingProdi(true);
+      const response = await fakultasAPI.getProdiByFakultas(fakultasId);
+      setProdiList(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch prodi:', error);
+      setProdiList([]);
+    } finally {
+      setLoadingProdi(false);
+    }
+  };
+
+  const fetchDosenByProdi = async (prodiId) => {
     try {
       setLoadingDosen(true);
       const response = await usersAPI.getUsersGuest({ role: 'DOSEN' });
 
-      // Filter dosen by prodi
-      const filteredDosen = response.data.filter(
-        (dosen) => dosen.prodi === prodi
+      // Filter dosen by prodiId
+      const filteredDosen = (response.data || []).filter(
+        (dosen) => dosen.prodi?.id === prodiId
       );
 
       setDosenList(filteredDosen);
@@ -127,7 +159,7 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
       return;
     }
 
-    if (!formData.fakultas || !formData.prodi || !formData.pembimbingId) {
+    if (!formData.fakultasId || !formData.prodiId || !formData.pembimbingId) {
       toast.error('Mohon lengkapi data akademik');
       return;
     }
@@ -298,16 +330,21 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
               Fakultas <span className="text-red-500">*</span>
             </Label>
             <Select
-              value={formData.fakultas}
-              onValueChange={(value) => handleChange('fakultas', value)}
+              value={formData.fakultasId}
+              onValueChange={(value) => handleChange('fakultasId', value)}
+              disabled={loadingFakultas}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Pilih fakultas" />
+                <SelectValue
+                  placeholder={
+                    loadingFakultas ? 'Loading...' : 'Pilih fakultas'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {FAKULTAS_OPTIONS.map((fakultas) => (
-                  <SelectItem key={fakultas.value} value={fakultas.value}>
-                    {fakultas.label}
+                {fakultasList.map((fakultas) => (
+                  <SelectItem key={fakultas.id} value={fakultas.id}>
+                    {fakultas.nama}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -319,17 +356,21 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
               Program Studi <span className="text-red-500">*</span>
             </Label>
             <Select
-              value={formData.prodi}
-              onValueChange={(value) => handleChange('prodi', value)}
-              disabled={!formData.fakultas}
+              value={formData.prodiId}
+              onValueChange={(value) => handleChange('prodiId', value)}
+              disabled={!formData.fakultasId || loadingProdi}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Pilih program studi" />
+                <SelectValue
+                  placeholder={
+                    loadingProdi ? 'Loading...' : 'Pilih program studi'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {prodiOptions.map((prodi) => (
-                  <SelectItem key={prodi} value={prodi}>
-                    {prodi}
+                {prodiList.map((prodi) => (
+                  <SelectItem key={prodi.id} value={prodi.id}>
+                    {prodi.nama}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -343,7 +384,7 @@ export default function MahasiswaForm({ onSubmit, isSubmitting }) {
             <Select
               value={formData.pembimbingId}
               onValueChange={(value) => handleChange('pembimbingId', value)}
-              disabled={!formData.prodi || loadingDosen}
+              disabled={!formData.prodiId || loadingDosen}
             >
               <SelectTrigger>
                 <SelectValue

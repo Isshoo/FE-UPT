@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usersAPI } from '@/lib/api';
-import { FAKULTAS_OPTIONS, PRODI_BY_FAKULTAS } from '@/lib/constants/labels';
+import { usersAPI, fakultasAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,14 +31,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import PaginationControls from '@/components/ui/pagination-controls';
-import {
-  Search,
-  Plus,
-  Edit2,
-  Trash2,
-  // Users as UsersIcon,
-  Key,
-} from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Key } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
@@ -49,7 +41,6 @@ import { Users } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
-  // const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -75,24 +66,55 @@ export default function AdminUsersPage() {
     password: '',
     nama: '',
     role: 'USER',
-    fakultas: '',
-    prodi: '',
+    fakultasId: '',
+    prodiId: '',
   });
 
   const [newPassword, setNewPassword] = useState('');
-  const [prodiOptions, setProdiOptions] = useState([]);
+
+  // Fakultas/Prodi data from API
+  const [fakultasList, setFakultasList] = useState([]);
+  const [prodiList, setProdiList] = useState([]);
+  const [loadingFakultas, setLoadingFakultas] = useState(false);
+  const [loadingProdi, setLoadingProdi] = useState(false);
 
   useEffect(() => {
     fetchData();
+    fetchFakultas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.limit]);
 
   useEffect(() => {
-    if (formData.fakultas) {
-      setProdiOptions(PRODI_BY_FAKULTAS[formData.fakultas] || []);
-      setFormData((prev) => ({ ...prev, prodi: '' }));
+    if (formData.fakultasId) {
+      fetchProdiByFakultas(formData.fakultasId);
+      setFormData((prev) => ({ ...prev, prodiId: '' }));
     }
-  }, [formData.fakultas]);
+  }, [formData.fakultasId]);
+
+  const fetchFakultas = async () => {
+    try {
+      setLoadingFakultas(true);
+      const response = await fakultasAPI.getAllFakultas();
+      setFakultasList(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch fakultas:', error);
+    } finally {
+      setLoadingFakultas(false);
+    }
+  };
+
+  const fetchProdiByFakultas = async (fakultasId) => {
+    try {
+      setLoadingProdi(true);
+      const response = await fakultasAPI.getProdiByFakultas(fakultasId);
+      setProdiList(response.data || []);
+    } catch (error) {
+      console.error('Failed to fetch prodi:', error);
+      setProdiList([]);
+    } finally {
+      setLoadingProdi(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -111,7 +133,6 @@ export default function AdminUsersPage() {
         total: usersResponse.pagination?.total || 0,
         totalPages: usersResponse.pagination?.totalPages || 0,
       }));
-      // setStats(statsResponse.data);
     } catch (error) {
       toast.error('Gagal memuat data');
       console.error(error);
@@ -148,10 +169,10 @@ export default function AdminUsersPage() {
       password: '',
       nama: '',
       role: 'USER',
-      fakultas: '',
-      prodi: '',
+      fakultasId: '',
+      prodiId: '',
     });
-    setProdiOptions([]);
+    setProdiList([]);
   };
 
   const handleCreate = () => {
@@ -159,18 +180,21 @@ export default function AdminUsersPage() {
     setCreateDialogOpen(true);
   };
 
-  const handleEdit = (user) => {
+  const handleEdit = async (user) => {
     setSelectedUser(user);
-    if (user.fakultas) {
-      setProdiOptions(PRODI_BY_FAKULTAS[user.fakultas] || []);
+
+    // Pre-load prodi if user has fakultas
+    if (user.fakultas?.id) {
+      await fetchProdiByFakultas(user.fakultas.id);
     }
+
     setFormData({
       email: user.email,
       nama: user.nama,
       role: user.role,
-      fakultas: user.fakultas || '',
-      prodi: user.prodi || '',
-      password: '', // Not needed for edit
+      fakultasId: user.fakultas?.id || '',
+      prodiId: user.prodi?.id || '',
+      password: '',
     });
     setEditDialogOpen(true);
   };
@@ -178,7 +202,10 @@ export default function AdminUsersPage() {
   const handleSubmitCreate = async (e) => {
     e.preventDefault();
 
-    if (formData.role === 'DOSEN' && (!formData.fakultas || !formData.prodi)) {
+    if (
+      formData.role === 'DOSEN' &&
+      (!formData.fakultasId || !formData.prodiId)
+    ) {
       toast.error('Fakultas dan Prodi wajib diisi untuk Dosen');
       return;
     }
@@ -200,7 +227,10 @@ export default function AdminUsersPage() {
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
 
-    if (formData.role === 'DOSEN' && (!formData.fakultas || !formData.prodi)) {
+    if (
+      formData.role === 'DOSEN' &&
+      (!formData.fakultasId || !formData.prodiId)
+    ) {
       toast.error('Fakultas dan Prodi wajib diisi untuk Dosen');
       return;
     }
@@ -210,8 +240,8 @@ export default function AdminUsersPage() {
       await usersAPI.updateUser(selectedUser.id, {
         nama: formData.nama,
         email: formData.email,
-        fakultas: formData.fakultas,
-        prodi: formData.prodi,
+        fakultasId: formData.fakultasId || null,
+        prodiId: formData.prodiId || null,
       });
       toast.success('User berhasil diupdate');
       setEditDialogOpen(false);
@@ -397,8 +427,10 @@ export default function AdminUsersPage() {
                         <TableCell>
                           {user.fakultas && user.prodi ? (
                             <div className="text-sm">
-                              <div>{user.fakultas}</div>
-                              <div className="text-gray-500">{user.prodi}</div>
+                              <div>{user.fakultas.nama}</div>
+                              <div className="text-gray-500">
+                                {user.prodi.nama}
+                              </div>
                             </div>
                           ) : (
                             '-'
@@ -527,21 +559,23 @@ export default function AdminUsersPage() {
                   <div className="space-y-2">
                     <Label htmlFor="fakultas">Fakultas *</Label>
                     <Select
-                      value={formData.fakultas}
+                      value={formData.fakultasId}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, fakultas: value })
+                        setFormData({ ...formData, fakultasId: value })
                       }
+                      disabled={loadingFakultas}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih fakultas" />
+                        <SelectValue
+                          placeholder={
+                            loadingFakultas ? 'Loading...' : 'Pilih fakultas'
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {FAKULTAS_OPTIONS.map((fakultas) => (
-                          <SelectItem
-                            key={fakultas.value}
-                            value={fakultas.value}
-                          >
-                            {fakultas.label}
+                        {fakultasList.map((fakultas) => (
+                          <SelectItem key={fakultas.id} value={fakultas.id}>
+                            {fakultas.nama}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -551,19 +585,23 @@ export default function AdminUsersPage() {
                   <div className="space-y-2">
                     <Label htmlFor="prodi">Program Studi *</Label>
                     <Select
-                      value={formData.prodi}
+                      value={formData.prodiId}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, prodi: value })
+                        setFormData({ ...formData, prodiId: value })
                       }
-                      disabled={!formData.fakultas}
+                      disabled={!formData.fakultasId || loadingProdi}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih prodi" />
+                        <SelectValue
+                          placeholder={
+                            loadingProdi ? 'Loading...' : 'Pilih prodi'
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {prodiOptions.map((prodi) => (
-                          <SelectItem key={prodi} value={prodi}>
-                            {prodi}
+                        {prodiList.map((prodi) => (
+                          <SelectItem key={prodi.id} value={prodi.id}>
+                            {prodi.nama}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -639,21 +677,23 @@ export default function AdminUsersPage() {
                   <div className="space-y-2">
                     <Label htmlFor="edit-fakultas">Fakultas *</Label>
                     <Select
-                      value={formData.fakultas}
+                      value={formData.fakultasId}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, fakultas: value })
+                        setFormData({ ...formData, fakultasId: value })
                       }
+                      disabled={loadingFakultas}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih fakultas" />
+                        <SelectValue
+                          placeholder={
+                            loadingFakultas ? 'Loading...' : 'Pilih fakultas'
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {FAKULTAS_OPTIONS.map((fakultas) => (
-                          <SelectItem
-                            key={fakultas.value}
-                            value={fakultas.value}
-                          >
-                            {fakultas.label}
+                        {fakultasList.map((fakultas) => (
+                          <SelectItem key={fakultas.id} value={fakultas.id}>
+                            {fakultas.nama}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -663,19 +703,23 @@ export default function AdminUsersPage() {
                   <div className="space-y-2">
                     <Label htmlFor="edit-prodi">Program Studi *</Label>
                     <Select
-                      value={formData.prodi}
+                      value={formData.prodiId}
                       onValueChange={(value) =>
-                        setFormData({ ...formData, prodi: value })
+                        setFormData({ ...formData, prodiId: value })
                       }
-                      disabled={!formData.fakultas}
+                      disabled={!formData.fakultasId || loadingProdi}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih prodi" />
+                        <SelectValue
+                          placeholder={
+                            loadingProdi ? 'Loading...' : 'Pilih prodi'
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {prodiOptions.map((prodi) => (
-                          <SelectItem key={prodi} value={prodi}>
-                            {prodi}
+                        {prodiList.map((prodi) => (
+                          <SelectItem key={prodi.id} value={prodi.id}>
+                            {prodi.nama}
                           </SelectItem>
                         ))}
                       </SelectContent>

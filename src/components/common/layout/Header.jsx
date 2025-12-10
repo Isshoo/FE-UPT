@@ -38,7 +38,6 @@ export default function Header() {
   const menuItems = [
     { title: 'Beranda', href: ROUTES.HOME },
     { title: 'Marketplace', href: ROUTES.USER_MARKETPLACE },
-    // { title: 'UMKM Binaan', href: ROUTES.USER_UMKM },
     ...(isDosen
       ? [
           { title: 'Pendampingan', href: ROUTES.DOSEN_PENDAMPINGAN },

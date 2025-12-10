@@ -188,7 +188,9 @@ export default function PendampinganDetailPage() {
                         )?.nama || '-'}
                       </TableCell>
                       <TableCell>{business.anggota?.length || 0}</TableCell>
-                      <TableCell>{business.prodi}</TableCell>
+                      <TableCell>
+                        {business.prodi?.nama || business.prodi}
+                      </TableCell>
                       <TableCell>
                         {business.disetujui ? (
                           <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
@@ -303,13 +305,18 @@ export default function PendampinganDetailPage() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-600 dark:text-gray-400">Fakultas</p>
-                    <p className="font-semibold">{selectedBusiness.fakultas}</p>
+                    <p className="font-semibold">
+                      {selectedBusiness.fakultas?.nama ||
+                        selectedBusiness.fakultas}
+                    </p>
                   </div>
                   <div>
                     <p className="text-gray-600 dark:text-gray-400">
                       Program Studi
                     </p>
-                    <p className="font-semibold">{selectedBusiness.prodi}</p>
+                    <p className="font-semibold">
+                      {selectedBusiness.prodi?.nama || selectedBusiness.prodi}
+                    </p>
                   </div>
                   {selectedBusiness.mataKuliah && (
                     <div className="col-span-2">

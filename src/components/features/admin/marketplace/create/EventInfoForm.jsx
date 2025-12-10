@@ -160,40 +160,6 @@ export default function EventInfoForm({ data, onUpdate }) {
             required
           />
         </div>
-
-        {/* Mulai Pendaftaran */}
-        <div className="space-y-2">
-          <Label htmlFor="mulaiPendaftaran">
-            Mulai Pendaftaran <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="mulaiPendaftaran"
-            type="datetime-local"
-            value={toDatetimeLocal(data.mulaiPendaftaran)}
-            onChange={(e) => handleChange('mulaiPendaftaran', e.target.value)}
-            required
-          />
-          {/* <p className="text-xs text-gray-500">
-            Waktu dalam timezone Anda ({userTimezone})
-          </p> */}
-        </div>
-
-        {/* Akhir Pendaftaran */}
-        <div className="space-y-2">
-          <Label htmlFor="akhirPendaftaran">
-            Akhir Pendaftaran <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="akhirPendaftaran"
-            type="datetime-local"
-            value={toDatetimeLocal(data.akhirPendaftaran)}
-            onChange={(e) => handleChange('akhirPendaftaran', e.target.value)}
-            required
-          />
-          {/* <p className="text-xs text-gray-500">
-            Waktu dalam timezone Anda ({userTimezone})
-          </p> */}
-        </div>
       </div>
     </div>
   );

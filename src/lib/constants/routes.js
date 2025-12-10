@@ -7,7 +7,6 @@ export const ROUTES = {
 
   // User
   USER_MARKETPLACE: '/marketplace',
-  USER_UMKM: '/umkm',
   USER_PROFILE: '/profile',
 
   // Dosen
@@ -17,6 +16,5 @@ export const ROUTES = {
   // Admin
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_MARKETPLACE: '/admin/marketplace',
-  ADMIN_UMKM: '/admin/umkm',
   ADMIN_USERS: '/admin/users',
 };

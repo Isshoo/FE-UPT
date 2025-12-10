@@ -164,10 +164,7 @@ export default function UserEventDetailPage() {
   }
 
   const event = eventDetail;
-  const isRegistrationOpen =
-    event?.status === 'TERBUKA' &&
-    new Date() >= new Date(event.mulaiPendaftaran) &&
-    new Date() <= new Date(event.akhirPendaftaran);
+  const isRegistrationOpen = event?.status === 'TERBUKA';
   const isEventCompleted = event?.status === 'SELESAI';
   const approvedBusinesses = event?.usaha?.filter((b) => b.disetujui) || [];
   const canRegister = isRegistrationOpen && !userRegistration;
@@ -256,11 +253,6 @@ export default function UserEventDetailPage() {
                 <h3 className="mb-2 text-lg font-semibold">
                   Pendaftaran Dibuka!
                 </h3>
-                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
-                  Periode pendaftaran:{' '}
-                  <strong>{formatDateTime(event.mulaiPendaftaran)}</strong> s/d{' '}
-                  <strong>{formatDateTime(event.akhirPendaftaran)}</strong>
-                </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Jangan lewatkan kesempatan untuk ikut serta dalam event ini!
                 </p>

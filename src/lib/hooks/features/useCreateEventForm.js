@@ -10,8 +10,6 @@ const initialFormData = {
   tahunAjaran: '',
   lokasi: '',
   tanggalPelaksanaan: '',
-  mulaiPendaftaran: '',
-  akhirPendaftaran: '',
   kuotaPeserta: '',
   sponsor: [],
   kategoriPenilaian: [],
@@ -26,49 +24,21 @@ export const useCreateEventForm = () => {
   };
 
   const validateEventInfo = () => {
-    const {
-      nama,
-      semester,
-      tahunAjaran,
-      tanggalPelaksanaan,
-      mulaiPendaftaran,
-      akhirPendaftaran,
-    } = formData;
+    const { nama, semester, tahunAjaran, tanggalPelaksanaan } = formData;
 
     if (!nama || !semester || !tahunAjaran) {
       toast.error('Mohon lengkapi semua field yang wajib');
       return false;
     }
 
-    if (!tanggalPelaksanaan || !mulaiPendaftaran || !akhirPendaftaran) {
-      toast.error('Mohon isi semua tanggal');
+    if (!tanggalPelaksanaan) {
+      toast.error('Mohon isi tanggal pelaksanaan');
       return false;
     }
 
     // Validate datetime strings
-    if (
-      !isValidDateTime(tanggalPelaksanaan) ||
-      !isValidDateTime(mulaiPendaftaran) ||
-      !isValidDateTime(akhirPendaftaran)
-    ) {
+    if (!isValidDateTime(tanggalPelaksanaan)) {
       toast.error('Format tanggal tidak valid');
-      return false;
-    }
-
-    // Validate date logic (in local time)
-    const eventDate = new Date(tanggalPelaksanaan);
-    const regStart = new Date(mulaiPendaftaran);
-    const regEnd = new Date(akhirPendaftaran);
-
-    if (regStart >= regEnd) {
-      toast.error('Tanggal mulai pendaftaran harus sebelum tanggal akhir');
-      return false;
-    }
-
-    if (regEnd >= eventDate) {
-      toast.error(
-        'Tanggal akhir pendaftaran harus sebelum tanggal pelaksanaan'
-      );
       return false;
     }
 
@@ -100,12 +70,6 @@ export const useCreateEventForm = () => {
       ...formData,
       tanggalPelaksanaan: toUTC(
         new Date(formData.tanggalPelaksanaan)
-      ).toISOString(),
-      mulaiPendaftaran: toUTC(
-        new Date(formData.mulaiPendaftaran)
-      ).toISOString(),
-      akhirPendaftaran: toUTC(
-        new Date(formData.akhirPendaftaran)
       ).toISOString(),
     };
   };

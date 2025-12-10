@@ -13,6 +13,7 @@ import Image from 'next/image';
 
 export default function EventInfoTab({ event, onRefresh }) {
   const [uploadingLayout, setUploadingLayout] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const handleUploadLayout = async (e) => {
     const file = e.target.files?.[0];
@@ -33,6 +34,28 @@ export default function EventInfoTab({ event, onRefresh }) {
       toast.error(error.response?.data?.message || 'Gagal upload layout');
     } finally {
       setUploadingLayout(false);
+    }
+  };
+
+  const handleUploadCover = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar');
+      return;
+    }
+
+    try {
+      setUploadingCover(true);
+      await marketplaceAPI.uploadCover(event.id, file);
+      toast.success('Cover berhasil diupload');
+      onRefresh();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal upload cover');
+    } finally {
+      setUploadingCover(false);
     }
   };
 
@@ -73,24 +96,6 @@ export default function EventInfoTab({ event, onRefresh }) {
                 Kuota Peserta
               </p>
               <p className="font-semibold">{event.kuotaPeserta}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Pendaftaran Dibuka
-              </p>
-              <p className="font-semibold">
-                {formatDateTime(event.mulaiPendaftaran)}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Pendaftaran Ditutup
-              </p>
-              <p className="font-semibold">
-                {formatDateTime(event.akhirPendaftaran)}
-              </p>
             </div>
           </div>
         </CardContent>
@@ -196,6 +201,76 @@ export default function EventInfoTab({ event, onRefresh }) {
                 </>
               ) : (
                 <p className="text-gray-500">Belum ada layout denah</p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Cover */}
+      <Card className="gap-3">
+        <CardHeader>
+          <CardTitle>Cover</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {event.gambarCover ? (
+            <div className="space-y-4">
+              <Image
+                width={800}
+                height={800}
+                src={event.gambarCover}
+                alt="Cover"
+                className="w-full max-w-2xl rounded-lg border"
+              />
+              {!event.terkunci && (
+                <div>
+                  <Label htmlFor="updateCover" className="cursor-pointer">
+                    <div className="flex items-center gap-2 text-sm text-[#fba635] hover:text-[#fdac58]">
+                      <Upload className="h-4 w-4" />
+                      Update Cover
+                    </div>
+                  </Label>
+                  <Input
+                    id="updateCover"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUploadCover}
+                    disabled={uploadingCover || event.terkunci}
+                    className="hidden"
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-lg border-2 border-dashed p-12 text-center">
+              {!event.terkunci ? (
+                <>
+                  <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                  <p className="mb-4 text-gray-600 dark:text-gray-400">
+                    Belum ada cover diupload
+                  </p>
+                  <Label htmlFor="uploadCover">
+                    <Button
+                      disabled={uploadingCover}
+                      className="bg-[#fba635] hover:bg-[#fdac58]"
+                      asChild
+                    >
+                      <span>
+                        {uploadingCover ? 'Uploading...' : 'Upload Cover'}
+                      </span>
+                    </Button>
+                  </Label>
+                  <Input
+                    id="uploadCover"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUploadCover}
+                    disabled={uploadingCover}
+                    className="hidden"
+                  />
+                </>
+              ) : (
+                <p className="text-gray-500">Belum ada cover</p>
               )}
             </div>
           )}

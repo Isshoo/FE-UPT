@@ -50,6 +50,19 @@ export const marketplaceAPI = {
     return response.data;
   },
 
+  uploadCover: async (id, file) => {
+    const formData = new FormData();
+    formData.append('cover', file);
+    const response = await apiClient.post(
+      `/marketplace/${id}/cover`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
+    return response.data;
+  },
+
   // Businesses
   getBusinessesByEvent: async (eventId, params) => {
     const response = await apiClient.get(`/marketplace/${eventId}/businesses`, {

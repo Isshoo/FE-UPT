@@ -83,14 +83,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href={ROUTES.USER_UMKM}
-                  className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
-                >
-                  UMKM Binaan
-                </Link>
-              </li>
-              <li>
-                <Link
                   href={ROUTES.ABOUT}
                   className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
                 >

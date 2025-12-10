@@ -57,8 +57,6 @@ export default function CreateEventPage() {
 
       console.log('Data to send (UTC):', {
         tanggalPelaksanaan: dataToSend.tanggalPelaksanaan,
-        mulaiPendaftaran: dataToSend.mulaiPendaftaran,
-        akhirPendaftaran: dataToSend.akhirPendaftaran,
       });
 
       const response = await marketplaceAPI.createEvent(dataToSend);

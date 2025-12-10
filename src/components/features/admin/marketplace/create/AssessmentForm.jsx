@@ -236,7 +236,7 @@ export default function AssessmentForm({ data, onUpdate }) {
                       <div className="flex flex-col items-start">
                         <span className="font-medium">{dosen.nama}</span>
                         <span className="text-xs text-gray-500">
-                          {dosen.fakultas} - {dosen.prodi}
+                          {dosen.fakultas?.nama} - {dosen.prodi?.nama}
                         </span>
                       </div>
                     </SelectItem>

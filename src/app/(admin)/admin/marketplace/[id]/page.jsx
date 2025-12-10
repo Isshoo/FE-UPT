@@ -77,8 +77,6 @@ export default function EventDetailPage() {
     tahunAjaran: '',
     lokasi: '',
     tanggalPelaksanaan: '',
-    mulaiPendaftaran: '',
-    akhirPendaftaran: '',
     kuotaPeserta: '',
   });
 
@@ -96,8 +94,6 @@ export default function EventDetailPage() {
         tahunAjaran: eventDetail.tahunAjaran,
         lokasi: eventDetail.lokasi,
         tanggalPelaksanaan: toDatetimeLocal(eventDetail.tanggalPelaksanaan),
-        mulaiPendaftaran: toDatetimeLocal(eventDetail.mulaiPendaftaran),
-        akhirPendaftaran: toDatetimeLocal(eventDetail.akhirPendaftaran),
         kuotaPeserta: eventDetail.kuotaPeserta?.toString(),
       });
       setSelectedStatus(eventDetail.status);
@@ -124,50 +120,22 @@ export default function EventDetailPage() {
   };
 
   const validateEditForm = () => {
-    const {
-      nama,
-      semester,
-      tahunAjaran,
-      tanggalPelaksanaan,
-      mulaiPendaftaran,
-      akhirPendaftaran,
-      kuotaPeserta,
-    } = editForm;
+    const { nama, semester, tahunAjaran, tanggalPelaksanaan, kuotaPeserta } =
+      editForm;
 
     if (!nama || !semester || !tahunAjaran || !kuotaPeserta) {
       toast.error('Mohon lengkapi semua field yang wajib');
       return false;
     }
 
-    if (!tanggalPelaksanaan || !mulaiPendaftaran || !akhirPendaftaran) {
-      toast.error('Mohon isi semua tanggal');
+    if (!tanggalPelaksanaan) {
+      toast.error('Mohon isi tanggal pelaksanaan');
       return false;
     }
 
     // Validate datetime strings
-    if (
-      !isValidDateTime(tanggalPelaksanaan) ||
-      !isValidDateTime(mulaiPendaftaran) ||
-      !isValidDateTime(akhirPendaftaran)
-    ) {
+    if (!isValidDateTime(tanggalPelaksanaan)) {
       toast.error('Format tanggal tidak valid');
-      return false;
-    }
-
-    // Validate date logic (in local time)
-    const eventDate = new Date(tanggalPelaksanaan);
-    const regStart = new Date(mulaiPendaftaran);
-    const regEnd = new Date(akhirPendaftaran);
-
-    if (regStart >= regEnd) {
-      toast.error('Tanggal mulai pendaftaran harus sebelum tanggal akhir');
-      return false;
-    }
-
-    if (regEnd >= eventDate) {
-      toast.error(
-        'Tanggal akhir pendaftaran harus sebelum tanggal pelaksanaan'
-      );
       return false;
     }
 
@@ -188,19 +156,11 @@ export default function EventDetailPage() {
         tanggalPelaksanaan: toUTC(
           new Date(editForm.tanggalPelaksanaan)
         ).toISOString(),
-        mulaiPendaftaran: toUTC(
-          new Date(editForm.mulaiPendaftaran)
-        ).toISOString(),
-        akhirPendaftaran: toUTC(
-          new Date(editForm.akhirPendaftaran)
-        ).toISOString(),
         kuotaPeserta: parseInt(editForm.kuotaPeserta),
       };
 
       console.log('Updating event with UTC dates:', {
         tanggalPelaksanaan: dataToSend.tanggalPelaksanaan,
-        mulaiPendaftaran: dataToSend.mulaiPendaftaran,
-        akhirPendaftaran: dataToSend.akhirPendaftaran,
       });
 
       await marketplaceAPI.updateEvent(eventId, dataToSend);
@@ -412,9 +372,6 @@ export default function EventDetailPage() {
                   <SelectItem value="TERBUKA">
                     {EVENT_STATUS_LABELS.TERBUKA}
                   </SelectItem>
-                  <SelectItem value="PERSIAPAN">
-                    {EVENT_STATUS_LABELS.PERSIAPAN}
-                  </SelectItem>
                   <SelectItem value="BERLANGSUNG">
                     {EVENT_STATUS_LABELS.BERLANGSUNG}
                   </SelectItem>
@@ -430,9 +387,6 @@ export default function EventDetailPage() {
               <ul className="list-inside list-disc space-y-1">
                 <li>
                   <strong>TERBUKA:</strong> Pendaftaran dibuka
-                </li>
-                <li>
-                  <strong>PERSIAPAN:</strong> Persiapan menjelang acara
                 </li>
                 <li>
                   <strong>BERLANGSUNG:</strong> Event sedang berlangsung
@@ -565,47 +519,6 @@ export default function EventDetailPage() {
                   })
                 }
               />
-              {/* <p className="text-xs text-gray-500">
-                Waktu dalam timezone Anda ({userTimezone})
-              </p> */}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="mulaiPendaftaran">Mulai Pendaftaran *</Label>
-                <Input
-                  id="mulaiPendaftaran"
-                  type="datetime-local"
-                  value={editForm.mulaiPendaftaran}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      mulaiPendaftaran: e.target.value,
-                    })
-                  }
-                />
-                {/* <p className="text-xs text-gray-500">
-                  Waktu dalam timezone Anda ({userTimezone})
-                </p> */}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="akhirPendaftaran">Akhir Pendaftaran *</Label>
-                <Input
-                  id="akhirPendaftaran"
-                  type="datetime-local"
-                  value={editForm.akhirPendaftaran}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      akhirPendaftaran: e.target.value,
-                    })
-                  }
-                />
-                {/* <p className="text-xs text-gray-500">
-                  Waktu dalam timezone Anda ({userTimezone})
-                </p> */}
-              </div>
             </div>
 
             <div className="space-y-2">

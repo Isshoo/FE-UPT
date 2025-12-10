@@ -8,7 +8,6 @@ export default function StatsSection() {
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalEvents: 0,
-    totalUmkm: 0,
     totalPeserta: 0,
   });
 
@@ -37,11 +36,6 @@ export default function StatsSection() {
       suffix: '+',
     },
     {
-      value: stats.totalUmkm,
-      label: 'UMKM Binaan',
-      suffix: '+',
-    },
-    {
       value: stats.totalUsers,
       label: 'Pengguna Terdaftar',
       suffix: '+',
@@ -66,7 +60,7 @@ export default function StatsSection() {
           </p>
         </motion.div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {statsData.map((stat, index) => (
             <motion.div
               key={index}
