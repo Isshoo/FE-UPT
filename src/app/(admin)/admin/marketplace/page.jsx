@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useMarketplaceStore } from '@/store';
 import { EVENT_STATUS_LABELS, SEMESTER_OPTIONS } from '@/lib/constants/labels';
@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Download, FileSpreadsheet, FileText } from 'lucide-react';
-import { Plus, Search, Calendar, MapPin, Users } from 'lucide-react';
+import { Plus, Search, Calendar, MapPin, Users, X } from 'lucide-react';
 import PaginationControls from '@/components/ui/pagination-controls';
 
 import { exportAPI, downloadBlob } from '@/lib/api';
@@ -45,20 +45,32 @@ export default function AdminMarketplacePage() {
   const tahunAjaranOptions = useMarketplaceStore(
     (state) => state.tahunAjaranOptions
   );
+  const statusOptions = useMarketplaceStore((state) => state.statusOptions);
   const fetchEvents = useMarketplaceStore((state) => state.fetchEvents);
   const setFilters = useMarketplaceStore((state) => state.setFilters);
   const setPagination = useMarketplaceStore((state) => state.setPagination);
   const resetFilters = useMarketplaceStore((state) => state.resetFilters);
 
-  useEffect(() => {
-    // Admin can see all events including DRAFT
-    fetchEvents({ includeDraft: true });
-  }, [pagination.page, pagination.limit, filters, fetchEvents]);
+  // Local search state for debouncing
+  const [localSearch, setLocalSearch] = useState(filters.search);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  const handleSearch = () => {
-    setPagination({ page: 1 });
-    fetchEvents({ page: 1, includeDraft: true });
-  };
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== filters.search) {
+        setFilters({ search: localSearch });
+        setPagination({ page: 1 });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [localSearch, filters.search, setFilters, setPagination]);
+
+  // Auto-fetch when filters or pagination changes
+  useEffect(() => {
+    fetchEvents({ includeDraft: true });
+    setIsInitialLoad(false);
+  }, [pagination.page, pagination.limit, filters, fetchEvents]);
 
   const handlePageChange = (newPage) => {
     setPagination({ page: newPage });
@@ -70,13 +82,17 @@ export default function AdminMarketplacePage() {
 
   const handleFilterChange = (key, value) => {
     setFilters({ [key]: value });
+    setPagination({ page: 1 });
   };
 
   const handleReset = () => {
+    setLocalSearch('');
     resetFilters();
     setPagination({ page: 1 });
-    fetchEvents({ page: 1, includeDraft: true });
   };
+
+  const hasActiveFilters =
+    localSearch || filters.semester || filters.tahunAjaran || filters.status;
 
   const handleExportMarketplace = async (format) => {
     // Export dengan filter yang sedang aktif
@@ -107,7 +123,7 @@ export default function AdminMarketplacePage() {
     downloadBlob(response.data, filename);
   };
 
-  if (isLoading) {
+  if (isLoading && isInitialLoad) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#fba635]"></div>
@@ -174,26 +190,28 @@ export default function AdminMarketplacePage() {
       </div>
 
       {/* Filters */}
-      <Card className="gap-2 pt-5 pb-6">
-        <CardContent className="flex flex-col gap-3 md:flex-row">
-          <div className="flex w-full flex-1 flex-col gap-3 md:flex-row">
-            <div className="flex w-full flex-col gap-3 sm:flex-row">
-              <div className="relative w-full">
-                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Cari event..."
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="pl-9"
-                />
-              </div>
+      <Card className="overflow-hidden border-0 pt-0 shadow-sm">
+        <div className="h-1 bg-gradient-to-r from-[#174c4e] to-[#fba635]" />
+        <CardContent className="p-4 py-2">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Cari nama event..."
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
+                className="h-10 border-gray-200 bg-gray-50 pl-9 transition-all focus:bg-white dark:border-gray-700 dark:bg-gray-800"
+              />
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
+
+            {/* Filter Selects */}
+            <div className="flex flex-wrap gap-2">
               <Select
                 value={filters.semester}
                 onValueChange={(value) => handleFilterChange('semester', value)}
               >
-                <SelectTrigger className="w-full min-w-[110px]">
+                <SelectTrigger className="h-10 w-full min-w-[120px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder="Semester" />
                 </SelectTrigger>
                 <SelectContent>
@@ -204,20 +222,19 @@ export default function AdminMarketplacePage() {
                   ))}
                 </SelectContent>
               </Select>
+
               <Select
                 value={filters.tahunAjaran}
                 onValueChange={(value) =>
                   handleFilterChange('tahunAjaran', value)
                 }
               >
-                <SelectTrigger className="w-full min-w-[140px]">
+                <SelectTrigger className="h-10 w-full min-w-[130px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder="Tahun Ajaran" />
                 </SelectTrigger>
                 <SelectContent>
                   {!tahunAjaranOptions.length && (
-                    <SelectItem disabled>
-                      Tidak ada tahun ajaran tersedia
-                    </SelectItem>
+                    <SelectItem disabled>Tidak ada tahun ajaran</SelectItem>
                   )}
                   {tahunAjaranOptions?.map((tahun) => (
                     <SelectItem key={tahun} value={tahun}>
@@ -231,107 +248,118 @@ export default function AdminMarketplacePage() {
                 value={filters.status}
                 onValueChange={(value) => handleFilterChange('status', value)}
               >
-                <SelectTrigger className="w-full min-w-[110px]">
+                <SelectTrigger className="h-10 w-full min-w-[110px] border-gray-200 bg-gray-50 sm:w-auto dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(EVENT_STATUS_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {EVENT_STATUS_LABELS[status]}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-          </div>
 
-          <div className="flex justify-end gap-2">
-            <Button onClick={handleReset} variant="outline">
-              Reset
-            </Button>
-            <Button
-              onClick={handleSearch}
-              className="min-w-[120px] bg-[#fba635] font-bold hover:bg-[#fdac58]"
-            >
-              Cari
-              <Search className="mr-2 h-4 w-4" />
-            </Button>
+              {/* Reset Button */}
+
+              <Button
+                onClick={handleReset}
+                variant="ghost"
+                size="sm"
+                className="h-10 text-gray-500 hover:text-gray-700"
+                disabled={!hasActiveFilters}
+              >
+                <X className="mr-1 h-4 w-4" />
+                Reset
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Events List */}
-      {events.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-6">
-            <EmptyState
-              icon={Calendar}
-              title="Belum Ada Event"
-              description="Belum ada event marketplace yang tersedia saat ini. Silakan buat event baru."
-            />
-            <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
-              <Link href="/admin/marketplace/create">
-                <Plus className="mr-2 h-5 w-5" />
-                Buat Event Pertama
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-              <Link key={event.id} href={`/admin/marketplace/${event.id}`}>
-                <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
-                  <CardHeader>
-                    <div className="mb-2 flex items-start justify-between">
-                      <Badge className={EVENT_STATUS_COLORS[event.status]}>
-                        {EVENT_STATUS_LABELS[event.status]}
-                      </Badge>
-                      {event.terkunci && (
-                        <Badge variant="outline" className="ml-2">
-                          🔒 Terkunci
-                        </Badge>
-                      )}
-                    </div>
-                    <CardTitle className="line-clamp-2">{event.nama}</CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {event.deskripsi}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <Calendar className="h-4 w-4" />
-                      {formatDate(event.tanggalPelaksanaan)}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <MapPin className="h-4 w-4" />
-                      {event.lokasi}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <Users className="h-4 w-4" />
-                      {event._count?.usaha || 0} / {event.kuotaPeserta} Peserta
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      {event.semester} {event.tahunAjaran}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+      <div className="relative">
+        {isLoading && !isInitialLoad && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60 backdrop-blur-[1px] dark:bg-gray-900/60">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#fba635] border-t-transparent"></div>
           </div>
-          {/* Add Pagination */}
-          <PaginationControls
-            currentPage={pagination.page}
-            totalPages={pagination.totalPages}
-            pageSize={pagination.limit}
-            totalItems={pagination.total}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            pageSizeOptions={[6, 12, 24, 48]}
-          />
-        </div>
-      )}
+        )}
+
+        {events.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-6">
+              <EmptyState
+                icon={Calendar}
+                title="Belum Ada Event"
+                description="Belum ada event marketplace yang tersedia saat ini. Silakan buat event baru."
+              />
+              <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
+                <Link href="/admin/marketplace/create">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Buat Event Pertama
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {events.map((event) => (
+                <Link key={event.id} href={`/admin/marketplace/${event.id}`}>
+                  <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
+                    <CardHeader>
+                      <div className="mb-2 flex items-start justify-between">
+                        <Badge className={EVENT_STATUS_COLORS[event.status]}>
+                          {EVENT_STATUS_LABELS[event.status]}
+                        </Badge>
+                        {event.terkunci && (
+                          <Badge variant="outline" className="ml-2">
+                            🔒 Terkunci
+                          </Badge>
+                        )}
+                      </div>
+                      <CardTitle className="line-clamp-2">
+                        {event.nama}
+                      </CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {event.deskripsi}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(event.tanggalPelaksanaan)}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <MapPin className="h-4 w-4" />
+                        {event.lokasi}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Users className="h-4 w-4" />
+                        {event._count?.usaha || 0} / {event.kuotaPeserta}{' '}
+                        Peserta
+                      </div>
+                      <div className="mt-2 text-xs text-gray-500">
+                        {event.semester} {event.tahunAjaran}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+            {/* Add Pagination */}
+            <PaginationControls
+              currentPage={pagination.page}
+              totalPages={pagination.totalPages}
+              pageSize={pagination.limit}
+              totalItems={pagination.total}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              pageSizeOptions={[6, 12, 24, 48]}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

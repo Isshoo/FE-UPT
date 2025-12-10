@@ -31,7 +31,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import PaginationControls from '@/components/ui/pagination-controls';
-import { Search, Plus, Edit2, Trash2, Key } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Key, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
@@ -39,9 +39,10 @@ import { TableSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import { Users } from 'lucide-react';
 
-export default function AdminUsersPage() {
+export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -52,6 +53,7 @@ export default function AdminUsersPage() {
     search: '',
     role: '',
   });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -78,11 +80,23 @@ export default function AdminUsersPage() {
   const [loadingFakultas, setLoadingFakultas] = useState(false);
   const [loadingProdi, setLoadingProdi] = useState(false);
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(filters.search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filters.search]);
+
+  // Auto-fetch when filters change
   useEffect(() => {
     fetchData();
-    fetchFakultas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, pagination.limit]);
+  }, [pagination.page, pagination.limit, debouncedSearch, filters.role]);
+
+  useEffect(() => {
+    fetchFakultas();
+  }, []);
 
   useEffect(() => {
     if (formData.fakultasId) {
@@ -121,7 +135,8 @@ export default function AdminUsersPage() {
       setLoading(true);
       const [usersResponse] = await Promise.all([
         usersAPI.getUsers({
-          ...filters,
+          search: debouncedSearch,
+          role: filters.role,
           page: pagination.page,
           limit: pagination.limit,
         }),
@@ -138,12 +153,8 @@ export default function AdminUsersPage() {
       console.error(error);
     } finally {
       setLoading(false);
+      setIsInitialLoad(false);
     }
-  };
-
-  const handleSearch = () => {
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    fetchData();
   };
 
   const handlePageChange = (newPage) => {
@@ -156,11 +167,15 @@ export default function AdminUsersPage() {
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    // Reset to page 1 when filter changes (except for search which is debounced)
+    if (key !== 'search') {
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }
   };
 
   const handleReset = () => {
     setFilters({ search: '', role: '' });
-    setTimeout(() => fetchData(), 100);
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const resetForm = () => {
@@ -303,8 +318,8 @@ export default function AdminUsersPage() {
     downloadBlob(response.data, filename);
   };
 
-  // Loading state
-  if (loading) {
+  // Initial loading state (only on first load)
+  if (isInitialLoad) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -343,52 +358,62 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Filters */}
-      <Card className="gap-2 py-6">
-        <CardContent>
-          <div className="flex flex-col items-center gap-3 md:flex-row">
-            <div className="flex w-full flex-col gap-3 sm:flex-row">
-              <div className="relative flex w-full">
-                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Cari nama atau email..."
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="pl-9"
-                />
-              </div>
+      <Card className="overflow-hidden border-0 pt-0 shadow-sm">
+        <div className="h-1 bg-gradient-to-r from-[#174c4e] to-[#fba635]" />
+        <CardContent className="p-4 py-2">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Cari nama atau email..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                className="h-10 border-gray-200 bg-gray-50 pl-9 transition-all focus:bg-white dark:border-gray-700 dark:bg-gray-800"
+              />
+            </div>
 
-              <Select
-                value={filters.role}
-                onValueChange={(value) => handleFilterChange('role', value)}
-              >
-                <SelectTrigger className="w-full min-w-[110px] sm:w-auto">
-                  <SelectValue placeholder="Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="DOSEN">Dosen</SelectItem>
-                  <SelectItem value="USER">Pengguna Biasa</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex w-full justify-end gap-3 md:w-auto">
-              <Button onClick={handleReset} variant="outline">
-                Reset
-              </Button>
-              <Button
-                onClick={handleSearch}
-                className="bg-[#fba635] hover:bg-[#fdac58]"
-              >
-                <Search className="mr-2 h-4 w-4" />
-                Cari
-              </Button>
-            </div>
+            {/* Role Filter */}
+            <Select
+              value={filters.role}
+              onValueChange={(value) => handleFilterChange('role', value)}
+            >
+              <SelectTrigger className="h-10 w-full min-w-[140px] border-gray-200 bg-gray-50 md:w-auto dark:border-gray-700 dark:bg-gray-800">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-gray-400" />
+                  <SelectValue placeholder="Semua Role" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="DOSEN">Dosen</SelectItem>
+                <SelectItem value="USER">Pengguna Biasa</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Reset Button */}
+            <Button
+              onClick={handleReset}
+              variant="ghost"
+              size="sm"
+              className="h-10 text-gray-500 hover:text-gray-700"
+              disabled={filters.search === '' && filters.role === ''}
+            >
+              <X className="mr-1 h-4 w-4" />
+              Reset
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Users Table */}
-      <Card className="gap-2">
+      <Card className="relative gap-2">
+        {/* Loading overlay for filter changes */}
+        {loading && !isInitialLoad && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[1px] dark:bg-gray-900/60">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#fba635] border-t-transparent"></div>
+          </div>
+        )}
         <CardHeader>
           <CardTitle>Daftar Pengguna ({pagination.total})</CardTitle>
         </CardHeader>

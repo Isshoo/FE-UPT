@@ -20,6 +20,7 @@ export const useMarketplaceStore = create((set, get) => ({
     status: '',
   },
   tahunAjaranOptions: [],
+  statusOptions: [],
 
   // Fetch events list
   fetchEvents: async (params = {}) => {
@@ -52,9 +53,15 @@ export const useMarketplaceStore = create((set, get) => ({
         return yearB - yearA;
       });
 
+      // Extract unique status from events
+      const uniqueStatus = [
+        ...new Set(publicEvents.map((event) => event.status).filter(Boolean)),
+      ];
+
       set({
         events: publicEvents,
         tahunAjaranOptions: uniqueTahunAjaran,
+        statusOptions: uniqueStatus,
         pagination: {
           ...pagination,
           page: params.page || pagination.page,
@@ -143,6 +150,6 @@ export const useMarketplaceStore = create((set, get) => ({
         status: '',
       },
       tahunAjaranOptions: [],
+      statusOptions: [],
     }),
 }));
-
