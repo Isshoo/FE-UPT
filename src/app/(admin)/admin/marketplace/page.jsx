@@ -29,7 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Download, FileSpreadsheet } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { Plus, Search, Calendar, MapPin, Users } from 'lucide-react';
 import PaginationControls from '@/components/ui/pagination-controls';
 
@@ -88,17 +88,22 @@ export default function AdminMarketplacePage() {
       },
       format
     );
-    const filename = `data-marketplace-${new Date().getTime()}.xlsx`;
+    const ext = format === 'pdf' ? 'pdf' : 'xlsx';
+    const filename = `data-marketplace-${new Date().getTime()}.${ext}`;
     downloadBlob(response.data, filename);
   };
 
-  const handleExportMarketplaceDetailed = async () => {
-    const response = await exportAPI.exportMarketplaceDetailed({
-      status: filters.status,
-      semester: filters.semester,
-      tahunAjaran: filters.tahunAjaran,
-    });
-    const filename = `data-marketplace-detail-${new Date().getTime()}.xlsx`;
+  const handleExportMarketplaceDetailed = async (format = 'excel') => {
+    const response = await exportAPI.exportMarketplaceDetailed(
+      {
+        status: filters.status,
+        semester: filters.semester,
+        tahunAjaran: filters.tahunAjaran,
+      },
+      format
+    );
+    const ext = format === 'pdf' ? 'pdf' : 'xlsx';
+    const filename = `data-marketplace-detail-${new Date().getTime()}.${ext}`;
     downloadBlob(response.data, filename);
   };
 
@@ -134,14 +139,28 @@ export default function AdminMarketplacePage() {
                 className="cursor-pointer"
               >
                 <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
-                Export Ringkasan
+                Export Ringkasan (Excel)
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => handleExportMarketplaceDetailed()}
+                onClick={() => handleExportMarketplace('pdf')}
+                className="cursor-pointer"
+              >
+                <FileText className="mr-2 h-4 w-4 text-red-600" />
+                Export Ringkasan (PDF)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleExportMarketplaceDetailed('excel')}
                 className="cursor-pointer"
               >
                 <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
-                Export Detail Lengkap
+                Export Detail (Excel)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleExportMarketplaceDetailed('pdf')}
+                className="cursor-pointer"
+              >
+                <FileText className="mr-2 h-4 w-4 text-red-600" />
+                Export Detail (PDF)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

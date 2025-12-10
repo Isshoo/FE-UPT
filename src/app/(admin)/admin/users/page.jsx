@@ -332,7 +332,7 @@ export default function AdminUsersPage() {
         <div className="flex items-center gap-2">
           <ExportButton
             onExport={handleExportUsers}
-            formats={['excel']}
+            formats={['excel', 'pdf']}
             label="Ekspor Data"
           />
           <Button onClick={handleCreate}>

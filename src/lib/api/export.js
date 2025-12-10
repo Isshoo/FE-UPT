@@ -45,9 +45,9 @@ export const exportAPI = {
     return response;
   },
   // Export marketplace detailed
-  exportMarketplaceDetailed: async (filters = {}) => {
+  exportMarketplaceDetailed: async (filters = {}, format = 'excel') => {
     const response = await apiClient.get('/export/marketplace/detailed', {
-      params: filters,
+      params: { ...filters, format },
       responseType: 'blob',
     });
     return response;

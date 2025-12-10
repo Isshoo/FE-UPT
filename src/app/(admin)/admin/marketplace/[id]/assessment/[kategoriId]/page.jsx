@@ -29,7 +29,8 @@ export default function AssessmentDetailPage() {
   const handleExportAssessment = async (format) => {
     try {
       const response = await exportAPI.exportAssessment(kategoriId, format);
-      const filename = `hasil-penilaian-${data?.kategori?.nama || 'assessment'}-${new Date().getTime()}.xlsx`;
+      const ext = format === 'pdf' ? 'pdf' : 'xlsx';
+      const filename = `hasil-penilaian-${data?.kategori?.nama || 'assessment'}-${new Date().getTime()}.${ext}`;
       downloadBlob(response.data, filename);
     } catch (err) {
       console.error('Export error:', err);
@@ -93,7 +94,7 @@ export default function AssessmentDetailPage() {
           <div className="flex items-center justify-between">
             <ExportButton
               onExport={handleExportAssessment}
-              formats={['excel']}
+              formats={['excel', 'pdf']}
               label="Export Hasil"
               size="sm"
             />
