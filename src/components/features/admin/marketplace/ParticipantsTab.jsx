@@ -57,7 +57,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [approving, setApproving] = useState(false);
 
-  const businesses = event.usaha || [];
+  const businesses = useMemo(() => event.usaha || [], [event.usaha]);
 
   // Stats
   const stats = useMemo(() => {

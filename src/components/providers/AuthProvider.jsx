@@ -47,7 +47,6 @@ export default function AuthProvider({ children }) {
       // Reset notifications jika tidak authenticated
       resetNotifications();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     // fetchUnreadCount and resetNotifications are stable from Zustand
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, isAuthenticated]);
