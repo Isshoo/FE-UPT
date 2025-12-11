@@ -86,7 +86,7 @@ export default function AboutPage() {
       <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-br from-[#174c4e] to-[#072526]">
         <div className="absolute inset-0">
           <Image
-            src="/images/hero.jpeg"
+            src="/images/beranda.jpg"
             alt="About Hero"
             fill
             className="object-cover opacity-20"

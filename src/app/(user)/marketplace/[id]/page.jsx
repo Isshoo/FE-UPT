@@ -196,7 +196,7 @@ export default function UserEventDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20 dark:bg-gray-950">
       {/* 1. HERO SECTION */}
-      <div className="relative h-[400px] w-full overflow-hidden bg-gray-900">
+      <div className="relative mt-16 h-[400px] w-full overflow-hidden bg-gray-900">
         {event.gambarCover ? (
           <Image
             src={event.gambarCover}
@@ -212,7 +212,7 @@ export default function UserEventDetailPage() {
         {/* Decorative Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent" />
 
-        <div className="relative container mx-auto flex h-full flex-col justify-end px-4 pt-0 pb-12">
+        <div className="relative container mx-auto flex h-full flex-col justify-center px-4 py-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

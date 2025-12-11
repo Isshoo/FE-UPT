@@ -86,7 +86,7 @@ export default function Footer() {
                   href={ROUTES.ABOUT}
                   className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
                 >
-                  About
+                  Tentang Kami
                 </Link>
               </li>
             </ul>
@@ -103,7 +103,7 @@ export default function Footer() {
                   href={ROUTES.LOGIN}
                   className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
                 >
-                  Login
+                  Masuk
                 </Link>
               </li>
               <li>
@@ -111,7 +111,7 @@ export default function Footer() {
                   href={ROUTES.REGISTER}
                   className="text-gray-600 transition-colors hover:text-[#fba635] dark:text-gray-400"
                 >
-                  Register
+                  Daftar
                 </Link>
               </li>
               <li>

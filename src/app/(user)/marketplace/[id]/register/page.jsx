@@ -95,7 +95,7 @@ export default function RegisterBusinessPage() {
   }
 
   return (
-    <div className="container mx-auto mt-20 max-w-4xl space-y-6 px-4 py-8">
+    <div className="container mx-auto mt-20 max-w-4xl space-y-6 px-4 py-8 pb-20">
       {/* Header */}
       <div>
         <Button

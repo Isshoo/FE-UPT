@@ -81,6 +81,12 @@ export default function HeroSection() {
     <section className="relative mt-3 min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-30 dark:opacity-20">
+        <Image
+          src="/images/beranda.jpg"
+          alt="Hero Background"
+          fill
+          className="object-cover"
+        />
         <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-[#fba635]/20 blur-3xl" />
         <div className="absolute right-10 bottom-20 h-72 w-72 rounded-full bg-[#174c4e]/20 blur-3xl" />
       </div>

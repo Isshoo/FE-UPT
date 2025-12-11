@@ -285,7 +285,7 @@ export default function Sidebar() {
                   isCollapsed ? 'hidden opacity-0' : 'opacity-100'
                 )}
               >
-                Collapse
+                Sembunyikan
               </span>
             </Button>
           </div>
@@ -348,7 +348,7 @@ export default function Sidebar() {
                       isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
                     )}
                   >
-                    Dark Mode
+                    Mode Gelap
                   </span>
                 </>
               ) : (
@@ -360,7 +360,7 @@ export default function Sidebar() {
                       isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
                     )}
                   >
-                    Light Mode
+                    Mode Terang
                   </span>
                 </>
               )}
@@ -384,7 +384,7 @@ export default function Sidebar() {
                   isCollapsed ? 'lg:hidden lg:opacity-0' : 'lg:opacity-100'
                 )}
               >
-                Logout
+                Keluar
               </span>
             </Button>
           </div>

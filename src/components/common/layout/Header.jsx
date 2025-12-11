@@ -46,7 +46,7 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b bg-slate-50 shadow-lg backdrop-blur-md transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/90">
+    <header className="fixed top-0 z-50 w-full bg-white/30 shadow-lg backdrop-blur-md transition-all duration-300 dark:bg-gray-900/90">
       <div className="container mx-auto flex h-18 items-center justify-between px-4">
         {/* Logo */}
         <Link href={ROUTES.HOME} className="flex items-center">
@@ -215,10 +215,10 @@ export default function Header() {
               <>
                 <div className="mt-2 flex flex-col gap-2 border-t pt-2 dark:border-gray-800">
                   <Button variant="ghost" asChild>
-                    <Link href={ROUTES.LOGIN}>Login</Link>
+                    <Link href={ROUTES.LOGIN}>Masuk</Link>
                   </Button>
                   <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
-                    <Link href={ROUTES.REGISTER}>Register</Link>
+                    <Link href={ROUTES.REGISTER}>Daftar</Link>
                   </Button>
                 </div>
               </>

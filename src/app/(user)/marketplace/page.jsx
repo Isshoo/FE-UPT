@@ -125,14 +125,20 @@ export default function UserMarketplacePage() {
   // }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20 dark:bg-gray-950">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Decorative Background */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-[20%] -right-[10%] h-[500px] w-[500px] rounded-full bg-[#fba635]/10 blur-3xl" />
-        <div className="absolute top-[20%] -left-[10%] h-[500px] w-[500px] rounded-full bg-[#174c4e]/5 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 h-full w-full opacity-30 dark:opacity-20">
+        <Image
+          src="/images/beranda.jpg"
+          alt="Hero Background"
+          fill
+          className="object-cover"
+        />
+        <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-[#fba635]/20 blur-3xl" />
+        <div className="absolute right-10 bottom-20 h-72 w-72 rounded-full bg-[#174c4e]/20 blur-3xl" />
       </div>
 
-      <div className="container mx-auto mt-20 px-4 py-8">
+      <div className="container mx-auto mt-0 px-4 pt-30 pb-20">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
