@@ -441,7 +441,10 @@ export default function UsersPage() {
                   <TableBody>
                     {users.map((user, index) => (
                       <TableRow key={user.id}>
-                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          {' '}
+                          {(pagination.page - 1) * pagination.limit + index + 1}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {user.nama}
                         </TableCell>
