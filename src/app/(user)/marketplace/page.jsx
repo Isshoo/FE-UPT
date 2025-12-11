@@ -37,14 +37,14 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { EventCardSkeleton } from '@/components/common/skeletons';
-import ErrorMessage from '@/components/ui/ErrorMessage';
+// import { EventCardSkeleton } from '@/components/common/skeletons';
+// import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function UserMarketplacePage() {
   // Store
   const events = useMarketplaceStore((state) => state.events);
   const isLoading = useMarketplaceStore((state) => state.isLoading);
-  const error = useMarketplaceStore((state) => state.error);
+  // const error = useMarketplaceStore((state) => state.error);
   const pagination = useMarketplaceStore((state) => state.pagination);
   const filters = useMarketplaceStore((state) => state.filters);
   const tahunAjaranOptions = useMarketplaceStore(
@@ -97,32 +97,32 @@ export default function UserMarketplacePage() {
     localSearch || filters.semester || filters.tahunAjaran || filters.status;
 
   // Loading State (First Load Only)
-  if (isInitialLoad && isLoading) {
-    return (
-      <div className="container mx-auto mt-20 px-4 py-8">
-        <div className="mb-8 space-y-4">
-          <div className="h-12 w-3/4 animate-pulse rounded-lg bg-gray-200 md:w-1/2 dark:bg-gray-800"></div>
-          <div className="h-6 w-full animate-pulse rounded bg-gray-200 md:w-2/3 dark:bg-gray-800"></div>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <EventCardSkeleton count={6} />
-        </div>
-      </div>
-    );
-  }
+  // if (isInitialLoad && isLoading) {
+  //   return (
+  //     <div className="container mx-auto mt-20 px-4 py-8">
+  //       <div className="mb-8 space-y-4">
+  //         <div className="h-12 w-3/4 animate-pulse rounded-lg bg-gray-200 md:w-1/2 dark:bg-gray-800"></div>
+  //         <div className="h-6 w-full animate-pulse rounded bg-gray-200 md:w-2/3 dark:bg-gray-800"></div>
+  //       </div>
+  //       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+  //         <EventCardSkeleton count={6} />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  // Error State
-  if (error) {
-    return (
-      <div className="container mx-auto mt-20 px-4 py-8">
-        <ErrorMessage
-          title="Gagal Memuat Event"
-          message={error}
-          onRetry={fetchEvents}
-        />
-      </div>
-    );
-  }
+  // // Error State
+  // if (error) {
+  //   return (
+  //     <div className="container mx-auto mt-20 px-4 py-8">
+  //       <ErrorMessage
+  //         title="Gagal Memuat Event"
+  //         message={error}
+  //         onRetry={fetchEvents}
+  //       />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20 dark:bg-gray-950">
@@ -137,6 +137,7 @@ export default function UserMarketplacePage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
           className="mb-8 text-center"
         >
           <Badge
@@ -162,6 +163,7 @@ export default function UserMarketplacePage() {
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
             className="rounded-2xl border border-white/20 bg-white/80 p-4 shadow-lg backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80"
           >
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
@@ -272,6 +274,7 @@ export default function UserMarketplacePage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
               className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-white/50 py-20 text-center dark:border-gray-700 dark:bg-gray-900/50"
             >
               <div className="mb-6 rounded-full bg-gray-100 p-6 dark:bg-gray-800">
@@ -301,7 +304,7 @@ export default function UserMarketplacePage() {
                     key={event.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    transition={{ duration: 0.8, delay: index * 0.05 }}
                   >
                     <Link href={`/marketplace/${event.id}`}>
                       <Card className="group relative h-full overflow-hidden rounded-3xl border-0 bg-white pt-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:bg-gray-900">
