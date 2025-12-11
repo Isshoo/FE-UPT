@@ -37,6 +37,7 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const response = await dashboardAPI.getFullDashboard();
+      console.log(response.data);
       setDashboardData(response.data);
     } catch (error) {
       toast.error('Gagal memuat data dashboard');
@@ -111,6 +112,13 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatsCard
+          title="Total Pengguna"
+          value={generalStats.totalUsers}
+          icon={Users}
+          color="blue"
+          compact
+        />
+        <StatsCard
           title="Total Peserta"
           value={generalStats.totalPeserta}
           icon={TrendingUp}
@@ -125,15 +133,8 @@ export default function AdminDashboard() {
           compact
         />
         <StatsCard
-          title="Total Pengguna"
-          value={generalStats.totalUsers}
-          icon={Users}
-          color="blue"
-          compact
-        />
-        <StatsCard
-          title="Tingkat Approval"
-          value={`${marketplaceAnalytics.approvalRate}%`}
+          title="Total Kategori Penilaian"
+          value={generalStats.totalKategori}
           icon={Store}
           color="orange"
           compact
