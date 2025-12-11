@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
+  // DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
@@ -164,7 +164,7 @@ export default function NotificationBell() {
         </div>
 
         {/* Footer - View All (Optional) */}
-        {notifications.length > 0 && (
+        {/* {notifications.length > 0 && (
           <>
             <DropdownMenuSeparator />
             <div className="p-2 text-center">
@@ -181,7 +181,7 @@ export default function NotificationBell() {
               </Button>
             </div>
           </>
-        )}
+        )} */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
