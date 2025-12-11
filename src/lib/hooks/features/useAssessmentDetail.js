@@ -41,15 +41,8 @@ export const useAssessmentDetail = (kategoriId) => {
     }
   }, [kategoriId]);
 
+  // Note: Confirmation should be handled by the consuming component before calling this
   const handleSetWinner = async (usahaId) => {
-    if (
-      !confirm(
-        'Apakah Anda yakin ingin menetapkan pemenang untuk kategori ini?'
-      )
-    ) {
-      return { success: false, cancelled: true };
-    }
-
     try {
       setSettingWinner(true);
       await assessmentAPI.setWinner(kategoriId, usahaId);

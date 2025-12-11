@@ -54,6 +54,7 @@ import {
   isValidDateTime,
   formatDateTime,
 } from '@/lib/utils/date';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function EventDetailPage() {
   const router = useRouter();
@@ -72,6 +73,10 @@ export default function EventDetailPage() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [updating, setUpdating] = useState(false);
+
+  // Unlock confirmation state
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -190,17 +195,21 @@ export default function EventDetailPage() {
     }
   };
 
-  const handleUnlockEvent = async () => {
-    if (!confirm('Apakah Anda yakin ingin membuka kunci event ini?')) {
-      return;
-    }
+  const handleUnlockClick = () => {
+    setShowUnlockDialog(true);
+  };
 
+  const handleUnlockConfirm = async () => {
     try {
+      setUnlocking(true);
       await marketplaceAPI.unlockEvent(eventId);
       toast.success('Event berhasil dibuka kembali');
+      setShowUnlockDialog(false);
       fetchEventDetail(eventId);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal membuka kunci event');
+    } finally {
+      setUnlocking(false);
     }
   };
 
@@ -344,7 +353,7 @@ export default function EventDetailPage() {
               ) : (
                 <Button
                   variant="secondary"
-                  onClick={handleUnlockEvent}
+                  onClick={handleUnlockClick}
                   className="bg-white/10 text-white hover:bg-white/20"
                 >
                   <Unlock className="mr-2 h-4 w-4" />
@@ -636,6 +645,19 @@ export default function EventDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Unlock Event Confirmation Dialog */}
+      <ConfirmDialog
+        open={showUnlockDialog}
+        onOpenChange={setShowUnlockDialog}
+        title="Buka Kunci Event"
+        description="Apakah Anda yakin ingin membuka kunci event ini? Event yang sudah dibuka kembali dapat diedit."
+        confirmText="Buka Kunci"
+        cancelText="Batal"
+        variant="warning"
+        onConfirm={handleUnlockConfirm}
+        loading={unlocking}
+      />
     </div>
   );
 }

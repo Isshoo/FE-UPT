@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ import {
 import { exportAPI, downloadBlob } from '@/lib/api';
 import ExportButton from '@/components/ui/ExportButton';
 import { useAssessmentDetail } from '@/lib/hooks/features/useAssessmentDetail';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function AssessmentDetailPage() {
   const router = useRouter();
@@ -35,6 +37,23 @@ export default function AssessmentDetailPage() {
 
   const { data, loading, error, settingWinner, refetch, handleSetWinner } =
     useAssessmentDetail(kategoriId);
+
+  // Set winner confirmation state
+  const [showWinnerConfirm, setShowWinnerConfirm] = useState(false);
+  const [selectedWinnerId, setSelectedWinnerId] = useState(null);
+
+  const handleSetWinnerClick = (usahaId) => {
+    setSelectedWinnerId(usahaId);
+    setShowWinnerConfirm(true);
+  };
+
+  const handleConfirmWinner = async () => {
+    if (selectedWinnerId) {
+      await handleSetWinner(selectedWinnerId);
+      setShowWinnerConfirm(false);
+      setSelectedWinnerId(null);
+    }
+  };
 
   const handleExportAssessment = async (format) => {
     try {
@@ -326,7 +345,7 @@ export default function AssessmentDetailPage() {
                               <Button
                                 size="sm"
                                 onClick={() =>
-                                  handleSetWinner(business.usahaId)
+                                  handleSetWinnerClick(business.usahaId)
                                 }
                                 disabled={settingWinner}
                                 className="h-7 bg-yellow-500 px-2 text-xs hover:bg-yellow-600"
@@ -372,6 +391,22 @@ export default function AssessmentDetailPage() {
         <span>|</span>
         <span>Total = Σ terbobot</span>
       </div>
+
+      {/* Set Winner Confirmation Dialog */}
+      <ConfirmDialog
+        open={showWinnerConfirm}
+        onOpenChange={(open) => {
+          setShowWinnerConfirm(open);
+          if (!open) setSelectedWinnerId(null);
+        }}
+        title="Tetapkan Pemenang"
+        description="Apakah Anda yakin ingin menetapkan pemenang untuk kategori ini? Tindakan ini tidak dapat dibatalkan."
+        confirmText="Tetapkan Pemenang"
+        cancelText="Batal"
+        variant="warning"
+        onConfirm={handleConfirmWinner}
+        loading={settingWinner}
+      />
     </div>
   );
 }

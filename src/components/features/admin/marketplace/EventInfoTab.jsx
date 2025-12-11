@@ -19,13 +19,22 @@ import {
 import { marketplaceAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import ImageUploadDialog from './ImageUploadDialog';
 
 export default function EventInfoTab({ event, onRefresh }) {
   const [uploadingLayout, setUploadingLayout] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [dragOver, setDragOver] = useState({ layout: false, cover: false });
 
-  const handleUploadLayout = async (e) => {
+  // Upload Preview State
+  const [uploadDialog, setUploadDialog] = useState({
+    open: false,
+    file: null,
+    previewUrl: null,
+    type: 'cover', // 'cover' or 'layout'
+  });
+
+  const handleFileSelect = (e, type) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -34,37 +43,17 @@ export default function EventInfoTab({ event, onRefresh }) {
       return;
     }
 
-    try {
-      setUploadingLayout(true);
-      await marketplaceAPI.uploadLayout(event.id, file);
-      toast.success('Layout berhasil diupload');
-      onRefresh();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Gagal upload layout');
-    } finally {
-      setUploadingLayout(false);
-    }
-  };
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setUploadDialog({
+      open: true,
+      file,
+      previewUrl,
+      type,
+    });
 
-  const handleUploadCover = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('File harus berupa gambar');
-      return;
-    }
-
-    try {
-      setUploadingCover(true);
-      await marketplaceAPI.uploadCover(event.id, file);
-      toast.success('Cover berhasil diupload');
-      onRefresh();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Gagal upload cover');
-    } finally {
-      setUploadingCover(false);
-    }
+    // Reset input value to allow selecting same file again
+    e.target.value = '';
   };
 
   const handleDragOver = (e, type) => {
@@ -77,7 +66,7 @@ export default function EventInfoTab({ event, onRefresh }) {
     setDragOver((prev) => ({ ...prev, [type]: false }));
   };
 
-  const handleDrop = async (e, type) => {
+  const handleDrop = (e, type) => {
     e.preventDefault();
     setDragOver((prev) => ({ ...prev, [type]: false }));
 
@@ -89,29 +78,53 @@ export default function EventInfoTab({ event, onRefresh }) {
       return;
     }
 
-    if (type === 'layout') {
-      try {
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setUploadDialog({
+      open: true,
+      file,
+      previewUrl,
+      type,
+    });
+  };
+
+  const handleConfirmUpload = async () => {
+    const { file, type } = uploadDialog;
+    if (!file) return;
+
+    try {
+      if (type === 'layout') {
         setUploadingLayout(true);
         await marketplaceAPI.uploadLayout(event.id, file);
         toast.success('Layout berhasil diupload');
-        onRefresh();
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Gagal upload layout');
-      } finally {
-        setUploadingLayout(false);
-      }
-    } else if (type === 'cover') {
-      try {
+      } else {
         setUploadingCover(true);
         await marketplaceAPI.uploadCover(event.id, file);
         toast.success('Cover berhasil diupload');
-        onRefresh();
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Gagal upload cover');
-      } finally {
-        setUploadingCover(false);
       }
+
+      handleCloseDialog();
+      onRefresh();
+    } catch (error) {
+      const msg = type === 'layout' ? 'layout' : 'cover';
+      toast.error(error.response?.data?.message || `Gagal upload ${msg}`);
+    } finally {
+      setUploadingLayout(false);
+      setUploadingCover(false);
     }
+  };
+
+  const handleCloseDialog = () => {
+    // Revoke object URL to avoid memory leaks
+    if (uploadDialog.previewUrl) {
+      URL.revokeObjectURL(uploadDialog.previewUrl);
+    }
+    setUploadDialog({
+      open: false,
+      file: null,
+      previewUrl: null,
+      type: 'cover',
+    });
   };
 
   // Info items configuration
@@ -272,7 +285,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                       id="updateCover"
                       type="file"
                       accept="image/*"
-                      onChange={handleUploadCover}
+                      onChange={(e) => handleFileSelect(e, 'cover')}
                       disabled={uploadingCover || event.terkunci}
                       className="hidden"
                     />
@@ -306,7 +319,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                         id="uploadCover"
                         type="file"
                         accept="image/*"
-                        onChange={handleUploadCover}
+                        onChange={(e) => handleFileSelect(e, 'cover')}
                         disabled={uploadingCover}
                         className="hidden"
                       />
@@ -355,7 +368,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                       id="updateLayout"
                       type="file"
                       accept="image/*"
-                      onChange={handleUploadLayout}
+                      onChange={(e) => handleFileSelect(e, 'layout')}
                       disabled={uploadingLayout || event.terkunci}
                       className="hidden"
                     />
@@ -389,7 +402,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                         id="uploadLayout"
                         type="file"
                         accept="image/*"
-                        onChange={handleUploadLayout}
+                        onChange={(e) => handleFileSelect(e, 'layout')}
                         disabled={uploadingLayout}
                         className="hidden"
                       />
@@ -406,6 +419,22 @@ export default function EventInfoTab({ event, onRefresh }) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Upload Preview Dialog */}
+      <ImageUploadDialog
+        open={uploadDialog.open}
+        onOpenChange={(open) => {
+          if (!open) handleCloseDialog();
+        }}
+        file={uploadDialog.file}
+        previewUrl={uploadDialog.previewUrl}
+        type={uploadDialog.type}
+        onConfirm={handleConfirmUpload}
+        onCancel={handleCloseDialog}
+        loading={
+          uploadDialog.type === 'layout' ? uploadingLayout : uploadingCover
+        }
+      />
     </div>
   );
 }

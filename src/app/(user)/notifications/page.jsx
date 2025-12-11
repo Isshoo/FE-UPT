@@ -10,6 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import PaginationControls from '@/components/ui/pagination-controls';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function NotificationsPage() {
   const router = useRouter();
@@ -26,6 +27,11 @@ export default function NotificationsPage() {
   const deleteNotification = useNotificationStore(
     (state) => state.deleteNotification
   );
+
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [notificationToDelete, setNotificationToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchNotifications({ page: 1, limit: 20 });
@@ -49,10 +55,25 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleDelete = async (notificationId) => {
-    const result = await deleteNotification(notificationId);
-    if (result.success) {
-      toast.success('Notifikasi dihapus');
+  const handleDeleteClick = (e, notification) => {
+    e.stopPropagation();
+    setNotificationToDelete(notification);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!notificationToDelete) return;
+
+    try {
+      setDeleting(true);
+      const result = await deleteNotification(notificationToDelete.id);
+      if (result.success) {
+        toast.success('Notifikasi dihapus');
+      }
+      setShowDeleteConfirm(false);
+      setNotificationToDelete(null);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -119,8 +140,7 @@ export default function NotificationsPage() {
                   variant="ghost"
                   size="icon"
                   onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(notification.id);
+                    handleDeleteClick(e, notification);
                   }}
                   className="hover:bg-red-50 hover:text-red-600"
                 >
@@ -141,6 +161,22 @@ export default function NotificationsPage() {
           />
         </div>
       )}
+
+      {/* Delete Notification Confirmation Dialog */}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={(open) => {
+          setShowDeleteConfirm(open);
+          if (!open) setNotificationToDelete(null);
+        }}
+        title="Hapus Notifikasi"
+        description={`Apakah Anda yakin ingin menghapus notifikasi "${notificationToDelete?.judul}"?`}
+        confirmText="Hapus"
+        cancelText="Batal"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        loading={deleting}
+      />
     </div>
   );
 }

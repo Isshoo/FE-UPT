@@ -21,6 +21,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Check,
   X,
   Edit2,
@@ -33,6 +41,7 @@ import {
   User,
   Store,
   Filter,
+  Info,
 } from 'lucide-react';
 import { BUSINESS_TYPE_LABELS } from '@/lib/constants/labels';
 import { marketplaceAPI } from '@/lib/api';
@@ -43,6 +52,10 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingBooth, setEditingBooth] = useState(null);
   const [boothNumber, setBoothNumber] = useState('');
+
+  // Detail Dialog State
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [approving, setApproving] = useState(false);
 
   const businesses = event.usaha || [];
 
@@ -93,11 +106,17 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
 
   const handleApproveBusiness = async (businessId) => {
     try {
+      setApproving(true);
       await marketplaceAPI.approveBusiness(businessId);
       toast.success('Peserta berhasil disetujui');
+      if (selectedBusiness?.id === businessId) {
+        setSelectedBusiness(null);
+      }
       onRefresh();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menyetujui peserta');
+    } finally {
+      setApproving(false);
     }
   };
 
@@ -272,7 +291,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-2xl">
+            <div className="max-w-full overflow-x-auto rounded-2xl">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50/80 dark:bg-gray-900/50">
@@ -419,6 +438,15 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                       {!isLocked && (
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedBusiness(business)}
+                              className="h-8 px-3 text-xs"
+                            >
+                              <Info className="mr-1 h-3 w-3" />
+                              Detail
+                            </Button>
                             {!business.disetujui && (
                               <Button
                                 size="sm"
@@ -453,6 +481,158 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
           )}
         </CardContent>
       </Card>
+
+      {/* Detail Dialog */}
+      <Dialog
+        open={!!selectedBusiness}
+        onOpenChange={() => setSelectedBusiness(null)}
+      >
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detail Peserta</DialogTitle>
+            <DialogDescription>
+              Informasi lengkap peserta event
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedBusiness && (
+            <div className="space-y-6">
+              {/* Product Info */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">Informasi Produk</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Nama Produk
+                    </p>
+                    <p className="font-semibold">
+                      {selectedBusiness.namaProduk}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Kategori</p>
+                    <p className="font-semibold">{selectedBusiness.kategori}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Tipe Usaha
+                    </p>
+                    <Badge variant="outline" className="mt-1">
+                      {BUSINESS_TYPE_LABELS[selectedBusiness.tipeUsaha]}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Deskripsi
+                  </p>
+                  <p className="text-sm">{selectedBusiness.deskripsi}</p>
+                </div>
+              </div>
+
+              {/* Team Members / Owner Info */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">
+                  {selectedBusiness.tipeUsaha === 'MAHASISWA'
+                    ? 'Anggota Kelompok'
+                    : 'Informasi Pemilik'}
+                </h3>
+
+                {selectedBusiness.tipeUsaha === 'MAHASISWA' ? (
+                  <div className="space-y-2">
+                    {selectedBusiness.anggota?.map((anggota, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between rounded border p-3"
+                      >
+                        <div>
+                          <p className="font-medium">{anggota.nama}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            NIM: {anggota.nim}
+                          </p>
+                        </div>
+                        {anggota.nim === selectedBusiness.ketuaId && (
+                          <Badge>Ketua</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded border p-3">
+                    <p className="font-medium">
+                      {selectedBusiness.namaPemilik}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Academic Info (Only for Mahasiswa) */}
+              {selectedBusiness.tipeUsaha === 'MAHASISWA' && (
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Informasi Akademik</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Fakultas
+                      </p>
+                      <p className="font-semibold">
+                        {selectedBusiness.fakultas?.nama ||
+                          selectedBusiness.fakultas}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Program Studi
+                      </p>
+                      <p className="font-semibold">
+                        {selectedBusiness.prodi?.nama || selectedBusiness.prodi}
+                      </p>
+                    </div>
+                    {selectedBusiness.mataKuliah && (
+                      <div className="col-span-2">
+                        <p className="text-gray-600 dark:text-gray-400">
+                          Mata Kuliah
+                        </p>
+                        <p className="font-semibold">
+                          {selectedBusiness.mataKuliah}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">Kontak</h3>
+                <div className="text-sm">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Nomor Telepon
+                  </p>
+                  <p className="font-semibold">{selectedBusiness.telepon}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedBusiness(null)}>
+              <X className="mr-2 h-4 w-4" />
+              Tutup
+            </Button>
+            {selectedBusiness && !selectedBusiness.disetujui && !isLocked && (
+              <Button
+                onClick={() => handleApproveBusiness(selectedBusiness.id)}
+                disabled={approving}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Check className="mr-2 h-4 w-4" />
+                {approving ? 'Memproses...' : 'Setujui Peserta'}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

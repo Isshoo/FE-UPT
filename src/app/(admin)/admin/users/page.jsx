@@ -38,6 +38,7 @@ import ExportButton from '@/components/ui/ExportButton';
 import { TableSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import { Users } from 'lucide-react';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -61,6 +62,11 @@ export default function UsersPage() {
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Delete confirmation state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -270,17 +276,25 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (user) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus user "${user.nama}"?`)) {
-      return;
-    }
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
 
     try {
-      await usersAPI.deleteUser(user.id);
+      setDeleting(true);
+      await usersAPI.deleteUser(userToDelete.id);
       toast.success('User berhasil dihapus');
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menghapus user');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -485,7 +499,7 @@ export default function UsersPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={() => handleDelete(user)}
+                                  onClick={() => handleDeleteClick(user)}
                                   className="text-red-600 hover:bg-red-50 hover:text-red-700"
                                 >
                                   <Trash2 className="h-3 w-3" />
@@ -822,6 +836,22 @@ export default function UsersPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete User Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) setUserToDelete(null);
+        }}
+        title="Hapus Pengguna"
+        description={`Apakah Anda yakin ingin menghapus pengguna "${userToDelete?.nama}"? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Hapus"
+        cancelText="Batal"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        loading={deleting}
+      />
     </div>
   );
 }

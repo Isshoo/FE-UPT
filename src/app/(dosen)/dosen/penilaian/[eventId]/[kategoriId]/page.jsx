@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/table';
 import { ChevronLeft, Award, Edit, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function PenilaianFormPage() {
   const router = useRouter();
@@ -44,6 +45,9 @@ export default function PenilaianFormPage() {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [modalScores, setModalScores] = useState({});
   const [submitting, setSubmitting] = useState(false);
+
+  // Save confirmation state
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -127,7 +131,7 @@ export default function PenilaianFormPage() {
     }
   };
 
-  const handleSubmitScores = async () => {
+  const handleSubmitClick = () => {
     // Validate all scores are filled
     const emptyScores = category.kriteria.filter(
       (k) => !modalScores[k.id] || modalScores[k.id] === ''
@@ -138,14 +142,10 @@ export default function PenilaianFormPage() {
       return;
     }
 
-    if (
-      !confirm(
-        `Apakah Anda yakin ingin menyimpan nilai untuk "${selectedBusiness.namaProduk}"?`
-      )
-    ) {
-      return;
-    }
+    setShowSaveConfirm(true);
+  };
 
+  const handleSubmitScores = async () => {
     try {
       setSubmitting(true);
 
@@ -162,6 +162,7 @@ export default function PenilaianFormPage() {
       await Promise.all(promises);
 
       toast.success('Nilai berhasil disimpan');
+      setShowSaveConfirm(false);
       handleCloseModal();
       fetchData(); // Refresh data
     } catch (error) {
@@ -446,7 +447,7 @@ export default function PenilaianFormPage() {
               Batal
             </Button>
             <Button
-              onClick={handleSubmitScores}
+              onClick={handleSubmitClick}
               disabled={submitting}
               className="bg-[#fba635] hover:bg-[#fdac58]"
             >
@@ -475,6 +476,19 @@ export default function PenilaianFormPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Save Scores Confirmation Dialog */}
+      <ConfirmDialog
+        open={showSaveConfirm}
+        onOpenChange={setShowSaveConfirm}
+        title="Simpan Nilai"
+        description={`Apakah Anda yakin ingin menyimpan nilai untuk "${selectedBusiness?.namaProduk}"?`}
+        confirmText="Simpan"
+        cancelText="Batal"
+        variant="info"
+        onConfirm={handleSubmitScores}
+        loading={submitting}
+      />
     </div>
   );
 }
