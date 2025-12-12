@@ -94,6 +94,21 @@ export const marketplaceAPI = {
     return response.data;
   },
 
+  rejectBusiness: async (businessId, alasan) => {
+    const response = await apiClient.post(
+      `/marketplace/businesses/${businessId}/reject`,
+      { alasan }
+    );
+    return response.data;
+  },
+
+  cancelRegistration: async (businessId) => {
+    const response = await apiClient.post(
+      `/marketplace/businesses/${businessId}/cancel`
+    );
+    return response.data;
+  },
+
   // Sponsors
   addSponsor: async (eventId, data) => {
     const response = await apiClient.post(

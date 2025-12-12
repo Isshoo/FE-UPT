@@ -42,7 +42,10 @@ import {
   Store,
   Filter,
   Info,
+  XCircle,
+  Ban,
 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { BUSINESS_TYPE_LABELS } from '@/lib/constants/labels';
 import { marketplaceAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -57,18 +60,27 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [approving, setApproving] = useState(false);
 
+  // Reject Dialog State
+  const [rejectingBusiness, setRejectingBusiness] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejecting, setRejecting] = useState(false);
+
   const businesses = useMemo(() => event.usaha || [], [event.usaha]);
 
   // Stats
   const stats = useMemo(() => {
-    const approved = businesses.filter((b) => b.disetujui);
-    const pending = businesses.filter((b) => !b.disetujui);
+    const approved = businesses.filter((b) => b.status === 'DISETUJUI');
+    const pending = businesses.filter((b) => b.status === 'PENDING');
+    const rejected = businesses.filter((b) => b.status === 'DITOLAK');
+    const cancelled = businesses.filter((b) => b.status === 'DIBATALKAN');
     const withBooth = businesses.filter((b) => b.nomorBooth);
 
     return {
       total: businesses.length,
       approved: approved.length,
       pending: pending.length,
+      rejected: rejected.length,
+      cancelled: cancelled.length,
       withBooth: withBooth.length,
     };
   }, [businesses]);
@@ -79,13 +91,17 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
 
     // Apply status filter
     if (filter === 'approved') {
-      result = result.filter((b) => b.disetujui);
+      result = result.filter((b) => b.status === 'DISETUJUI');
     } else if (filter === 'pending') {
-      result = result.filter((b) => !b.disetujui);
+      result = result.filter((b) => b.status === 'PENDING');
+    } else if (filter === 'rejected') {
+      result = result.filter((b) => b.status === 'DITOLAK');
+    } else if (filter === 'cancelled') {
+      result = result.filter((b) => b.status === 'DIBATALKAN');
     } else if (filter === 'withBooth') {
       result = result.filter((b) => b.nomorBooth);
     } else if (filter === 'noBooth') {
-      result = result.filter((b) => b.disetujui && !b.nomorBooth);
+      result = result.filter((b) => b.status === 'DISETUJUI' && !b.nomorBooth);
     }
 
     // Apply search
@@ -120,6 +136,25 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
     }
   };
 
+  const handleRejectBusiness = async () => {
+    if (!rejectingBusiness) return;
+    try {
+      setRejecting(true);
+      await marketplaceAPI.rejectBusiness(rejectingBusiness.id, rejectReason);
+      toast.success('Peserta berhasil ditolak');
+      setRejectingBusiness(null);
+      setRejectReason('');
+      if (selectedBusiness?.id === rejectingBusiness.id) {
+        setSelectedBusiness(null);
+      }
+      onRefresh();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal menolak peserta');
+    } finally {
+      setRejecting(false);
+    }
+  };
+
   const handleAssignBooth = async (businessId) => {
     if (!boothNumber.trim()) {
       toast.error('Nomor booth harus diisi');
@@ -149,6 +184,41 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
     setBoothNumber('');
   };
 
+  // Helper to render status badge
+  const renderStatusBadge = (status) => {
+    switch (status) {
+      case 'DISETUJUI':
+        return (
+          <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">
+            <CheckCircle className="mr-1 h-3 w-3" />
+            Disetujui
+          </Badge>
+        );
+      case 'DITOLAK':
+        return (
+          <Badge className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400">
+            <XCircle className="mr-1 h-3 w-3" />
+            Ditolak
+          </Badge>
+        );
+      case 'DIBATALKAN':
+        return (
+          <Badge className="bg-gray-100 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400">
+            <Ban className="mr-1 h-3 w-3" />
+            Dibatalkan
+          </Badge>
+        );
+      case 'PENDING':
+      default:
+        return (
+          <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400">
+            <Clock className="mr-1 h-3 w-3" />
+            Menunggu
+          </Badge>
+        );
+    }
+  };
+
   // Stats cards configuration
   const statsCards = [
     {
@@ -173,6 +243,13 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
       filterValue: 'pending',
     },
     {
+      label: 'Ditolak',
+      value: stats.rejected,
+      icon: XCircle,
+      color: 'text-red-600 bg-red-100 dark:bg-red-900/30',
+      filterValue: 'rejected',
+    },
+    {
       label: 'Ada Booth',
       value: stats.withBooth,
       icon: MapPin,
@@ -184,7 +261,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {statsCards.map((stat, index) => (
           <button
             key={index}
@@ -375,17 +452,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                         </div>
                       </TableCell>
                       <TableCell className="text-center">
-                        {business.disetujui ? (
-                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400">
-                            <CheckCircle className="mr-1 h-3 w-3" />
-                            Disetujui
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400">
-                            <Clock className="mr-1 h-3 w-3" />
-                            Menunggu
-                          </Badge>
-                        )}
+                        {renderStatusBadge(business.status)}
                       </TableCell>
                       <TableCell className="text-center">
                         {editingBooth === business.id ? (
@@ -447,29 +514,41 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                               <Info className="mr-1 h-3 w-3" />
                               Detail
                             </Button>
-                            {!business.disetujui && (
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleApproveBusiness(business.id)
-                                }
-                                className="h-8 bg-green-600 px-3 text-xs hover:bg-green-700"
-                              >
-                                <Check className="mr-1 h-3 w-3" />
-                                Setujui
-                              </Button>
-                            )}
-                            {business.disetujui && !business.nomorBooth && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => startEditBooth(business)}
-                                className="h-8 px-3 text-xs"
-                              >
-                                <MapPin className="mr-1 h-3 w-3" />
-                                Set Booth
-                              </Button>
-                            )}
+                            {/* {business.status === 'PENDING' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleApproveBusiness(business.id)
+                                  }
+                                  className="h-8 bg-green-600 px-3 text-xs hover:bg-green-700"
+                                >
+                                  <Check className="mr-1 h-3 w-3" />
+                                  Setujui
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => setRejectingBusiness(business)}
+                                  className="h-8 px-3 text-xs"
+                                >
+                                  <X className="mr-1 h-3 w-3" />
+                                  Tolak
+                                </Button>
+                              </>
+                            )} */}
+                            {business.status === 'DISETUJUI' &&
+                              !business.nomorBooth && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => startEditBooth(business)}
+                                  className="h-8 px-3 text-xs"
+                                >
+                                  <MapPin className="mr-1 h-3 w-3" />
+                                  Set Booth
+                                </Button>
+                              )}
                           </div>
                         </TableCell>
                       )}
@@ -620,16 +699,96 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
               <X className="mr-2 h-4 w-4" />
               Tutup
             </Button>
-            {selectedBusiness && !selectedBusiness.disetujui && !isLocked && (
-              <Button
-                onClick={() => handleApproveBusiness(selectedBusiness.id)}
-                disabled={approving}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Check className="mr-2 h-4 w-4" />
-                {approving ? 'Memproses...' : 'Setujui Peserta'}
-              </Button>
-            )}
+            {selectedBusiness &&
+              selectedBusiness.status === 'PENDING' &&
+              !isLocked && (
+                <>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setRejectingBusiness(selectedBusiness);
+                      setSelectedBusiness(null);
+                    }}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    Tolak
+                  </Button>
+                  <Button
+                    onClick={() => handleApproveBusiness(selectedBusiness.id)}
+                    disabled={approving}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    {approving ? 'Memproses...' : 'Setujui Peserta'}
+                  </Button>
+                </>
+              )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Dialog */}
+      <Dialog
+        open={!!rejectingBusiness}
+        onOpenChange={() => {
+          setRejectingBusiness(null);
+          setRejectReason('');
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tolak Pendaftaran</DialogTitle>
+            <DialogDescription>
+              Masukkan alasan penolakan untuk peserta ini. Alasan akan
+              dikirimkan ke peserta melalui notifikasi.
+            </DialogDescription>
+          </DialogHeader>
+
+          {rejectingBusiness && (
+            <div className="space-y-4">
+              <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Peserta
+                </p>
+                <p className="font-semibold">{rejectingBusiness.namaProduk}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {rejectingBusiness.tipeUsaha === 'MAHASISWA'
+                    ? rejectingBusiness.pemilik?.nama
+                    : rejectingBusiness.namaPemilik}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Alasan Penolakan (Opsional)
+                </label>
+                <Textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Masukkan alasan penolakan..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectingBusiness(null);
+                setRejectReason('');
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRejectBusiness}
+              disabled={rejecting}
+            >
+              {rejecting ? 'Memproses...' : 'Tolak Pendaftaran'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

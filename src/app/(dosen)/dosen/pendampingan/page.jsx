@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
 import { assessmentAPI } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -15,6 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -22,7 +22,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Users, Search, Eye, X } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Users,
+  Search,
+  X,
+  Check,
+  Info,
+  XCircle,
+  Ban,
+  Clock,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import PaginationControls from '@/components/ui/pagination-controls';
 import EmptyState from '@/components/ui/EmptyState';
@@ -37,13 +54,22 @@ export default function PendampinganPage() {
   const [filters, setFilters] = useState({
     search: '',
     eventId: 'ALL',
-    status: 'ALL', // ALL, MENUNGGU, DISETUJUI
+    status: 'ALL',
   });
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
   });
+
+  // Dialog states
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [approving, setApproving] = useState(false);
+
+  // Reject Dialog State
+  const [rejectingBusiness, setRejectingBusiness] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejecting, setRejecting] = useState(false);
 
   // Unique Events for Filter
   const eventOptions = useMemo(() => {
@@ -85,6 +111,81 @@ export default function PendampinganPage() {
     }
   };
 
+  // Handlers
+  const handleApprove = async (businessId) => {
+    try {
+      setApproving(true);
+      await assessmentAPI.approveMentoredBusiness(businessId);
+      toast.success('Usaha mahasiswa berhasil disetujui');
+      if (selectedBusiness?.id === businessId) {
+        setSelectedBusiness(null);
+      }
+      fetchMentoredBusinesses();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal menyetujui usaha');
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectingBusiness) return;
+
+    try {
+      setRejecting(true);
+      await assessmentAPI.rejectMentoredBusiness(
+        rejectingBusiness.id,
+        rejectReason
+      );
+      toast.success('Usaha mahasiswa berhasil ditolak');
+      setRejectingBusiness(null);
+      setRejectReason('');
+      if (selectedBusiness?.id === rejectingBusiness.id) {
+        setSelectedBusiness(null);
+      }
+      fetchMentoredBusinesses();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal menolak usaha');
+    } finally {
+      setRejecting(false);
+    }
+  };
+
+  // Helper to render status badge
+  const renderStatusBadge = (status) => {
+    switch (status) {
+      case 'DISETUJUI':
+        return (
+          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            <Check className="mr-1 h-3 w-3" />
+            Disetujui
+          </Badge>
+        );
+      case 'DITOLAK':
+        return (
+          <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+            <XCircle className="mr-1 h-3 w-3" />
+            Ditolak
+          </Badge>
+        );
+      case 'DIBATALKAN':
+        return (
+          <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+            <Ban className="mr-1 h-3 w-3" />
+            Dibatalkan
+          </Badge>
+        );
+      case 'PENDING':
+      default:
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+            <Clock className="mr-1 h-3 w-3" />
+            Menunggu
+          </Badge>
+        );
+    }
+  };
+
   // Filter and Paginate Data
   const filteredData = useMemo(() => {
     return businesses.filter((item) => {
@@ -96,8 +197,7 @@ export default function PendampinganPage() {
         filters.eventId === 'ALL' || item.event.id === filters.eventId;
 
       const matchesStatus =
-        filters.status === 'ALL' ||
-        (filters.status === 'DISETUJUI' ? item.disetujui : !item.disetujui);
+        filters.status === 'ALL' || item.status === filters.status;
 
       return matchesSearch && matchesEvent && matchesStatus;
     });
@@ -188,8 +288,9 @@ export default function PendampinganPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ALL">Semua Status</SelectItem>
-                  <SelectItem value="MENUNGGU">Menunggu</SelectItem>
+                  <SelectItem value="PENDING">Menunggu</SelectItem>
                   <SelectItem value="DISETUJUI">Disetujui</SelectItem>
+                  <SelectItem value="DITOLAK">Ditolak</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -257,7 +358,7 @@ export default function PendampinganPage() {
                         <TableCell className="font-medium">
                           {business.namaProduk}
                           <div className="text-xs text-gray-500">
-                            {business.kategoriProduk}
+                            {business.kategori}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -276,37 +377,46 @@ export default function PendampinganPage() {
                               {business.pemilik.nama}
                             </span>
                             <span className="text-xs text-gray-500">
-                              {business.pemilik.prodi?.nama || '-'}
+                              {business.prodi?.nama || '-'}
                             </span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            variant={business.disetujui ? 'success' : 'warning'}
-                            className={
-                              business.disetujui
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-                            }
-                          >
-                            {business.disetujui ? 'Disetujui' : 'Menunggu'}
-                          </Badge>
+                          {renderStatusBadge(business.status)}
                         </TableCell>
                         <TableCell>
-                          <div className="flex justify-center">
+                          <div className="flex justify-center gap-2">
                             <Button
-                              asChild
                               size="sm"
-                              variant="ghost"
-                              className="h-8 w-8 p-0"
+                              variant="outline"
+                              onClick={() => setSelectedBusiness(business)}
+                              className="h-8 px-3 text-xs"
                             >
-                              <Link
-                                href={`/dosen/pendampingan/${business.event.id}`}
-                              >
-                                <Eye className="h-4 w-4 text-gray-500" />
-                                <span className="sr-only">Lihat Detail</span>
-                              </Link>
+                              <Info className="mr-1 h-3 w-3" />
+                              Detail
                             </Button>
+                            {/* {business.status === 'PENDING' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleApprove(business.id)}
+                                  disabled={approving}
+                                  className="h-8 bg-green-600 px-3 text-xs hover:bg-green-700"
+                                >
+                                  <Check className="mr-1 h-3 w-3" />
+                                  Setujui
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => setRejectingBusiness(business)}
+                                  className="h-8 px-3 text-xs"
+                                >
+                                  <X className="mr-1 h-3 w-3" />
+                                  Tolak
+                                </Button>
+                              </>
+                            )} */}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -333,6 +443,248 @@ export default function PendampinganPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Detail Dialog */}
+      <Dialog
+        open={!!selectedBusiness}
+        onOpenChange={() => setSelectedBusiness(null)}
+      >
+        <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detail Usaha Mahasiswa</DialogTitle>
+            <DialogDescription>
+              Informasi lengkap usaha yang didampingi
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedBusiness && (
+            <div className="space-y-6">
+              {/* Product Info */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">Informasi Produk</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Nama Produk
+                    </p>
+                    <p className="font-semibold">
+                      {selectedBusiness.namaProduk}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Kategori</p>
+                    <p className="font-semibold">{selectedBusiness.kategori}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Deskripsi
+                    </p>
+                    <p className="font-semibold">
+                      {selectedBusiness.deskripsi}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Status</p>
+                    {renderStatusBadge(selectedBusiness.status)}
+                  </div>
+                  {selectedBusiness.status === 'DITOLAK' &&
+                    selectedBusiness.alasanPenolakan && (
+                      <div className="col-span-2">
+                        <p className="text-gray-600 dark:text-gray-400">
+                          Alasan Penolakan
+                        </p>
+                        <p className="font-semibold text-red-600">
+                          {selectedBusiness.alasanPenolakan}
+                        </p>
+                      </div>
+                    )}
+                </div>
+              </div>
+
+              {/* Event Info */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">Informasi Event</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Nama Event
+                    </p>
+                    <p className="font-semibold">
+                      {selectedBusiness.event.nama}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Tahun Ajaran
+                    </p>
+                    <p className="font-semibold">
+                      {selectedBusiness.event.tahunAjaran}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Team Members */}
+              {selectedBusiness.anggota?.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Anggota Tim</h3>
+                  <div className="space-y-1">
+                    {selectedBusiness.anggota.map((anggota, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <span className="font-medium">{anggota.nama}</span>
+                        <span className="text-gray-500">({anggota.nim})</span>
+                        {anggota.nim === selectedBusiness.ketuaId && (
+                          <Badge variant="outline" className="text-xs">
+                            Ketua
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Academic Info */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">Informasi Akademik</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">Fakultas</p>
+                    <p className="font-semibold">
+                      {selectedBusiness.fakultas?.nama || '-'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Program Studi
+                    </p>
+                    <p className="font-semibold">
+                      {selectedBusiness.prodi?.nama || '-'}
+                    </p>
+                  </div>
+                  {selectedBusiness.mataKuliah && (
+                    <div className="col-span-2">
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Mata Kuliah
+                      </p>
+                      <p className="font-semibold">
+                        {selectedBusiness.mataKuliah}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact */}
+              <div className="space-y-2">
+                <h3 className="font-semibold">Kontak</h3>
+                <div className="text-sm">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Nomor Telepon
+                  </p>
+                  <p className="font-semibold">{selectedBusiness.telepon}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedBusiness(null)}>
+              <X className="mr-2 h-4 w-4" />
+              Tutup
+            </Button>
+            {selectedBusiness && selectedBusiness.status === 'PENDING' && (
+              <>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setRejectingBusiness(selectedBusiness);
+                    setSelectedBusiness(null);
+                  }}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Tolak
+                </Button>
+                <Button
+                  onClick={() => handleApprove(selectedBusiness.id)}
+                  disabled={approving}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  {approving ? 'Memproses...' : 'Setujui Usaha'}
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Dialog */}
+      <Dialog
+        open={!!rejectingBusiness}
+        onOpenChange={() => {
+          setRejectingBusiness(null);
+          setRejectReason('');
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tolak Pendaftaran Mahasiswa</DialogTitle>
+            <DialogDescription>
+              Masukkan alasan penolakan. Alasan akan dikirimkan ke mahasiswa
+              melalui notifikasi.
+            </DialogDescription>
+          </DialogHeader>
+
+          {rejectingBusiness && (
+            <div className="space-y-4">
+              <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Usaha
+                </p>
+                <p className="font-semibold">{rejectingBusiness.namaProduk}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {rejectingBusiness.pemilik?.nama || 'Pemilik tidak diketahui'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Alasan Penolakan (Opsional)
+                </label>
+                <Textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Masukkan alasan penolakan..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectingBusiness(null);
+                setRejectReason('');
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleReject}
+              disabled={rejecting}
+            >
+              {rejecting ? 'Memproses...' : 'Tolak Pendaftaran'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

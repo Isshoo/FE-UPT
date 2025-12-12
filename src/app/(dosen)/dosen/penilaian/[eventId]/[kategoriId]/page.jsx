@@ -210,7 +210,7 @@ export default function PenilaianFormPage() {
       <div>
         <Button
           variant="ghost"
-          onClick={() => router.push(`/dosen/penilaian/${eventId}`)}
+          onClick={() => router.push(`/dosen/penilaian`)}
           className="mb-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
@@ -248,26 +248,28 @@ export default function PenilaianFormPage() {
         </Card>
       )}
 
-      {/* Kriteria Info */}
+      {/* Kriteria Info - Compact */}
       <Card>
-        <CardHeader>
-          <CardTitle>Kriteria Penilaian</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <CardContent className="py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              Kriteria:
+            </span>
             {category.kriteria.map((kriteria, index) => (
-              <div
+              <Badge
                 key={kriteria.id}
-                className="rounded-lg border p-4 text-center"
+                variant="outline"
+                className="px-3 py-1 text-sm"
               >
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  (K{index + 1})
-                </p>
-                <p className="font-semibold">{kriteria.nama}</p>
-                <p className="mt-2 text-2xl font-bold text-[#fba635]">
-                  {kriteria.bobot}%
-                </p>
-              </div>
+                <span className="font-semibold text-[#fba635]">
+                  K{index + 1}
+                </span>
+                <span className="mx-1">-</span>
+                <span>{kriteria.nama}</span>
+                <span className="ml-2 text-xs text-gray-500">
+                  ({kriteria.bobot}%)
+                </span>
+              </Badge>
             ))}
           </div>
         </CardContent>
@@ -367,7 +369,13 @@ export default function PenilaianFormPage() {
                         })}
                         {/* NILAI rata-rata */}
                         <TableCell className="text-center font-bold text-[#fba635]">
-                          {category.kriteria.length > 0
+                          {category.kriteria.length > 0 &&
+                          (
+                            Object.values(
+                              existingScores[business.id] || {}
+                            ).reduce((a, b) => a + b, 0) /
+                            category.kriteria.length
+                          ).toFixed(2) > 0
                             ? (
                                 Object.values(
                                   existingScores[business.id] || {}
@@ -425,9 +433,9 @@ export default function PenilaianFormPage() {
                 <Input
                   id={kriteria.id}
                   type="number"
-                  min="0"
+                  min="1"
                   max="100"
-                  placeholder="Masukkan nilai 0-100"
+                  placeholder="Masukkan nilai 1-100"
                   value={modalScores[kriteria.id] || ''}
                   onChange={(e) =>
                     handleModalScoreChange(kriteria.id, e.target.value)

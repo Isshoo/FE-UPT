@@ -19,6 +19,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -44,7 +45,17 @@ import {
   XCircle,
   Share2,
   Image as ImageIcon,
+  Ban,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { marketplaceAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -63,6 +74,8 @@ export default function UserEventDetailPage() {
   );
 
   const [userRegistration, setUserRegistration] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   // Check Registration Callback
   const checkUserRegistration = useCallback(
@@ -110,8 +123,25 @@ export default function UserEventDetailPage() {
     navigator.clipboard.writeText(window.location.href);
     toast.success('Link event disalin ke clipboard');
   };
+  // Cancel Registration Handler
+  const handleCancelRegistration = async () => {
+    if (!userRegistration) return;
 
-  // Status Badge Logic for User Registration
+    try {
+      setCancelling(true);
+      await marketplaceAPI.cancelRegistration(userRegistration.id);
+      toast.success('Pendaftaran berhasil dibatalkan');
+      setShowCancelDialog(false);
+      setUserRegistration(null);
+      fetchEventDetail(eventId);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || 'Gagal membatalkan pendaftaran'
+      );
+    } finally {
+      setCancelling(false);
+    }
+  };
   const getRegistrationStatusBadge = () => {
     if (!userRegistration) return null;
 
@@ -122,31 +152,35 @@ export default function UserEventDetailPage() {
           'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
         label: 'Menunggu Persetujuan',
       },
-      APPROVED: {
+      DISETUJUI: {
         icon: CheckCircle,
         color:
           'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
         label: 'Disetujui',
       },
-      REJECTED: {
+      DITOLAK: {
         icon: XCircle,
         color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
         label: 'Ditolak',
       },
+      DIBATALKAN: {
+        icon: Ban,
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+        label: 'Dibatalkan',
+      },
     };
 
-    const status =
-      userRegistration.disetujui === false ? 'PENDING' : 'APPROVED'; // Simplification based on current data model
-    // Note: If you have a real 'REJECTED' status in DB, use that instead.
-
-    const config = statusConfig[status];
+    const status = userRegistration.status || 'PENDING';
+    const config = statusConfig[status] || statusConfig.PENDING;
     const Icon = config.icon;
 
     return (
-      <Badge className={`${config.color} px-3 py-1`}>
-        <Icon className="mr-2 h-3 w-3" />
-        {config.label}
-      </Badge>
+      <div className="space-y-2">
+        <Badge className={`${config.color} px-3 py-1`}>
+          <Icon className="mr-2 h-3 w-3" />
+          {config.label}
+        </Badge>
+      </div>
     );
   };
 
@@ -585,6 +619,24 @@ export default function UserEventDetailPage() {
                     </div>
                   </div>
                 </CardContent>
+                <CardFooter>
+                  {userRegistration.status === 'PENDING' && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setShowCancelDialog(true)}
+                      className="mt-2 w-full"
+                    >
+                      Batalkan Pendaftaran
+                    </Button>
+                  )}
+                  {userRegistration.status === 'DITOLAK' &&
+                    userRegistration.alasanPenolakan && (
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        Alasan Penolakan: {userRegistration.alasanPenolakan}
+                      </p>
+                    )}
+                </CardFooter>
               </Card>
             ) : (
               <Card className="overflow-hidden rounded-3xl border-2 border-[#fba635] bg-white shadow-xl dark:bg-gray-900">
@@ -666,6 +718,42 @@ export default function UserEventDetailPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Cancel Registration Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Batalkan Pendaftaran</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin membatalkan pendaftaran usaha Anda di
+              event ini? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+
+          {userRegistration && (
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Usaha</p>
+              <p className="font-semibold">{userRegistration.namaProduk}</p>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelDialog(false)}
+            >
+              Kembali
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelRegistration}
+              disabled={cancelling}
+            >
+              {cancelling ? 'Membatalkan...' : 'Ya, Batalkan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -80,4 +80,12 @@ export const assessmentAPI = {
     );
     return response.data;
   },
+
+  rejectMentoredBusiness: async (businessId, alasan) => {
+    const response = await apiClient.post(
+      `/assessment/dosen/businesses/${businessId}/reject`,
+      { alasan }
+    );
+    return response.data;
+  },
 };

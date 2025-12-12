@@ -40,6 +40,7 @@ export default function DosenDashboard() {
       ]);
       setMentoredBusinesses(businessesRes.data || []);
       setAssessmentCategories(categoriesRes.data || []);
+      console.log(categoriesRes.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
       toast.error('Gagal memuat data dashboard');
@@ -49,8 +50,12 @@ export default function DosenDashboard() {
   };
 
   // Calculate statistics
-  const pendingApprovals = mentoredBusinesses.filter((b) => !b.disetujui);
-  const approvedBusinesses = mentoredBusinesses.filter((b) => b.disetujui);
+  const pendingApprovals = mentoredBusinesses.filter(
+    (b) => b.status === 'PENDING'
+  );
+  const approvedBusinesses = mentoredBusinesses.filter(
+    (b) => b.status === 'DISETUJUI'
+  );
 
   // Get unique events from mentored businesses
   const uniqueEvents = [
@@ -303,7 +308,9 @@ export default function DosenDashboard() {
                           </div>
                         </div>
                         <Button asChild size="sm">
-                          <Link href={`/dosen/penilaian/${event.id}`}>
+                          <Link
+                            href={`/dosen/penilaian/${event.id}/${categoriesForEvent[0].id}`}
+                          >
                             Nilai
                           </Link>
                         </Button>
@@ -333,7 +340,7 @@ export default function DosenDashboard() {
                   (b) => b.event.id === event.id
                 ).length;
                 const pendingCount = mentoredBusinesses.filter(
-                  (b) => b.event.id === event.id && !b.disetujui
+                  (b) => b.event.id === event.id && b.status === 'PENDING'
                 ).length;
                 return (
                   <Link

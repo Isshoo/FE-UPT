@@ -23,7 +23,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ChevronLeft, Check, Info, X } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ChevronLeft, Check, Info, X, XCircle, Ban, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function PendampinganDetailPage() {
@@ -36,6 +37,11 @@ export default function PendampinganDetailPage() {
   const [loading, setLoading] = useState(true);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [approving, setApproving] = useState(false);
+
+  // Reject state
+  const [rejectingBusiness, setRejectingBusiness] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejecting, setRejecting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -76,6 +82,64 @@ export default function PendampinganDetailPage() {
       toast.error(error.response?.data?.message || 'Gagal menyetujui usaha');
     } finally {
       setApproving(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectingBusiness) return;
+
+    try {
+      setRejecting(true);
+      await assessmentAPI.rejectMentoredBusiness(
+        rejectingBusiness.id,
+        rejectReason
+      );
+      toast.success('Usaha mahasiswa berhasil ditolak');
+      setRejectingBusiness(null);
+      setRejectReason('');
+      if (selectedBusiness?.id === rejectingBusiness.id) {
+        setSelectedBusiness(null);
+      }
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal menolak usaha');
+    } finally {
+      setRejecting(false);
+    }
+  };
+
+  // Helper to render status badge
+  const renderStatusBadge = (status) => {
+    switch (status) {
+      case 'DISETUJUI':
+        return (
+          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            <Check className="mr-1 h-3 w-3" />
+            Disetujui
+          </Badge>
+        );
+      case 'DITOLAK':
+        return (
+          <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+            <XCircle className="mr-1 h-3 w-3" />
+            Ditolak
+          </Badge>
+        );
+      case 'DIBATALKAN':
+        return (
+          <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+            <Ban className="mr-1 h-3 w-3" />
+            Dibatalkan
+          </Badge>
+        );
+      case 'PENDING':
+      default:
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+            <Clock className="mr-1 h-3 w-3" />
+            Menunggu
+          </Badge>
+        );
     }
   };
 
@@ -143,7 +207,7 @@ export default function PendampinganDetailPage() {
                 Menunggu Persetujuan
               </p>
               <p className="font-semibold text-yellow-600">
-                {businesses.filter((b) => !b.disetujui).length}
+                {businesses.filter((b) => b.status === 'PENDING').length}
               </p>
             </div>
           </div>
@@ -195,16 +259,7 @@ export default function PendampinganDetailPage() {
                         {business.prodi?.nama || business.prodi}
                       </TableCell>
                       <TableCell>
-                        {business.disetujui ? (
-                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                            <Check className="mr-1 h-3 w-3" />
-                            Disetujui
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                            Menunggu
-                          </Badge>
-                        )}
+                        {renderStatusBadge(business.status)}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -216,17 +271,27 @@ export default function PendampinganDetailPage() {
                             <Info className="mr-1 h-3 w-3" />
                             Detail
                           </Button>
-                          {!business.disetujui && (
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                setSelectedBusiness(business);
-                              }}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              <Check className="mr-1 h-3 w-3" />
-                              Setujui
-                            </Button>
+                          {business.status === 'PENDING' && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedBusiness(business);
+                                }}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                <Check className="mr-1 h-3 w-3" />
+                                Setujui
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => setRejectingBusiness(business)}
+                              >
+                                <X className="mr-1 h-3 w-3" />
+                                Tolak
+                              </Button>
+                            </>
                           )}
                         </div>
                       </TableCell>
@@ -352,16 +417,94 @@ export default function PendampinganDetailPage() {
               <X className="mr-2 h-4 w-4" />
               Tutup
             </Button>
-            {selectedBusiness && !selectedBusiness.disetujui && (
-              <Button
-                onClick={handleApprove}
-                disabled={approving}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Check className="mr-2 h-4 w-4" />
-                {approving ? 'Memproses...' : 'Setujui Usaha'}
-              </Button>
+            {selectedBusiness && selectedBusiness.status === 'PENDING' && (
+              <>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setRejectingBusiness(selectedBusiness);
+                    setSelectedBusiness(null);
+                  }}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Tolak
+                </Button>
+                <Button
+                  onClick={handleApprove}
+                  disabled={approving}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  {approving ? 'Memproses...' : 'Setujui Usaha'}
+                </Button>
+              </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Dialog */}
+      <Dialog
+        open={!!rejectingBusiness}
+        onOpenChange={() => {
+          setRejectingBusiness(null);
+          setRejectReason('');
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tolak Pendaftaran Mahasiswa</DialogTitle>
+            <DialogDescription>
+              Masukkan alasan penolakan. Alasan akan dikirimkan ke mahasiswa
+              melalui notifikasi.
+            </DialogDescription>
+          </DialogHeader>
+
+          {rejectingBusiness && (
+            <div className="space-y-4">
+              <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Usaha
+                </p>
+                <p className="font-semibold">{rejectingBusiness.namaProduk}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {rejectingBusiness.anggota?.find(
+                    (a) => a.nim === rejectingBusiness.ketuaId
+                  )?.nama || 'Ketua tidak diketahui'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Alasan Penolakan (Opsional)
+                </label>
+                <Textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Masukkan alasan penolakan..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectingBusiness(null);
+                setRejectReason('');
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleReject}
+              disabled={rejecting}
+            >
+              {rejecting ? 'Memproses...' : 'Tolak Pendaftaran'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

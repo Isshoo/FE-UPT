@@ -243,7 +243,7 @@ export default function PenilaianPage() {
                       <TableHead>Nama Event</TableHead>
                       <TableHead>Tanggal Pelaksanaan</TableHead>
                       <TableHead>Status Event</TableHead>
-                      <TableHead className="text-center">Aksi</TableHead>
+                      <TableHead className="text-center">Detail</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -284,7 +284,7 @@ export default function PenilaianPage() {
                               className="h-8 w-8 p-0"
                             >
                               <Link
-                                href={`/dosen/penilaian/${category.event.id}`}
+                                href={`/dosen/penilaian/${category.event.id}/${category.id}`}
                               >
                                 <Eye className="h-4 w-4 text-gray-500" />
                                 <span className="sr-only">Lihat Detail</span>
