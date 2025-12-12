@@ -11,26 +11,26 @@ import {
   Trophy,
   ChevronRight,
   Star,
-  Target,
+  // Target,
   Medal,
 } from 'lucide-react';
 
 export default function AssessmentTab({ event }) {
   const categories = event.kategoriPenilaian || [];
-  const totalPenilai = categories.reduce(
-    (acc, cat) => acc + (cat.penilai?.length || 0),
-    0
-  );
-  const totalKriteria = categories.reduce(
-    (acc, cat) => acc + (cat.kriteria?.length || 0),
-    0
-  );
-  const categoriesWithWinner = categories.filter((cat) => cat.pemenang).length;
+  // const totalPenilai = categories.reduce(
+  //   (acc, cat) => acc + (cat.penilai?.length || 0),
+  //   0
+  // );
+  // const totalKriteria = categories.reduce(
+  //   (acc, cat) => acc + (cat.kriteria?.length || 0),
+  //   0
+  // );
+  // const categoriesWithWinner = categories.filter((cat) => cat.pemenang).length;
 
   return (
     <div className="space-y-6">
       {/* Overview Stats */}
-      {categories.length > 0 && (
+      {/* {categories.length > 0 && (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="mb-2 flex items-center justify-between">
@@ -88,7 +88,7 @@ export default function AssessmentTab({ event }) {
             </span>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Categories List */}
       {categories.length === 0 ? (

@@ -271,7 +271,7 @@ export default function PendampinganDetailPage() {
                             <Info className="mr-1 h-3 w-3" />
                             Detail
                           </Button>
-                          {business.status === 'PENDING' && (
+                          {/* {business.status === 'PENDING' && (
                             <>
                               <Button
                                 size="sm"
@@ -292,7 +292,7 @@ export default function PendampinganDetailPage() {
                                 Tolak
                               </Button>
                             </>
-                          )}
+                          )} */}
                         </div>
                       </TableCell>
                     </TableRow>

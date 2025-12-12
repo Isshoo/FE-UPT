@@ -220,48 +220,48 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
   };
 
   // Stats cards configuration
-  const statsCards = [
-    {
-      label: 'Total Peserta',
-      value: stats.total,
-      icon: Users,
-      color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30',
-      filterValue: 'all',
-    },
-    {
-      label: 'Disetujui',
-      value: stats.approved,
-      icon: CheckCircle,
-      color: 'text-green-600 bg-green-100 dark:bg-green-900/30',
-      filterValue: 'approved',
-    },
-    {
-      label: 'Menunggu',
-      value: stats.pending,
-      icon: Clock,
-      color: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30',
-      filterValue: 'pending',
-    },
-    {
-      label: 'Ditolak',
-      value: stats.rejected,
-      icon: XCircle,
-      color: 'text-red-600 bg-red-100 dark:bg-red-900/30',
-      filterValue: 'rejected',
-    },
-    {
-      label: 'Ada Booth',
-      value: stats.withBooth,
-      icon: MapPin,
-      color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30',
-      filterValue: 'withBooth',
-    },
-  ];
+  // const statsCards = [
+  //   {
+  //     label: 'Total Peserta',
+  //     value: stats.total,
+  //     icon: Users,
+  //     color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30',
+  //     filterValue: 'all',
+  //   },
+  //   {
+  //     label: 'Disetujui',
+  //     value: stats.approved,
+  //     icon: CheckCircle,
+  //     color: 'text-green-600 bg-green-100 dark:bg-green-900/30',
+  //     filterValue: 'approved',
+  //   },
+  //   {
+  //     label: 'Menunggu',
+  //     value: stats.pending,
+  //     icon: Clock,
+  //     color: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30',
+  //     filterValue: 'pending',
+  //   },
+  //   {
+  //     label: 'Ditolak',
+  //     value: stats.rejected,
+  //     icon: XCircle,
+  //     color: 'text-red-600 bg-red-100 dark:bg-red-900/30',
+  //     filterValue: 'rejected',
+  //   },
+  //   {
+  //     label: 'Ada Booth',
+  //     value: stats.withBooth,
+  //     icon: MapPin,
+  //     color: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30',
+  //     filterValue: 'withBooth',
+  //   },
+  // ];
 
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+      {/* <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {statsCards.map((stat, index) => (
           <button
             key={index}
@@ -285,7 +285,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
             </span>
           </button>
         ))}
-      </div>
+      </div> */}
 
       {/* Filter & Search Bar */}
       <Card className="overflow-hidden rounded-2xl border-0 shadow-md">
