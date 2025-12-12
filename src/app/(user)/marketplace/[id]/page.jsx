@@ -605,7 +605,7 @@ export default function UserEventDetailPage() {
                     </div>
                   </div>
 
-                  {isAuthenticated ? (
+                  {isAuthenticated && user?.role === 'USER' ? (
                     <Button
                       className="h-12 w-full rounded-xl bg-[#fba635] text-lg font-bold text-white shadow-lg shadow-orange-200 hover:bg-[#fa9e25] dark:shadow-none"
                       onClick={handleRegister}
@@ -613,7 +613,8 @@ export default function UserEventDetailPage() {
                     >
                       {isRegistrationOpen ? 'Daftar Sekarang' : 'Event Ditutup'}
                     </Button>
-                  ) : (
+                  ) : user?.role === 'ADMIN' ||
+                    user?.role === 'DOSEN' ? null : (
                     <Button
                       className="h-12 w-full rounded-xl bg-[#fba635] text-white hover:bg-[#fa9e25]"
                       asChild
