@@ -330,15 +330,17 @@ export default function AssessmentForm({ data, onUpdate }) {
 
             {/* Kriteria List */}
             {newKategori.kriteria.length > 0 ? (
-              <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 max-h-60 space-y-2 overflow-y-auto rounded-md border p-2">
+              <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 grid max-h-60 grid-cols-2 gap-2 overflow-y-auto rounded-md border p-2 md:grid-cols-3">
                 {newKategori.kriteria.map((kriteria, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between rounded border p-3"
+                    className="flex items-center justify-between rounded border bg-gray-50 p-2"
                   >
-                    <div className="flex flex-1 items-center gap-3">
-                      <span className="font-medium">{kriteria.nama}</span>
-                      <span className="text-sm text-gray-500">
+                    <div className="flex flex-1 items-center gap-2 truncate">
+                      <span className="truncate text-xs font-medium">
+                        {kriteria.nama}
+                      </span>
+                      <span className="text-xs text-gray-500">
                         {kriteria.bobot}%
                       </span>
                     </div>
@@ -346,9 +348,9 @@ export default function AssessmentForm({ data, onUpdate }) {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleRemoveKriteria(index)}
-                      className="text-red-600 hover:text-red-700"
+                      className="h-6 w-6 text-red-600 hover:text-red-700"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 ))}
@@ -402,69 +404,67 @@ export default function AssessmentForm({ data, onUpdate }) {
           <h3 className="text-lg font-semibold">
             Daftar Kategori Penilaian ({kategoriList.length})
           </h3>
-          <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 max-h-[500px] space-y-4 overflow-y-auto rounded-md p-1">
+          <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 grid max-h-[500px] grid-cols-1 gap-4 overflow-y-auto rounded-md p-1 md:grid-cols-2">
             {kategoriList.map((kategori, index) => (
-              <Card key={index}>
-                <CardContent className="pt-0">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-lg font-semibold">
-                          {kategori.nama}
-                        </h4>
+              <Card key={index} className="flex flex-col">
+                <CardContent className="flex flex-1 flex-col justify-between px-4">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <h4 className="font-semibold">{kategori.nama}</h4>
                         {kategori.deskripsi && (
-                          <span className="text-sm text-gray-500">
-                            - {kategori.deskripsi}
-                          </span>
+                          <p className="line-clamp-2 text-xs text-gray-500">
+                            {kategori.deskripsi}
+                          </p>
                         )}
-                      </div>
-
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        <p>
+                        <p className="text-xs text-gray-600">
                           <strong>Penilai:</strong>{' '}
                           {getDosenName(kategori.penilaiIds[0])}
                         </p>
-                        <p>
-                          <strong>Kriteria:</strong> {kategori.kriteria.length}
-                        </p>
                       </div>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditKategori(index)}
+                          disabled={editingIndex !== null}
+                          className="h-7 w-7"
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveKategori(index)}
+                          className="h-7 w-7 text-red-600 hover:bg-red-50 hover:text-red-700"
+                          disabled={editingIndex !== null}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
 
-                      <div className="space-y-1">
+                    <div className="space-y-1 rounded bg-gray-50 p-2 text-xs">
+                      <p className="font-semibold text-gray-500">
+                        Total {kategori.kriteria.length} Kriteria:
+                      </p>
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                         {kategori.kriteria.map((kriteria, kIndex) => (
                           <div
                             key={kIndex}
-                            className="flex items-center gap-2 text-sm"
+                            className="flex items-center gap-1 truncate"
+                            title={`${kriteria.nama} (${kriteria.bobot}%)`}
                           >
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#fba635] text-xs text-white">
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#fba635] text-[10px] text-white">
                               {kIndex + 1}
                             </span>
-                            <span>{kriteria.nama}</span>
-                            <span className="text-gray-500">
-                              ({kriteria.bobot}%)
+                            <span className="truncate">{kriteria.nama}</span>
+                            <span className="shrink-0 text-gray-400">
+                              {kriteria.bobot}%
                             </span>
                           </div>
                         ))}
                       </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditKategori(index)}
-                        disabled={editingIndex !== null}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveKategori(index)}
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                        disabled={editingIndex !== null}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </div>
                 </CardContent>
