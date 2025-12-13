@@ -94,7 +94,7 @@ export default function SponsorForm({ data, onUpdate }) {
           <h3 className="text-lg font-semibold">
             Daftar Sponsor ({sponsors.length})
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {sponsors.map((sponsor, index) => (
               <Card key={index}>
                 <CardContent className="">
