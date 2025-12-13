@@ -219,7 +219,8 @@ export default function UserEventDetailPage() {
   const event = eventDetail;
   const isRegistrationOpen = event?.status === 'TERBUKA';
   const isEventCompleted = event?.status === 'SELESAI';
-  const approvedBusinesses = event?.usaha?.filter((b) => b.disetujui) || [];
+  const approvedBusinesses =
+    event?.usaha?.filter((b) => b.status === 'DISETUJUI') || [];
 
   // Calculate Progress
   const participationRate = Math.min(
