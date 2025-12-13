@@ -142,7 +142,8 @@ export default function PenilaianFormPage() {
       return;
     }
 
-    setShowSaveConfirm(true);
+    // setShowSaveConfirm(true);
+    handleSubmitScores();
   };
 
   const handleSubmitScores = async () => {
