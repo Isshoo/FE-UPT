@@ -119,10 +119,10 @@ export default function Header() {
                 asChild
                 className="text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
               >
-                <Link href={ROUTES.LOGIN}>Login</Link>
+                <Link href={ROUTES.LOGIN}>Masuk</Link>
               </Button>
               <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
-                <Link href={ROUTES.REGISTER}>Register</Link>
+                <Link href={ROUTES.REGISTER}>Daftar</Link>
               </Button>
             </div>
           ) : (
@@ -157,7 +157,7 @@ export default function Header() {
                       className="cursor-pointer !text-red-600"
                     >
                       <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                      Logout
+                      Keluar
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

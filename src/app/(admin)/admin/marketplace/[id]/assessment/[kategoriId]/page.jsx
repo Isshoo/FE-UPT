@@ -159,7 +159,7 @@ export default function AssessmentDetailPage() {
         <ExportButton
           onExport={handleExportAssessment}
           formats={['excel', 'pdf']}
-          label="Export"
+          label="Ekspor"
           size="sm"
         />
       </div>

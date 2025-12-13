@@ -339,7 +339,7 @@ export default function UserEventDetailPage() {
                 value="layout"
                 className="flex-1 rounded-xl px-3 py-2 text-sm font-medium data-[state=active]:bg-[#174c4e] data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-600 dark:data-[state=inactive]:bg-gray-800 dark:data-[state=inactive]:text-gray-400"
               >
-                Denah & Layout
+                Denah
               </TabsTrigger>
               <TabsTrigger
                 value="sponsors"

@@ -327,7 +327,7 @@ export default function EventDetailPage() {
               <ExportButton
                 onExport={handleExportEvent}
                 formats={['excel', 'pdf']}
-                label="Export"
+                label="Ekspor"
                 variant="secondary"
                 className="bg-white/10 text-white hover:bg-white/20"
               />
@@ -340,7 +340,7 @@ export default function EventDetailPage() {
                     className="bg-white/10 text-white hover:bg-white/20"
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    Update Status
+                    Ubah Status
                   </Button>
                   <Button
                     onClick={() => setShowEditDialog(true)}
@@ -431,7 +431,7 @@ export default function EventDetailPage() {
       <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Update Status Event</DialogTitle>
+            <DialogTitle>Ubah Status Event</DialogTitle>
             <DialogDescription>
               Ubah status event sesuai dengan kondisi saat ini
             </DialogDescription>
@@ -507,7 +507,7 @@ export default function EventDetailPage() {
               disabled={updating || selectedStatus === eventDetail?.status}
               className="bg-[#fba635] hover:bg-[#fdac58]"
             >
-              {updating ? 'Memperbarui...' : 'Update Status'}
+              {updating ? 'Memperbarui...' : 'Ubah Status'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -517,7 +517,7 @@ export default function EventDetailPage() {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Event</DialogTitle>
+            <DialogTitle>Ubah Event</DialogTitle>
             <DialogDescription>
               Perbarui informasi event marketplace
             </DialogDescription>

@@ -69,12 +69,12 @@ export default function ProfilePage() {
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Password baru tidak cocok');
+      toast.error('Kata sandi baru tidak cocok');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      toast.error('Password minimal 6 karakter');
+      toast.error('Kata sandi minimal 6 karakter');
       return;
     }
 
@@ -85,14 +85,14 @@ export default function ProfilePage() {
         newPassword: passwordData.newPassword,
       });
 
-      toast.success('Password berhasil diubah');
+      toast.success('Kata sandi berhasil diubah');
       setPasswordData({
         oldPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Gagal mengubah password');
+      toast.error(error.response?.data?.message || 'Gagal mengubah kata sandi');
     } finally {
       setChangingPassword(false);
     }
@@ -211,13 +211,13 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5" />
-                Ubah Password
+                Ubah Kata Sandi
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="oldPassword">Password Lama</Label>
+                  <Label htmlFor="oldPassword">Kata Sandi Lama</Label>
                   <Input
                     id="oldPassword"
                     type="password"
@@ -233,7 +233,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Password Baru</Label>
+                  <Label htmlFor="newPassword">Kata Sandi Baru</Label>
                   <Input
                     id="newPassword"
                     type="password"
@@ -250,7 +250,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">
-                    Konfirmasi Password Baru
+                    Konfirmasi Kata Sandi Baru
                   </Label>
                   <Input
                     id="confirmPassword"
@@ -271,7 +271,7 @@ export default function ProfilePage() {
                   disabled={changingPassword}
                   className="bg-[#fba635] hover:bg-[#fdac58]"
                 >
-                  {changingPassword ? 'Memproses...' : 'Ubah Password'}
+                  {changingPassword ? 'Memproses...' : 'Ubah Kata Sandi'}
                 </Button>
               </form>
             </CardContent>

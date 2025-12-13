@@ -14,7 +14,7 @@ import { toast } from 'react-hot-toast';
 export default function ExportButton({
   onExport,
   formats = ['excel', 'pdf'],
-  label = 'Export',
+  label = 'Ekspor',
   size = 'default',
   variant = 'outline',
 }) {
@@ -63,7 +63,7 @@ export default function ExportButton({
             className="cursor-pointer"
           >
             <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
-            Export ke Excel
+            Ekspor ke Excel
           </DropdownMenuItem>
         )}
         {formats.includes('pdf') && (
@@ -73,7 +73,7 @@ export default function ExportButton({
             className="cursor-pointer"
           >
             <FileText className="mr-2 h-4 w-4 text-red-600" />
-            Export ke PDF
+            Ekspor ke PDF
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

@@ -37,12 +37,12 @@ export function RegisterForm({ className, ...props }) {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Password tidak cocok');
+      toast.error('Kata Sandi tidak cocok');
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password minimal 6 karakter');
+      toast.error('Kata Sandi minimal 6 karakter');
       return;
     }
 
@@ -170,7 +170,7 @@ export function RegisterForm({ className, ...props }) {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Kata Sandi</Label>
                     <Input
                       id="password"
                       name="password"
@@ -183,12 +183,14 @@ export function RegisterForm({ className, ...props }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Konfirmasi Kata Sandi
+                    </Label>
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
                       type="password"
-                      placeholder="Ulangi password"
+                      placeholder="Ulangi kata sandi"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
@@ -212,7 +214,7 @@ export function RegisterForm({ className, ...props }) {
                   href={ROUTES.LOGIN}
                   className="font-medium text-[#fba635] hover:underline"
                 >
-                  Login di sini
+                  Masuk di sini
                 </Link>
               </p>
             </div>

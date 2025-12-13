@@ -164,7 +164,7 @@ export default function Footer() {
         <div className="mt-6 border-t pt-4 dark:border-gray-800">
           <div className="flex flex-col items-center justify-center gap-4 text-xs text-gray-600 md:flex-row dark:text-gray-400">
             <p>
-              © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+              © {new Date().getFullYear()} {APP_NAME}. Hak Cipta Dilindungi.
             </p>
             {/* <div className="flex gap-6">
               <a href="#" className="hover:text-[#fba635]">

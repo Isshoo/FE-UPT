@@ -77,7 +77,7 @@ export default function Sidebar() {
   // Determine menu items based on role
   const menuItems =
     user?.role === ROLES.DOSEN ? DOSEN_MENU_ITEMS : ADMIN_MENU_ITEMS;
-  const panelTitle = user?.role === ROLES.DOSEN ? 'Dosen Panel' : 'Admin Panel';
+  const panelTitle = user?.role === ROLES.DOSEN ? 'Panel Dosen' : 'Panel Admin';
 
   const handleLogout = async () => {
     await logout();
@@ -334,8 +334,8 @@ export default function Sidebar() {
               title={
                 isCollapsed
                   ? theme === 'light'
-                    ? 'Dark Mode'
-                    : 'Light Mode'
+                    ? 'Mode Gelap'
+                    : 'Mode Terang'
                   : undefined
               }
             >

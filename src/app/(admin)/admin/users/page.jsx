@@ -565,7 +565,7 @@ export default function UsersPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
+                <Label htmlFor="password">Kata Sandi *</Label>
                 <Input
                   id="password"
                   type="password"
@@ -784,7 +784,7 @@ export default function UsersPage() {
                 disabled={submitting}
                 className="bg-[#fba635] hover:bg-[#fdac58]"
               >
-                {submitting ? 'Memproses...' : 'Update User'}
+                {submitting ? 'Memproses...' : 'Ubah User'}
               </Button>
             </DialogFooter>
           </form>
@@ -798,15 +798,15 @@ export default function UsersPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
+            <DialogTitle>Reset Kata Sandi</DialogTitle>
             <DialogDescription>
-              Reset password untuk {selectedUser?.nama}
+              Reset kata sandi untuk {selectedUser?.nama}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmitResetPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new-password">Password Baru *</Label>
+              <Label htmlFor="new-password">Kata Sandi Baru *</Label>
               <Input
                 id="new-password"
                 type="password"
@@ -830,7 +830,7 @@ export default function UsersPage() {
                 disabled={submitting}
                 className="bg-[#fba635] hover:bg-[#fdac58]"
               >
-                {submitting ? 'Memproses...' : 'Reset Password'}
+                {submitting ? 'Memproses...' : 'Reset Kata Sandi'}
               </Button>
             </DialogFooter>
           </form>

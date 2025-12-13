@@ -38,7 +38,7 @@ export function LoginForm({ className, ...props }) {
     const result = await login(formData);
 
     if (result.success) {
-      toast.success('Login berhasil!');
+      toast.success('berhasil masuk!');
 
       const user = result.user;
 
@@ -50,7 +50,7 @@ export function LoginForm({ className, ...props }) {
         router.push(ROUTES.HOME);
       }
     } else {
-      toast.error(result.error || 'Login gagal');
+      toast.error(result.error || 'gagal masuk');
     }
   };
 
@@ -89,7 +89,7 @@ export function LoginForm({ className, ...props }) {
                   {APP_NAME}
                 </h2>
                 <p className="text-sm text-gray-200 drop-shadow-md">
-                  Login dan akses berbagai event bazaar menarik
+                  Masuk dan akses berbagai event bazaar menarik
                 </p>
               </div>
             </div>
@@ -131,7 +131,7 @@ export function LoginForm({ className, ...props }) {
               <div className="hidden flex-col items-center gap-2 text-center md:flex">
                 <h1 className="text-2xl font-bold">Selamat Datang</h1>
                 <p className="text-muted-foreground text-sm text-balance">
-                  Login untuk mengakses berbagai event bazaar menarik
+                  Masuk untuk mengakses berbagai event bazaar menarik
                 </p>
               </div>
 
@@ -151,7 +151,7 @@ export function LoginForm({ className, ...props }) {
 
                 <div className="space-y-2">
                   <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Kata Sandi</Label>
                   </div>
                   <Input
                     id="password"
@@ -169,7 +169,7 @@ export function LoginForm({ className, ...props }) {
                   className="w-full bg-[#fba635] hover:bg-[#fdac58]"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Memproses...' : 'Login'}
+                  {isLoading ? 'Memproses...' : 'Masuk'}
                 </Button>
               </div>
 
