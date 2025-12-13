@@ -59,6 +59,15 @@ export default function AssessmentForm({ data, onUpdate }) {
       return;
     }
 
+    if (
+      newKategori.kriteria.some(
+        (k) => k.nama.toLowerCase() === newKriteria.nama.toLowerCase()
+      )
+    ) {
+      toast.error('Nama kriteria sudah ada dalam kategori ini');
+      return;
+    }
+
     const bobot = parseInt(newKriteria.bobot);
     if (bobot <= 0 || bobot > 100) {
       toast.error('Bobot harus antara 1-100');
@@ -87,6 +96,18 @@ export default function AssessmentForm({ data, onUpdate }) {
   const handleAddKategori = () => {
     if (!newKategori.nama) {
       toast.error('Nama kategori harus diisi');
+      return;
+    }
+
+    // Check for duplicate category name
+    const isDuplicateName = kategoriList.some(
+      (k, i) =>
+        i !== editingIndex &&
+        k.nama.toLowerCase() === newKategori.nama.toLowerCase()
+    );
+
+    if (isDuplicateName) {
+      toast.error('Nama kategori sudah ada');
       return;
     }
 
@@ -248,13 +269,33 @@ export default function AssessmentForm({ data, onUpdate }) {
 
           {/* Kriteria Penilaian */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>
-                Kriteria Penilaian <span className="text-red-500">*</span>
-              </Label>
-              <span className={`text-sm font-semibold ${bobotColor}`}>
-                Total Bobot: {totalBobot}%
-              </span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Label>
+                  Kriteria Penilaian <span className="text-red-500">*</span>
+                </Label>
+                <span className={`text-sm font-semibold ${bobotColor}`}>
+                  Total Bobot: {totalBobot}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    totalBobot > 100
+                      ? 'bg-red-500'
+                      : totalBobot === 100
+                        ? 'bg-green-500'
+                        : 'bg-yellow-500'
+                  }`}
+                  style={{ width: `${Math.min(totalBobot, 100)}%` }}
+                />
+              </div>
+              {totalBobot !== 100 && (
+                <p className="text-xs text-gray-500">
+                  *Total bobot kriteria harus tepat 100% untuk menyimpan
+                  kategori.
+                </p>
+              )}
             </div>
 
             {/* Add Kriteria Form */}
@@ -289,7 +330,7 @@ export default function AssessmentForm({ data, onUpdate }) {
 
             {/* Kriteria List */}
             {newKategori.kriteria.length > 0 ? (
-              <div className="space-y-2">
+              <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 max-h-60 space-y-2 overflow-y-auto rounded-md border p-2">
                 {newKategori.kriteria.map((kriteria, index) => (
                   <div
                     key={index}
@@ -361,7 +402,7 @@ export default function AssessmentForm({ data, onUpdate }) {
           <h3 className="text-lg font-semibold">
             Daftar Kategori Penilaian ({kategoriList.length})
           </h3>
-          <div className="space-y-4">
+          <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 max-h-[500px] space-y-4 overflow-y-auto rounded-md p-1">
             {kategoriList.map((kategori, index) => (
               <Card key={index}>
                 <CardContent className="pt-0">

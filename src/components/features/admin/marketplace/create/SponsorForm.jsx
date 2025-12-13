@@ -22,6 +22,15 @@ export default function SponsorForm({ data, onUpdate }) {
       return;
     }
 
+    if (
+      sponsors.some(
+        (s) => s.nama.toLowerCase() === newSponsor.nama.toLowerCase()
+      )
+    ) {
+      toast.error('Nama sponsor sudah ada');
+      return;
+    }
+
     const updatedSponsors = [...sponsors, { ...newSponsor }];
     setSponsors(updatedSponsors);
     onUpdate({ sponsor: updatedSponsors });
