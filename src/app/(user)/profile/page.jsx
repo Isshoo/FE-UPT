@@ -22,6 +22,7 @@ import {
   Clock,
   ExternalLink,
   CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatDateTime } from '@/lib/utils/date';
@@ -374,8 +375,10 @@ export default function ProfilePage() {
                                         )}
                                       </div>
                                     </div>
-                                    {history.usaha.disetujui ? (
+                                    {history.usaha.status === 'DISETUJUI' ? (
                                       <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                    ) : history.usaha.status === 'DITOLAK' ? (
+                                      <XCircle className="h-5 w-5 text-red-500" />
                                     ) : (
                                       <Clock className="h-5 w-5 text-yellow-500" />
                                     )}

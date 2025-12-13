@@ -400,7 +400,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                     <TableRow
                       key={business.id}
                       className={`transition-colors hover:bg-gray-50 dark:hover:bg-gray-900/50 ${
-                        !business.disetujui
+                        business.status === 'PENDING'
                           ? 'bg-yellow-50/30 dark:bg-yellow-900/10'
                           : ''
                       }`}

@@ -93,8 +93,8 @@ export default function EventDetailPage() {
   const stats = useMemo(() => {
     if (!eventDetail) return null;
     const businesses = eventDetail.usaha || [];
-    const approved = businesses.filter((b) => b.disetujui);
-    const pending = businesses.filter((b) => !b.disetujui);
+    const approved = businesses.filter((b) => b.status === 'DISETUJUI');
+    const pending = businesses.filter((b) => b.status === 'PENDING');
     const withBooth = businesses.filter((b) => b.nomorBooth);
 
     return {
