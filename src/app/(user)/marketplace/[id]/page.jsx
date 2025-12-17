@@ -515,7 +515,7 @@ export default function UserEventDetailPage() {
                         src={event.gambarLayout}
                         alt="Layout Denah"
                         fill
-                        className="object-contain"
+                        className="object-cover"
                       />
                     </div>
                   ) : (

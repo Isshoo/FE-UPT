@@ -352,7 +352,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                     fill
                     src={event.gambarLayout}
                     alt="Layout Denah"
-                    className="object-contain"
+                    className="object-cover"
                   />
                 </div>
                 {!event.terkunci && (
