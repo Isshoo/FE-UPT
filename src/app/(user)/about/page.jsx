@@ -76,7 +76,7 @@ export default function AboutPage() {
     {
       year: '2024',
       title: 'Platform Digital',
-      desc: 'Launching platform terintegrasi untuk manajemen event UMKM',
+      desc: 'Launching platform terintegrasi untuk manajemen event marketplace',
     },
   ];
 
@@ -360,7 +360,7 @@ export default function AboutPage() {
                   <p className="leading-relaxed text-gray-600 dark:text-gray-400">
                     Memimpin UPT Pusat Inovasi dan Kewirausahaan dengan dedikasi
                     tinggi dalam mengembangkan ekosistem wirausaha mahasiswa dan
-                    UMKM lokal.
+                    Usaha lokal.
                   </p>
                 </div>
               </div>

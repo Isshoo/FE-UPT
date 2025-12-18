@@ -366,7 +366,7 @@ export default function ProfilePage() {
                                           {history.usaha.tipeUsaha ===
                                           'MAHASISWA'
                                             ? 'Mahasiswa'
-                                            : 'UMKM Luar'}
+                                            : 'Usaha Luar'}
                                         </Badge>
                                         {history.usaha.nomorBooth && (
                                           <Badge className="bg-[#174c4e] text-white">

@@ -14,14 +14,13 @@ const oxygen = Oxygen({
 
 export const metadata = {
   title: {
-    default: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
+    default: 'UPT-PIK | Platform Manajemen Event Marketplace',
     template: '%s | UPT-PIK',
   },
   description:
-    'Platform terpadu untuk manajemen event marketplace, pembinaan UMKM, dan pengembangan usaha mahasiswa di Universitas Katolik De La Salle Manado.',
+    'Platform terpadu untuk manajemen event marketplace dan pengembangan usaha mahasiswa di Universitas Katolik De La Salle Manado.',
   keywords: [
     'UPT-PIK',
-    'UMKM',
     'Marketplace',
     'Bazaar',
     'Kewirausahaan',
@@ -37,9 +36,8 @@ export const metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
-    description:
-      'Platform terpadu untuk manajemen event marketplace dan pembinaan UMKM',
+    title: 'UPT-PIK | Platform Manajemen Event Marketplace',
+    description: 'Platform terpadu untuk manajemen event marketplace',
     type: 'website',
     locale: 'id_ID',
     siteName: 'UPT-PIK',
@@ -54,9 +52,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'UPT-PIK | Platform Manajemen UMKM & Event Marketplace',
-    description:
-      'Platform terpadu untuk manajemen event marketplace dan pembinaan UMKM',
+    title: 'UPT-PIK | Platform Manajemen Event Marketplace',
+    description: 'Platform terpadu untuk manajemen event marketplace',
     // images: [
     //   {
     //     url: '/images/banner.png',

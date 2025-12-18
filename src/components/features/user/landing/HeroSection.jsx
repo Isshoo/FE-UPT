@@ -111,7 +111,7 @@ export default function HeroSection() {
               className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#174c4e]/20 bg-[#174c4e]/5 px-4 py-2 text-sm font-medium text-[#174c4e] dark:border-[#fba635]/30 dark:bg-[#fba635]/10 dark:text-[#fba635]"
             >
               <Sparkles className="h-4 w-4" />
-              Platform Event Marketplace & UMKM
+              Platform Event Marketplace & Bazaar
             </motion.div>
 
             {/* Title */}

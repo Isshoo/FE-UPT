@@ -30,14 +30,14 @@ export default function AboutContent() {
     {
       icon: Target,
       title: 'Event Marketplace',
-      desc: 'Penyelenggaraan bazaar dan event UMKM',
+      desc: 'Penyelenggaraan bazaar dan event marketplace',
       color: 'from-[#fba635] to-[#fdac58]',
       iconBg: 'bg-[#fba635]/20',
       iconColor: 'text-[#fba635]',
     },
     {
       icon: Award,
-      title: 'Pembinaan UMKM',
+      title: 'Pembinaan Usaha',
       desc: 'Program mentoring bertahap',
       color: 'from-[#174c4e] to-[#0a3738]',
       iconBg: 'bg-[#174c4e]/20',
@@ -210,8 +210,7 @@ export default function AboutContent() {
                   <p>
                     Dengan berkembangnya teknologi, UPT-PIK menghadirkan
                     platform digital untuk memudahkan pengelolaan event
-                    marketplace dan pembinaan UMKM secara bertahap dan
-                    terstruktur.
+                    marketplace secara bertahap dan terstruktur.
                   </p>
                 </div>
               </div>

@@ -28,8 +28,8 @@ export default function Footer() {
               </span>
             </div>
             <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-              Platform terpadu untuk manajemen event marketplace dan pembinaan
-              UMKM di lingkungan kampus.
+              Platform terpadu untuk manajemen event marketplace di lingkungan
+              kampus.
             </p>
             <div className="flex gap-3">
               <p

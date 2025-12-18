@@ -166,7 +166,7 @@ export default function AdminDashboard() {
             <PieChartCard
               title="Jenis Usaha"
               data={marketplaceAnalytics.businessTypeComparison.map((item) => ({
-                name: item.type === 'MAHASISWA' ? 'Mahasiswa' : 'UMKM Luar',
+                name: item.type === 'MAHASISWA' ? 'Mahasiswa' : 'Usaha Luar',
                 value: item.count,
               }))}
               dataKey="value"
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
                         <Badge variant="outline" className="text-xs">
                           {business.tipeUsaha === 'MAHASISWA'
                             ? 'Mahasiswa'
-                            : 'UMKM'}
+                            : 'Usaha Luar'}
                         </Badge>
                       </div>
                     ))

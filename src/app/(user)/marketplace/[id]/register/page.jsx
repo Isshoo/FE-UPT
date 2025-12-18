@@ -178,9 +178,9 @@ export default function RegisterBusinessPage() {
 
             <TabsContent value="UMKM_LUAR" className="mt-6 space-y-6">
               <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm dark:border-green-800 dark:bg-green-950">
-                <p className="mb-2 font-semibold">ℹ️ Informasi UMKM Luar:</p>
+                <p className="mb-2 font-semibold">ℹ️ Informasi Usaha Luar:</p>
                 <ul className="list-inside list-disc space-y-1 text-gray-700 dark:text-gray-300">
-                  <li>Untuk UMKM di luar kampus</li>
+                  <li>Untuk Usaha di luar kampus</li>
                   <li>Memerlukan persetujuan admin</li>
                   <li>Tidak mengikuti kompetisi penilaian</li>
                   <li>Fokus pada promosi dan penjualan produk</li>

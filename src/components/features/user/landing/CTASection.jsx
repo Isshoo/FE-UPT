@@ -39,8 +39,7 @@ export default function CTASection() {
 
             <p className="mx-auto mb-8 max-w-2xl text-lg lg:text-xl">
               Daftar sekarang dan mulai perjalanan kewirausahaan Anda bersama
-              UPT-PIK. Dapatkan akses ke event marketplace dan program pembinaan
-              UMKM.
+              UPT-PIK. Dapatkan akses ke event marketplace.
             </p>
 
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
