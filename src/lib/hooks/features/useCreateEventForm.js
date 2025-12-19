@@ -42,6 +42,14 @@ export const useCreateEventForm = () => {
       return false;
     }
 
+    // Validate date is not in the past
+    const eventDate = new Date(tanggalPelaksanaan);
+    const now = new Date();
+    if (eventDate < now) {
+      toast.error('Tanggal pelaksanaan tidak boleh di hari yang sudah lewat');
+      return false;
+    }
+
     return true;
   };
 
