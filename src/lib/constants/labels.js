@@ -2,6 +2,7 @@ export const ROLES = {
   ADMIN: 'ADMIN',
   DOSEN: 'DOSEN',
   USER: 'USER',
+  WR_II: 'WR_II',
 };
 
 export const EVENT_STATUS = {

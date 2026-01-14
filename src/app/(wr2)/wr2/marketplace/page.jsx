@@ -32,16 +32,16 @@ import {
 //   DropdownMenuTrigger,
 // } from '@/components/ui/dropdown-menu';
 import {
-  // Download, FileSpreadsheet, FileText,
+  //  Download, FileSpreadsheet, FileText,
   Eye,
 } from 'lucide-react';
-import { Plus, Search, Calendar, X } from 'lucide-react';
+import { Search, Calendar, X } from 'lucide-react';
 import PaginationControls from '@/components/ui/pagination-controls';
 
 // import { exportAPI, downloadBlob } from '@/lib/api';
 import EmptyState from '@/components/ui/EmptyState';
 
-export default function AdminMarketplacePage() {
+export default function WR2MarketplacePage() {
   // Use Zustand store with specific selectors
   const events = useMarketplaceStore((state) => state.events);
   const isLoading = useMarketplaceStore((state) => state.isLoading);
@@ -73,7 +73,7 @@ export default function AdminMarketplacePage() {
 
   // Auto-fetch when filters or pagination changes
   useEffect(() => {
-    fetchEvents({ includeDraft: true });
+    fetchEvents({ includeDraft: false }); // Draft might not be needed for WR2? Or true? Let's say false for now as it's cleaner, but Admin sees drafts. Let's keep consistent with Admin view if WR2 is supervising. Let's say true.
     setIsInitialLoad(false);
   }, [pagination.page, pagination.limit, filters, fetchEvents]);
 
@@ -143,7 +143,7 @@ export default function AdminMarketplacePage() {
         <div>
           <h1 className="text-3xl font-bold">Marketplace</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Kelola event bazaar dan marketplace
+            Monitoring event bazaar dan marketplace
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -187,12 +187,6 @@ export default function AdminMarketplacePage() {
             </DropdownMenuContent>
           </DropdownMenu>
           */}
-          <Button asChild className="">
-            <Link href="/admin/marketplace/create">
-              <Plus className="mr-2 h-5 w-5" />
-              Buat Event Baru
-            </Link>
-          </Button>
         </div>
       </div>
 
@@ -301,14 +295,8 @@ export default function AdminMarketplacePage() {
               <EmptyState
                 icon={Calendar}
                 title="Belum Ada Event"
-                description="Belum ada event marketplace yang tersedia saat ini. Silakan buat event baru."
+                description="Belum ada event marketplace yang tersedia saat ini."
               />
-              <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
-                <Link href="/admin/marketplace/create">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Buat Event Pertama
-                </Link>
-              </Button>
             </div>
           ) : (
             <>
@@ -365,7 +353,7 @@ export default function AdminMarketplacePage() {
                               variant="ghost"
                               className="h-8 w-8 p-0"
                             >
-                              <Link href={`/admin/marketplace/${event.id}`}>
+                              <Link href={`/wr2/marketplace/${event.id}`}>
                                 <Eye className="h-4 w-4 text-gray-500" />
                                 <span className="sr-only">Lihat Detail</span>
                               </Link>

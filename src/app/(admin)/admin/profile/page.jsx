@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { User, Lock, Settings, Mail, Shield } from 'lucide-react';
+import { User, Lock, Settings, Mail, Shield, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminProfilePage() {
@@ -104,6 +104,16 @@ export default function AdminProfilePage() {
                   Email
                 </Label>
                 <p className="font-semibold">{user.email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+              <Phone className="mt-0.5 h-5 w-5 text-[#fba635]" />
+              <div>
+                <Label className="text-sm text-gray-600 dark:text-gray-400">
+                  Telepon
+                </Label>
+                <p className="font-semibold">{user.telepon || '-'}</p>
               </div>
             </div>
 

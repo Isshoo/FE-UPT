@@ -63,6 +63,19 @@ const DOSEN_MENU_ITEMS = [
   },
 ];
 
+const WR2_MENU_ITEMS = [
+  {
+    label: 'Dashboard',
+    href: ROUTES.WR2_DASHBOARD,
+    icon: LayoutDashboard,
+  },
+  {
+    label: 'Marketplace',
+    href: ROUTES.WR2_MARKETPLACE,
+    icon: Store,
+  },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -75,9 +88,32 @@ export default function Sidebar() {
   const toggleCollapse = useSidebarStore((state) => state.toggleCollapse);
 
   // Determine menu items based on role
-  const menuItems =
-    user?.role === ROLES.DOSEN ? DOSEN_MENU_ITEMS : ADMIN_MENU_ITEMS;
-  const panelTitle = user?.role === ROLES.DOSEN ? 'Panel Dosen' : 'Panel Admin';
+  const getMenuItemsAndTitle = () => {
+    switch (user?.role) {
+      case ROLES.DOSEN:
+        return { menuItems: DOSEN_MENU_ITEMS, panelTitle: 'Panel Dosen' };
+      case ROLES.WR_II:
+        return {
+          menuItems: WR2_MENU_ITEMS,
+          panelTitle: 'Panel Wakil Rektor II',
+        };
+      default:
+        return { menuItems: ADMIN_MENU_ITEMS, panelTitle: 'Panel Admin' };
+    }
+  };
+
+  const { menuItems, panelTitle } = getMenuItemsAndTitle();
+
+  const getProfileRoute = () => {
+    switch (user?.role) {
+      case ROLES.DOSEN:
+        return ROUTES.DOSEN_PROFILE;
+      case ROLES.WR_II:
+        return ROUTES.WR2_PROFILE;
+      default:
+        return ROUTES.ADMIN_PROFILE;
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -293,14 +329,7 @@ export default function Sidebar() {
           {/* Bottom Actions */}
           <div className="space-y-2 border-t p-4 dark:border-gray-800">
             {/* Profile */}
-            <Link
-              href={
-                user?.role === ROLES.DOSEN
-                  ? ROUTES.DOSEN_PROFILE
-                  : ROUTES.ADMIN_PROFILE
-              }
-              onClick={() => setIsOpen(false)}
-            >
+            <Link href={getProfileRoute()} onClick={() => setIsOpen(false)}>
               <Button
                 variant="outline"
                 className={cn(

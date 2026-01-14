@@ -15,7 +15,10 @@ import {
   Medal,
 } from 'lucide-react';
 
-export default function AssessmentTab({ event }) {
+export default function AssessmentTab({
+  event,
+  basePath = '/admin/marketplace',
+}) {
   const categories = event.kategoriPenilaian || [];
   // const totalPenilai = categories.reduce(
   //   (acc, cat) => acc + (cat.penilai?.length || 0),
@@ -231,7 +234,7 @@ export default function AssessmentTab({ event }) {
                   className="w-full bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
                   <Link
-                    href={`/admin/marketplace/${event.id}/assessment/${kategori.id}`}
+                    href={`${basePath}/${event.id}/assessment/${kategori.id}`}
                     className="flex items-center justify-center gap-2"
                   >
                     Lihat Detail Penilaian

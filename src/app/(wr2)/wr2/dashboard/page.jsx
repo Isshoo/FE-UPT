@@ -1,0 +1,260 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import {
+  Calendar,
+  TrendingUp,
+  Store,
+  ChevronRight,
+  Activity,
+  School,
+} from 'lucide-react';
+import { dashboardAPI } from '@/lib/api';
+import { useAuthStore } from '@/store';
+import { toast } from 'react-hot-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ROUTES } from '@/lib/constants/routes';
+import { formatDateTime } from '@/lib/utils/date';
+import StatsCard from '@/components/features/admin/dashboard/StatsCard';
+import BarChartCard from '@/components/features/admin/dashboard/BarChartCard';
+import PieChartCard from '@/components/features/admin/dashboard/PieChartCard';
+import DashboardSkeleton from '@/components/features/admin/dashboard/DashboardSkeleton';
+
+export default function WR2Dashboard() {
+  const user = useAuthStore((state) => state.user);
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const response = await dashboardAPI.getFullDashboard();
+      setDashboardData(response.data);
+    } catch (error) {
+      toast.error('Gagal memuat data dashboard');
+      console.error('Dashboard error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get current time greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Selamat Pagi';
+    if (hour < 15) return 'Selamat Siang';
+    if (hour < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
+  };
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-gray-600">Gagal memuat data dashboard</p>
+      </div>
+    );
+  }
+
+  const { generalStats, marketplaceAnalytics, recentActivities } =
+    dashboardData;
+
+  return (
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div className="rounded-xl bg-gradient-to-r from-[#174c4e] to-[#2a6b6e] p-6 text-white">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">
+              {getGreeting()}, {user?.nama?.split(' ')[0] || 'WR II'}! 👋
+            </h1>
+            <p className="mt-1 text-white/80">
+              Selamat datang di Dashboard Wakil Rektor II
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatsCard
+          title="Event Aktif"
+          value={generalStats.activeEvents}
+          icon={Activity}
+          color="blue"
+          compact
+        />
+        <StatsCard
+          title="Total Peserta"
+          value={generalStats.totalPeserta}
+          icon={TrendingUp}
+          color="purple"
+          compact
+        />
+        <StatsCard
+          title="Total Event"
+          value={generalStats.totalEvents}
+          icon={Calendar}
+          color="green"
+          compact
+        />
+        <StatsCard
+          title="Total Kategori Penilaian"
+          value={generalStats.totalKategori}
+          icon={Store}
+          color="orange"
+          compact
+        />
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Charts - Left Side (2 cols) */}
+        <div className="space-y-6 lg:col-span-2">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <BarChartCard
+              title="Peserta per Semester"
+              data={marketplaceAnalytics.participantsPerSemester}
+              dataKey="count"
+              xAxisKey="semester"
+              color="#fba635"
+              height={280}
+            />
+            <PieChartCard
+              title="Kategori Usaha"
+              data={marketplaceAnalytics.categoryDistribution}
+              dataKey="count"
+              nameKey="kategori"
+              height={280}
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <PieChartCard
+              title="Jenis Usaha"
+              data={marketplaceAnalytics.businessTypeComparison.map((item) => ({
+                name: item.type === 'MAHASISWA' ? 'Mahasiswa' : 'Usaha Luar',
+                value: item.count,
+              }))}
+              dataKey="value"
+              nameKey="name"
+              height={280}
+            />
+            <BarChartCard
+              title="Usaha per Fakultas"
+              data={marketplaceAnalytics.facultyComparison}
+              dataKey="count"
+              xAxisKey="fakultas"
+              color="#174c4e"
+              height={280}
+            />
+          </div>
+        </div>
+
+        {/* Recent Activities - Right Side (1 col) */}
+        <div className="space-y-6">
+          {/* Top Faculties */}
+          <Card className="max-h-[357.6px] gap-1">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <School className="h-4 w-4 text-blue-500" />
+                  Fakultas Partisipan
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="overflow-y-auto pt-0">
+              <div className="space-y-3">
+                {marketplaceAnalytics?.facultyComparison?.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-gray-500">
+                    Belum ada data partisipasi
+                  </p>
+                ) : (
+                  marketplaceAnalytics?.facultyComparison
+                    ?.slice(0, 5)
+                    .map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between rounded-lg border p-3"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">
+                            {item.fakultas}
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="text-xs">
+                          {item.count} Usaha
+                        </Badge>
+                      </div>
+                    ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          {/* Recent Events */}
+          <Card className="max-h-[357.6px] gap-1">
+            <CardHeader className="pb-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Calendar className="h-4 w-4 text-green-500" />
+                  Event Terbaru
+                </CardTitle>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={ROUTES.WR2_MARKETPLACE}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="overflow-y-auto pt-0">
+              <div className="space-y-3">
+                {recentActivities?.recentEvents?.length === 0 ? (
+                  <p className="py-4 text-center text-sm text-gray-500">
+                    Belum ada event
+                  </p>
+                ) : (
+                  recentActivities?.recentEvents?.slice(0, 4).map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex items-center justify-between rounded-lg border p-3"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          {event.nama}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {formatDateTime(event.createdAt)}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={
+                          event.status === 'BERLANGSUNG'
+                            ? 'default'
+                            : event.status === 'TERBUKA'
+                              ? 'secondary'
+                              : 'outline'
+                        }
+                        className="text-xs"
+                      >
+                        {event.status}
+                      </Badge>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

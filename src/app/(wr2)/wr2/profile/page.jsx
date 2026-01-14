@@ -8,10 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { User, Lock, GraduationCap, Mail, Shield, Phone } from 'lucide-react';
+import { User, Lock, Settings, Mail, Shield, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function DosenProfilePage() {
+export default function WR2ProfilePage() {
   const user = useAuthStore((state) => state.user);
   const [changingPassword, setChangingPassword] = useState(false);
 
@@ -25,12 +25,12 @@ export default function DosenProfilePage() {
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Kata sandi baru tidak cocok');
+      toast.error('Kata Sandi baru tidak cocok');
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      toast.error('Kata sandi minimal 6 karakter');
+      toast.error('Kata Sandi minimal 6 karakter');
       return;
     }
 
@@ -41,7 +41,7 @@ export default function DosenProfilePage() {
         newPassword: passwordData.newPassword,
       });
 
-      toast.success('Kata sandi berhasil diubah');
+      toast.success('Kata Sandi berhasil diubah');
       setPasswordData({
         oldPassword: '',
         newPassword: '',
@@ -67,10 +67,10 @@ export default function DosenProfilePage() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#174c4e]">
-          <GraduationCap className="h-6 w-6 text-white" />
+          <Settings className="h-6 w-6 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Profil Dosen</h1>
+          <h1 className="text-2xl font-bold">Profil Wakil Rektor II</h1>
           <p className="text-gray-600 dark:text-gray-400">
             Kelola informasi profil dan akun Anda
           </p>
@@ -124,38 +124,10 @@ export default function DosenProfilePage() {
                   Role
                 </Label>
                 <Badge className="mt-1 bg-[#174c4e] capitalize">
-                  {user.role}
+                  Wakil Rektor II
                 </Badge>
               </div>
             </div>
-
-            {user.fakultas && (
-              <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                <GraduationCap className="mt-0.5 h-5 w-5 text-[#fba635]" />
-                <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">
-                    Fakultas
-                  </Label>
-                  <p className="font-semibold">
-                    {user.fakultas.nama || user.fakultas}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {user.prodi && (
-              <div className="flex items-start gap-3 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-                <GraduationCap className="mt-0.5 h-5 w-5 text-[#fba635]" />
-                <div>
-                  <Label className="text-sm text-gray-600 dark:text-gray-400">
-                    Program Studi
-                  </Label>
-                  <p className="font-semibold">
-                    {user.prodi.nama || user.prodi}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>

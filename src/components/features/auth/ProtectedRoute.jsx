@@ -30,6 +30,8 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
         router.replace(ROUTES.ADMIN_DASHBOARD);
       } else if (user?.role === ROLES.DOSEN) {
         router.replace(ROUTES.DOSEN_DASHBOARD);
+      } else if (user?.role === ROLES.WR_II) {
+        router.replace(ROUTES.WR2_DASHBOARD);
       } else {
         router.replace(ROUTES.HOME);
       }

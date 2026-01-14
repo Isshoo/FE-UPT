@@ -182,6 +182,13 @@ export default function ProfilePage() {
                   <Badge className="capitalize">{user.role}</Badge>
                 </div>
 
+                <div>
+                  <Label className="text-sm text-gray-600 dark:text-gray-400">
+                    Telepon
+                  </Label>
+                  <p className="font-semibold">{user.telepon || '-'}</p>
+                </div>
+
                 {user.fakultas && (
                   <div>
                     <Label className="text-sm text-gray-600 dark:text-gray-400">

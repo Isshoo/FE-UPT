@@ -21,7 +21,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import ImageUploadDialog from './ImageUploadDialog';
 
-export default function EventInfoTab({ event, onRefresh }) {
+export default function EventInfoTab({ event, onRefresh, readOnly = false }) {
   const [uploadingLayout, setUploadingLayout] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [dragOver, setDragOver] = useState({ layout: false, cover: false });
@@ -275,7 +275,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                     className="object-cover"
                   />
                 </div>
-                {!event.terkunci && (
+                {!event.terkunci && !readOnly && (
                   <Label htmlFor="updateCover" className="block cursor-pointer">
                     <div className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-[#fba635] hover:bg-[#fba635]/5 hover:text-[#fba635] dark:border-gray-700 dark:bg-gray-800">
                       <Upload className="h-4 w-4" />
@@ -303,7 +303,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                 onDragLeave={(e) => handleDragLeave(e, 'cover')}
                 onDrop={(e) => handleDrop(e, 'cover')}
               >
-                {!event.terkunci ? (
+                {!event.terkunci && !readOnly ? (
                   <>
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
                       <Upload className="h-5 w-5 text-gray-400" />
@@ -355,7 +355,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                     className="object-cover"
                   />
                 </div>
-                {!event.terkunci && (
+                {!event.terkunci && !readOnly && (
                   <Label
                     htmlFor="updateLayout"
                     className="block cursor-pointer"
@@ -386,7 +386,7 @@ export default function EventInfoTab({ event, onRefresh }) {
                 onDragLeave={(e) => handleDragLeave(e, 'layout')}
                 onDrop={(e) => handleDrop(e, 'layout')}
               >
-                {!event.terkunci ? (
+                {!event.terkunci && !readOnly ? (
                   <>
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
                       <Upload className="h-5 w-5 text-gray-400" />

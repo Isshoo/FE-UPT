@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -28,32 +27,13 @@ import {
 // import { exportAPI, downloadBlob } from '@/lib/api';
 // import ExportButton from '@/components/ui/ExportButton';
 import { useAssessmentDetail } from '@/lib/hooks/features/useAssessmentDetail';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
-export default function AssessmentDetailPage() {
+export default function WR2AssessmentDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { id: eventId, kategoriId } = params;
 
-  const { data, loading, error, settingWinner, refetch, handleSetWinner } =
-    useAssessmentDetail(kategoriId);
-
-  // Set winner confirmation state
-  const [showWinnerConfirm, setShowWinnerConfirm] = useState(false);
-  const [selectedWinnerId, setSelectedWinnerId] = useState(null);
-
-  const handleSetWinnerClick = (usahaId) => {
-    setSelectedWinnerId(usahaId);
-    setShowWinnerConfirm(true);
-  };
-
-  const handleConfirmWinner = async () => {
-    if (selectedWinnerId) {
-      await handleSetWinner(selectedWinnerId);
-      setShowWinnerConfirm(false);
-      setSelectedWinnerId(null);
-    }
-  };
+  const { data, loading, error, refetch } = useAssessmentDetail(kategoriId);
 
   // const handleExportAssessment = async (format) => {
   //   try {
@@ -84,7 +64,7 @@ export default function AssessmentDetailPage() {
             Coba Lagi
           </Button>
           <Button asChild className="bg-[#fba635] hover:bg-[#fdac58]">
-            <Link href={`/admin/marketplace/${eventId}`}>
+            <Link href={`/wr2/marketplace/${eventId}`}>
               <ChevronLeft className="mr-2 h-4 w-4" />
               Kembali
             </Link>
@@ -94,16 +74,12 @@ export default function AssessmentDetailPage() {
     );
   }
 
-  const { kategori, kriteria, businesses, event, pemenang } = data;
-
-  const canSetWinner = event?.status === 'SELESAI' && !pemenang;
-  const isEventSelesai = event?.status === 'SELESAI';
+  const { kategori, kriteria, businesses, pemenang } = data;
 
   const highestScore = businesses.length > 0 ? businesses[0].totalScore : 0;
   const tiedTopScorers = businesses.filter(
     (b) => b.totalScore === highestScore && highestScore > 0
   );
-  const hasTie = tiedTopScorers.length > 1;
 
   const isTopScorer = (business) => {
     return tiedTopScorers.some((t) => t.usahaId === business.usahaId);
@@ -137,7 +113,7 @@ export default function AssessmentDetailPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push(`/admin/marketplace/${eventId}`)}
+            onClick={() => router.push(`/wr2/marketplace/${eventId}`)}
             className="h-8 bg-slate-100 px-2 hover:bg-slate-200 dark:bg-gray-800"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -264,7 +240,7 @@ export default function AssessmentDetailPage() {
                     <TableHead className="text-center font-bold">
                       Total
                     </TableHead>
-                    <TableHead className="text-center">Aksi</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -336,41 +312,20 @@ export default function AssessmentDetailPage() {
                         </span>
                       </TableCell>
                       <TableCell className="text-center">
-                        {isTopScorer(business) && (
-                          <>
-                            {pemenang && business.usahaId === pemenang.id ? (
-                              <Badge className="bg-green-600 text-xs">
-                                <Trophy className="mr-1 h-3 w-3" />
-                                Pemenang
-                              </Badge>
-                            ) : pemenang ? null : canSetWinner ? (
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  handleSetWinnerClick(business.usahaId)
-                                }
-                                disabled={settingWinner}
-                                className="h-7 bg-yellow-500 px-2 text-xs hover:bg-yellow-600"
-                              >
-                                <Trophy className="mr-1 h-3 w-3" />
-                                {settingWinner
-                                  ? '...'
-                                  : hasTie
-                                    ? 'Pilih'
-                                    : 'Set'}
-                              </Button>
-                            ) : !isEventSelesai ? (
-                              index === 0 && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs text-gray-400"
-                                >
-                                  Belum selesai
-                                </Badge>
-                              )
-                            ) : null}
-                          </>
-                        )}
+                        {isWinner(business) ? (
+                          <Badge className="bg-green-600 text-xs">
+                            <Trophy className="mr-1 h-3 w-3" />
+                            Pemenang
+                          </Badge>
+                        ) : isTopScorer(business) && !pemenang ? (
+                          <Badge
+                            variant="outline"
+                            className="text-xs text-yellow-600"
+                          >
+                            <Star className="mr-1 h-3 w-3" />
+                            Teratas
+                          </Badge>
+                        ) : null}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -393,22 +348,6 @@ export default function AssessmentDetailPage() {
         <span>|</span>
         <span>Total = Σ terbobot</span>
       </div>
-
-      {/* Set Winner Confirmation Dialog */}
-      <ConfirmDialog
-        open={showWinnerConfirm}
-        onOpenChange={(open) => {
-          setShowWinnerConfirm(open);
-          if (!open) setSelectedWinnerId(null);
-        }}
-        title="Tetapkan Pemenang"
-        description="Apakah Anda yakin ingin menetapkan pemenang untuk kategori ini? Tindakan ini tidak dapat dibatalkan."
-        confirmText="Tetapkan Pemenang"
-        cancelText="Batal"
-        variant="warning"
-        onConfirm={handleConfirmWinner}
-        loading={settingWinner}
-      />
     </div>
   );
 }

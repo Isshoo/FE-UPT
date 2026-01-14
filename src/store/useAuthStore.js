@@ -70,21 +70,18 @@ export const useAuthStore = create(
         }
       },
 
-      // Register
+      // Register (user perlu diapprove admin sebelum bisa login)
       register: async (userData) => {
         set({ isLoading: true, error: null });
         try {
           const response = await authAPI.register(userData);
-          const { user, token } = response.data;
+          const { user, message } = response.data;
 
+          // Tidak menyimpan auth state karena user butuh approval admin
           set({
-            user,
-            token,
-            isAuthenticated: true,
             isLoading: false,
-            isInitialized: true,
           });
-          return { success: true, user };
+          return { success: true, user, message };
         } catch (error) {
           const errorMessage =
             error.response?.data?.message || 'Registrasi gagal';

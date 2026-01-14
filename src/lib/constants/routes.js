@@ -20,4 +20,9 @@ export const ROUTES = {
   ADMIN_MARKETPLACE: '/admin/marketplace',
   ADMIN_USERS: '/admin/users',
   ADMIN_PROFILE: '/admin/profile',
+
+  // Wakil Rektor II
+  WR2_DASHBOARD: '/wr2/dashboard',
+  WR2_MARKETPLACE: '/wr2/marketplace',
+  WR2_PROFILE: '/wr2/profile',
 };

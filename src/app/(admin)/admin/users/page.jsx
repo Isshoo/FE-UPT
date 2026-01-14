@@ -31,10 +31,21 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import PaginationControls from '@/components/ui/pagination-controls';
-import { Search, Plus, Edit2, Trash2, Key, X } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Edit2,
+  Trash2,
+  Key,
+  X,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Phone,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
-import { exportAPI, downloadBlob } from '@/lib/api';
-import ExportButton from '@/components/ui/ExportButton';
+// import { exportAPI, downloadBlob } from '@/lib/api';
+// import ExportButton from '@/components/ui/ExportButton';
 import { TableSkeleton } from '@/components/common/skeletons';
 import EmptyState from '@/components/ui/EmptyState';
 import { Users } from 'lucide-react';
@@ -53,6 +64,7 @@ export default function UsersPage() {
   const [filters, setFilters] = useState({
     search: '',
     role: '',
+    status: '',
   });
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -68,11 +80,19 @@ export default function UsersPage() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Verify/Reject states
+  const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [userToVerify, setUserToVerify] = useState(null);
+  const [userToReject, setUserToReject] = useState(null);
+  const [processing, setProcessing] = useState(false);
+
   // Form states
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     nama: '',
+    telepon: '',
     role: 'USER',
     fakultasId: '',
     prodiId: '',
@@ -98,7 +118,13 @@ export default function UsersPage() {
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page, pagination.limit, debouncedSearch, filters.role]);
+  }, [
+    pagination.page,
+    pagination.limit,
+    debouncedSearch,
+    filters.role,
+    filters.status,
+  ]);
 
   useEffect(() => {
     fetchFakultas();
@@ -143,6 +169,7 @@ export default function UsersPage() {
         usersAPI.getUsers({
           search: debouncedSearch,
           role: filters.role,
+          status: filters.status,
           page: pagination.page,
           limit: pagination.limit,
         }),
@@ -180,7 +207,7 @@ export default function UsersPage() {
   };
 
   const handleReset = () => {
-    setFilters({ search: '', role: '' });
+    setFilters({ search: '', role: '', status: '' });
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
@@ -189,6 +216,7 @@ export default function UsersPage() {
       email: '',
       password: '',
       nama: '',
+      telepon: '',
       role: 'USER',
       fakultasId: '',
       prodiId: '',
@@ -212,6 +240,7 @@ export default function UsersPage() {
     setFormData({
       email: user.email,
       nama: user.nama,
+      telepon: user.telepon || '',
       role: user.role,
       fakultasId: user.fakultas?.id || '',
       prodiId: user.prodi?.id || '',
@@ -261,6 +290,7 @@ export default function UsersPage() {
       await usersAPI.updateUser(selectedUser.id, {
         nama: formData.nama,
         email: formData.email,
+        telepon: formData.telepon,
         fakultasId: formData.fakultasId || null,
         prodiId: formData.prodiId || null,
       });
@@ -274,6 +304,62 @@ export default function UsersPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleVerifyClick = (user) => {
+    setUserToVerify(user);
+    setVerifyDialogOpen(true);
+  };
+
+  const handleVerifyConfirm = async () => {
+    try {
+      setProcessing(true);
+      await usersAPI.verifyUser(userToVerify.id);
+      toast.success('User berhasil diverifikasi');
+      setVerifyDialogOpen(false);
+      setUserToVerify(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal verifikasi user');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleRejectClick = (user) => {
+    console.log(user);
+    setUserToReject(user);
+    setRejectDialogOpen(true);
+  };
+
+  const handleRejectConfirm = async () => {
+    try {
+      setProcessing(true);
+      await usersAPI.rejectUser(userToReject.id);
+      toast.success('User berhasil ditolak');
+      setRejectDialogOpen(false);
+      setUserToReject(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal menolak user');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const variants = {
+      AKTIF:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      MENUNGGU:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      DITOLAK: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    };
+    return (
+      <Badge className={variants[status] || variants.MENUNGGU}>
+        {status || 'MENUNGGU'}
+      </Badge>
+    );
   };
 
   const handleDeleteClick = (user) => {
@@ -326,11 +412,11 @@ export default function UsersPage() {
     }
   };
 
-  const handleExportUsers = async (format) => {
-    const response = await exportAPI.exportUsers(format);
-    const filename = `data-pengguna-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
-    downloadBlob(response.data, filename);
-  };
+  // const handleExportUsers = async (format) => {
+  //   const response = await exportAPI.exportUsers(format);
+  //   const filename = `data-pengguna-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+  //   downloadBlob(response.data, filename);
+  // };
 
   // Initial loading state (only on first load)
   if (isInitialLoad) {
@@ -359,11 +445,13 @@ export default function UsersPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Export button temporarily hidden
           <ExportButton
             onExport={handleExportUsers}
             formats={['excel', 'pdf']}
             label="Ekspor Data"
           />
+          */}
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             Tambah Pengguna
@@ -400,8 +488,27 @@ export default function UsersPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="WR_II">Wakil Rektor II</SelectItem>
                 <SelectItem value="DOSEN">Dosen</SelectItem>
                 <SelectItem value="USER">Pengguna Biasa</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Status Filter */}
+            <Select
+              value={filters.status}
+              onValueChange={(value) => handleFilterChange('status', value)}
+            >
+              <SelectTrigger className="h-10 w-full min-w-[140px] border-gray-200 bg-gray-50 md:w-auto dark:border-gray-700 dark:bg-gray-800">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <SelectValue placeholder="Semua Status" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="AKTIF">Aktif</SelectItem>
+                <SelectItem value="MENUNGGU">Menunggu</SelectItem>
+                <SelectItem value="DITOLAK">Ditolak</SelectItem>
               </SelectContent>
             </Select>
 
@@ -411,7 +518,11 @@ export default function UsersPage() {
               variant="ghost"
               size="sm"
               className="h-10 text-gray-500 hover:text-gray-700"
-              disabled={filters.search === '' && filters.role === ''}
+              disabled={
+                filters.search === '' &&
+                filters.role === '' &&
+                filters.status === ''
+              }
             >
               <X className="mr-1 h-4 w-4" />
               Reset
@@ -447,7 +558,9 @@ export default function UsersPage() {
                       <TableHead>No</TableHead>
                       <TableHead>Nama</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead>Telepon</TableHead>
                       <TableHead>Role</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Fakultas/Prodi</TableHead>
                       <TableHead className="text-center">Aksi</TableHead>
                     </TableRow>
@@ -464,8 +577,19 @@ export default function UsersPage() {
                         </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
+                          {user.telepon ? (
+                            <div className="flex items-center gap-1">
+                              <Phone className="text-muted-foreground h-3 w-3" />
+                              <span className="text-sm">{user.telepon}</span>
+                            </div>
+                          ) : (
+                            '-'
+                          )}
+                        </TableCell>
+                        <TableCell>
                           <Badge className="capitalize">{user.role}</Badge>
                         </TableCell>
+                        <TableCell>{getStatusBadge(user.status)}</TableCell>
                         <TableCell>
                           {user.fakultas && user.prodi ? (
                             <div className="text-sm">
@@ -482,28 +606,75 @@ export default function UsersPage() {
                           <div className="flex justify-center gap-2">
                             {user.role !== 'ADMIN' && (
                               <>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleEdit(user)}
-                                >
-                                  <Edit2 className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleResetPassword(user)}
-                                >
-                                  <Key className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleDeleteClick(user)}
-                                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
+                                {user.status === 'MENUNGGU' && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleVerifyClick(user)}
+                                      className="text-green-600 hover:bg-green-50 hover:text-green-700"
+                                      title="Verifikasi User"
+                                    >
+                                      <CheckCircle className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleRejectClick(user)}
+                                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                      title="Tolak User"
+                                    >
+                                      <XCircle className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                                {user.status === 'DITOLAK' && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleVerifyClick(user)}
+                                      className="text-green-600 hover:bg-green-50 hover:text-green-700"
+                                      title="Verifikasi User"
+                                    >
+                                      <CheckCircle className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleDeleteClick(user)}
+                                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </>
+                                )}
+                                {user.status === 'AKTIF' && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleEdit(user)}
+                                    >
+                                      <Edit2 className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleResetPassword(user)}
+                                    >
+                                      <Key className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleDeleteClick(user)}
+                                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </>
+                                )}
                               </>
                             )}
                           </div>
@@ -565,6 +736,19 @@ export default function UsersPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="telepon">Nomor Telepon</Label>
+                <Input
+                  id="telepon"
+                  type="tel"
+                  value={formData.telepon}
+                  onChange={(e) =>
+                    setFormData({ ...formData, telepon: e.target.value })
+                  }
+                  placeholder="08123456789"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="password">Kata Sandi *</Label>
                 <Input
                   id="password"
@@ -591,6 +775,7 @@ export default function UsersPage() {
                   <SelectContent>
                     <SelectItem value="USER">Pengguna Biasa</SelectItem>
                     <SelectItem value="DOSEN">Dosen</SelectItem>
+                    <SelectItem value="WR_II">Wakil Rektor II</SelectItem>
                     <SelectItem value="ADMIN">Admin</SelectItem>
                   </SelectContent>
                 </Select>
@@ -705,6 +890,19 @@ export default function UsersPage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-telepon">Nomor Telepon</Label>
+                <Input
+                  id="edit-telepon"
+                  type="tel"
+                  value={formData.telepon}
+                  onChange={(e) =>
+                    setFormData({ ...formData, telepon: e.target.value })
+                  }
+                  placeholder="08123456789"
                 />
               </div>
 
@@ -851,6 +1049,35 @@ export default function UsersPage() {
         variant="danger"
         onConfirm={handleDeleteConfirm}
         loading={deleting}
+      />
+      <ConfirmDialog
+        open={verifyDialogOpen}
+        onOpenChange={(open) => {
+          setVerifyDialogOpen(open);
+          if (!open) setUserToVerify(null);
+        }}
+        onConfirm={handleVerifyConfirm}
+        title="Verifikasi Pengguna"
+        description={`Apakah Anda yakin ingin memverifikasi pengguna ${userToVerify?.nama}? Pengguna statusnya akan menjadi AKTIF dan dapat login.`}
+        confirmText="Verifikasi"
+        cancelText="Batal"
+        variant="default"
+        loading={processing}
+      />
+
+      <ConfirmDialog
+        open={rejectDialogOpen}
+        onOpenChange={(open) => {
+          setRejectDialogOpen(open);
+          if (!open) setUserToReject(null);
+        }}
+        onConfirm={handleRejectConfirm}
+        title="Tolak Pengguna"
+        description={`Apakah Anda yakin ingin menolak pengguna ${userToReject?.nama}? Status pengguna akan menjadi DITOLAK.`}
+        confirmText="Tolak"
+        cancelText="Batal"
+        variant="danger"
+        loading={processing}
       />
     </div>
   );

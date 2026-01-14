@@ -46,6 +46,8 @@ export function LoginForm({ className, ...props }) {
         router.push(ROUTES.ADMIN_DASHBOARD);
       } else if (user?.role === ROLES.DOSEN) {
         router.push(ROUTES.DOSEN_DASHBOARD);
+      } else if (user?.role === ROLES.WR_II) {
+        router.push(ROUTES.WR2_DASHBOARD);
       } else {
         router.push(ROUTES.HOME);
       }

@@ -37,6 +37,16 @@ export const usersAPI = {
     return response.data;
   },
 
+  verifyUser: async (id) => {
+    const response = await apiClient.patch(`/users/${id}/verify`);
+    return response.data;
+  },
+
+  rejectUser: async (id) => {
+    const response = await apiClient.patch(`/users/${id}/reject`);
+    return response.data;
+  },
+
   getStatistics: async () => {
     const response = await apiClient.get('/users/statistics');
     return response.data;

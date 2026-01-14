@@ -50,7 +50,12 @@ import { BUSINESS_TYPE_LABELS } from '@/lib/constants/labels';
 import { marketplaceAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
-export default function ParticipantsTab({ event, onRefresh, isLocked }) {
+export default function ParticipantsTab({
+  event,
+  onRefresh,
+  isLocked,
+  readOnly = false,
+}) {
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [editingBooth, setEditingBooth] = useState(null);
@@ -328,7 +333,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
             </div>
           </div>
 
-          {!isLocked && stats.pending > 0 && (
+          {!isLocked && stats.pending > 0 && !readOnly && (
             <div className="mt-4 flex items-center gap-2 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
               <Clock className="h-4 w-4" />
               <span>
@@ -388,7 +393,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                     <TableHead className="text-center font-semibold">
                       Booth
                     </TableHead>
-                    {!isLocked && (
+                    {!isLocked && !readOnly && (
                       <TableHead className="text-center font-semibold">
                         Aksi
                       </TableHead>
@@ -487,7 +492,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                               <MapPin className="mr-1 h-3 w-3" />
                               {business.nomorBooth}
                             </Badge>
-                            {!isLocked && (
+                            {!isLocked && !readOnly && (
                               <Button
                                 size="icon"
                                 variant="ghost"
@@ -502,7 +507,7 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
                           <span className="text-gray-300">—</span>
                         )}
                       </TableCell>
-                      {!isLocked && (
+                      {!isLocked && !readOnly && (
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">
                             <Button
@@ -701,7 +706,8 @@ export default function ParticipantsTab({ event, onRefresh, isLocked }) {
             </Button>
             {selectedBusiness &&
               selectedBusiness.status === 'PENDING' &&
-              !isLocked && (
+              !isLocked &&
+              !readOnly && (
                 <>
                   <Button
                     variant="destructive"

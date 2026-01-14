@@ -11,17 +11,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils/tailwind';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export function RegisterForm({ className, ...props }) {
   const router = useRouter();
   const register = useAuthStore((state) => state.register);
   const isLoading = useAuthStore((state) => state.isLoading);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    telepon: '',
     password: '',
     confirmPassword: '',
   });
@@ -46,15 +55,23 @@ export function RegisterForm({ className, ...props }) {
       return;
     }
 
+    // Validasi nomor telepon
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,13}$/;
+    if (!phoneRegex.test(formData.telepon)) {
+      toast.error('Format nomor telepon tidak valid (contoh: 08123456789)');
+      return;
+    }
+
     const result = await register({
       nama: formData.name,
       email: formData.email,
+      telepon: formData.telepon,
       password: formData.password,
     });
 
     if (result.success) {
-      toast.success('Registrasi berhasil!');
-      router.push(ROUTES.HOME);
+      // Tampilkan dialog success, bukan redirect
+      setShowSuccessDialog(true);
     } else {
       toast.error(result.error || 'Registrasi gagal');
     }
@@ -130,7 +147,7 @@ export function RegisterForm({ className, ...props }) {
           </div>
 
           {/* Form Section */}
-          <form onSubmit={handleSubmit} className="p-6 md:min-h-[460px] md:p-8">
+          <form onSubmit={handleSubmit} className="p-6 md:min-h-[520px] md:p-8">
             <div className="flex flex-col gap-6">
               <div className="hidden flex-col items-center gap-2 text-center md:flex">
                 <h1 className="text-2xl font-bold">Buat Akun Baru</h1>
@@ -154,18 +171,33 @@ export function RegisterForm({ className, ...props }) {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="nama@email.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    disabled={isLoading}
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="nama@email.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="telepon">Nomor Telepon</Label>
+                    <Input
+                      id="telepon"
+                      name="telepon"
+                      type="tel"
+                      placeholder="08123456789"
+                      value={formData.telepon}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -221,6 +253,32 @@ export function RegisterForm({ className, ...props }) {
           </form>
         </CardContent>
       </Card>
+
+      {/* Success Dialog - Pending Approval */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+            </div>
+            <DialogTitle className="text-center text-xl">
+              Registrasi Berhasil!
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Akun Anda telah berhasil dibuat. Silakan tunggu persetujuan dari
+              admin sebelum dapat login ke sistem.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex justify-center">
+            <Button
+              onClick={() => router.push(ROUTES.LOGIN)}
+              className="bg-[#fba635] hover:bg-[#fdac58]"
+            >
+              Ke Halaman Login
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
